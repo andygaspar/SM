@@ -41,14 +41,18 @@ def arr(N,f="exp",fattore_sigma=20):
     #caso exp
     if f=="exp":
         delay=np.array(samp.sample_from_exp(lam/fattore_sigma,N))
-        print("exp")
-        print(delay)
+
 
     if f=="uni":
         max_delay=fattore_sigma*np.sqrt(12)/lam
         delay=np.array(samp.sample_from_uniform(N))
         delay=delay*max_delay
-        print(delay)
+
+
+    if f=="norm":
+        delay=np.random.normal(0, fattore_sigma/lam, N)
+        delay[delay<0]=0
+
 
 
     #calolo arrival
@@ -71,22 +75,25 @@ def PSRA(lasso_temporale_in_ore,distributione,fattore_sigma):
     #costruzione del vettore degli arrivi con ritardi
     arrival,delay=arr(N,distributione,fattore_sigma)
 
-
     #costruzione del PSRA
     queue=np.zeros(N)
     for i in range(1,N):
-        arrival_in_slot=len(arrival[(arrival>=90*(i-1)) & (arrival<=90*i)])
+        arrival_in_slot=len(arrival[(arrival>=90*(i-1)) & (arrival<90*i)])
         queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
+
+    plt.plot(arrival)
+    plt.plot(np.arange(0,T,90))
+    plt.show()
 
     plt.plot(delay/90,label="delay")
     plt.plot(queue,label="queue")
     plt.legend()
     plt.show()
-    return queue
+    return queue,delay,arrival
 
 
-x=PSRA(3,"exp",20)
-
-x
-
-20*np.sqrt(12)*90
+queue,delay,arrival=PSRA(3,"norm",30)
+plt.plot(queue)
+90*90
+8100/60
+np.mean

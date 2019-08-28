@@ -55,3 +55,4 @@ def sample_discrete_rv(P,N):
 # cont=sum(prob)
 # prob=prob/cont
 # s=sample_discrete_rv(prob,10000)
+ 

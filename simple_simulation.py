@@ -4,6 +4,42 @@ import matplotlib.pyplot as plt
 
 
 
+
+"""
+# TODO:
+
+- leggere articoli presenti nel paper, in particolare nell'ordine: Iovanella, Willemain, Guadagni (sulla stationary distribution), possibilmentte gli altri
+
+- tramite gli articoli capire bene se siamo sulla strada giiusta specialmente per quello che riguarda l'interpretazione e quindi l'implementazione della distribuzione dei ritardi (con particolare riguardo ai valori di sigma e lamda)
+
+- ALBI scrivere agli altri professori del paper
+
+- GASPA scrivere a castelli
+
+- cercare autonomamente dataset
+
+obiettivi nell'ordine:
+1)confermare i risultati del paper
+2)implementare e confermare la stationary distribution
+3)varie ed eventuali idee di modifiche
+4)se a disposizione il dataset originale fare un ragionamento sul flusso OCK escluso dal paper
+
+
+"""
+
+
+
+def tot_dist(a,b):
+    return sum(np.abs(a-b))/len(a)
+
+def hell_dist(a,b):
+    return np.sqrt(sum((np.abs(np.sqrt(a)-np.sqrt(b)))**2))/np.sqrt(2)
+
+
+
+a=np.array([1,2,3,1,2,3,1])
+b=np.array([1,2,3,1,1,3,1])
+tot_dist(a,b)
 # arrival=np.zeros(100)
 # lam=1/90
 # delay=np.array(samp.sample_from_exp(np.sqrt(lam/20),100))
@@ -40,13 +76,14 @@ def arr(N,f="exp",fattore_sigma=20):
 
     #caso exp
     if f=="exp":
-        delay=np.array(samp.sample_from_exp(lam/fattore_sigma,N))
+        delay=np.array(samp.sample30_from_exp(lam/fattore_sigma,N))
 
 
     if f=="uni":
         max_delay=fattore_sigma*np.sqrt(12)/lam
-        delay=np.array(samp.sample_from_uniform(N))
-        delay=delay*max_delay
+        int_a_b=fattore_sigma/2*np.sqrt(12)/lam
+        delay=np.random.uniform(-int_a_b,int_a_b,N)
+        delay[delay<0]=0
 
 
     if f=="norm":
@@ -81,19 +118,40 @@ def PSRA(lasso_temporale_in_ore,distributione,fattore_sigma):
         arrival_in_slot=len(arrival[(arrival>=90*(i-1)) & (arrival<90*i)])
         queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
 
-    plt.plot(arrival)
-    plt.plot(np.arange(0,T,90))
-    plt.show()
+    # plt.plot(arrival)
+    # plt.plot(np.arange(0,T,90))
+    # plt.show()
+#
+    # plt.plot(delay/90,label="delay")
+    # plt.plot(queue,label="queue")
+    # plt.legend()
 
-    plt.plot(delay/90,label="delay")
-    plt.plot(queue,label="queue")
-    plt.legend()
-    plt.show()
     return queue,delay,arrival
 
 
-queue,delay,arrival=PSRA(3,"norm",30)
-plt.plot(queue)
-90*90
-8100/60
-np.mean
+
+
+"simulazioni"
+k=20
+dist=np.zeros(2000)
+for i in range(2000):
+
+    queue_u,delay_u,arrival_u=PSRA(3,"uni",k)
+    queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
+    dist[i]=tot_dist(queue_u,queue_n)
+
+np.mean(dist)
+plt.plot(dist)
+plt.plot(queue_u,label="uniform")
+plt.plot(queue_n,label="normal")
+plt.legend()
+
+
+
+queue_u,delay_u,arrival_u=PSRA(3,"uni",k)
+queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
+d=tot_dist(queue_u,queue_n)
+plt.plot(queue_u,label="uniform")
+plt.plot(queue_n,label="normal")
+plt.legend()
+plt.title(d)

@@ -1,7 +1,11 @@
 from scipy.stats import kstest
+import time
 
 
 def sample_from_uniform(N):
+    """
+    costruisce un vettore random in [0,1]
+    """
     a=5
     c=3
     m=2**10

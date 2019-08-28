@@ -1,5 +1,6 @@
 from scipy.stats import kstest
 import time
+import numpy
 
 
 def sample_from_uniform(N):
@@ -17,8 +18,6 @@ def sample_from_uniform(N):
         rand_seq[i]=rand_seq[i]/m
     rand_seq[N-1]=rand_seq[N-1]/m
     return rand_seq
-
-
 
 
 

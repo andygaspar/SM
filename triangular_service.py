@@ -21,12 +21,12 @@ def PSRA_G(lasso_temporale_in_ore,distribuzione,fattore_sigma):
     left = 0.4/lam
     right = 1.6/lam
     service_dix = np.random.triangular(left,mode,right,N-1)/90
-    print(service_dix)
+    #print(service_dix)
     for i in range(1,N):
         # numero di aerei che arrivano nella slot considerata
         arrival_in_slot = len(arrival[(arrival>=90*(i-1)) & (arrival<90*i)])
         if(queue[i-1]!=0):
-            queue[i] = queue[i-1]+arrival_in_slot - int(service_dix[i-1])
+            queue[i] = queue[i-1]+arrival_in_slot - round(service_dix[i-1])
         else:
             queue[i] = queue[i-1]+arrival_in_slot
     return queue,delay,arrival

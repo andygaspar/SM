@@ -90,6 +90,11 @@ def arr(N,f="exp",fattore_sigma=20):
         delay=np.random.normal(0, fattore_sigma/lam, N)
         delay[delay<0]=0
 
+    if f=="tri":
+        b = (20/lam)*np.sqrt(6)
+        delay = np.random.triangular(0,b/2,b,N)
+
+
 
 
     #calolo arrival
@@ -150,6 +155,7 @@ plt.legend()
 
 queue_u,delay_u,arrival_u=PSRA(3,"uni",k)
 queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
+queue_tri,delay_tri,arrival_tri=PSRA(3,"tri",k)
 d=tot_dist(queue_u,queue_n)
 plt.plot(queue_u,label="uniform")
 plt.plot(queue_n,label="normal")

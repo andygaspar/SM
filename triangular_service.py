@@ -1,6 +1,8 @@
 import numpy as np
 import simple_simulation as sm
 import matplotlib.pyplot as plt
+import queue
+import random as rm
 
 
 "Nel lavoro precedente abbiamo considerato di servire sempre un aereo per slot"
@@ -34,31 +36,38 @@ def PSRA_G(lasso_temporale_in_ore,distribuzione,fattore_sigma):
 
 # questa simulazione invece il service time è deterministico, però gli arrivi
 # non seguono più il PSRA ma sono arrivi che si basano su Poisson dix
-# vengono fatti con mean = 20/lam e 30/lam
-#NON SICURO DI QUESTO---> RIVEDERE
-def M_D_1(lasso_temporale_in_ore,fattore_sigma):
-    lam = 1/90
-    T = lasso_temporale_in_ore*60*60
+
+def M_D_1(lam,mu,max_time):
+    T = max_time*60*60
     N=int(T/90)
-    arrival_poisson = np.random.poisson(fattore_sigma/lam,N)
+    arrival_poisson = rm.expovariate(lam)
     arrival = np.zeros(N)
-    for i in range(N):
-        arrival[i] = i/lam + int(arrival_poisson[i])
+    arrival[0] = arrival_poisson
+    for i in range(1,N):
+        arrival_poisson = rm.expovariate(lam)
+        arrival[i] = arrival[i-1] + arrival_poisson
     queue = np.zeros(N)
     for i in range(1,N):
         arrival_in_slot = len(arrival[(arrival>=90*(i-1)) & (arrival<90*i)])
-        queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
-    return queue
+        if i>1:
+            queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
+        else:
+            queue[i]=queue[i-1]+arrival_in_slot-1
 
 
-a = M_D_1(3,20)
-
-plt.plot(a)
+    return queue,arrival
 
 
+a,b = M_D_1(1/70,1/90,1)
 
-#queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
-#queue,delay,arrival=sm.PSRA(3,"uni",20)
-#plt.plot(queue_u,label="triangular service")
-#plt.plot(queue,label="deterministic service")
-#plt.legend()
+b
+queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
+queue,delay,arrival=sm.PSRA(3,"uni",20)
+plt.plot(queue_u,label="triangular service")
+plt.plot(queue,label="deterministic service")
+plt.legend()
+
+
+###########################################################
+
+q = Queue()

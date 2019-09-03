@@ -38,8 +38,11 @@ def PSRA_G(lasso_temporale_in_ore,distribuzione,fattore_sigma):
 # non seguono più il PSRA ma sono arrivi che si basano su Poisson dix
 
 def M_D_1(lam,mu,max_time):
+    "lam = mean of arrival of airctraft (poisson dix)"
+    " mu = frequency of service time (deterministic)"
+    " max_time = considered time_lapse"
     T = max_time*60*60
-    N=int(T/90)
+    N=int(T*mu)
     arrival_poisson = rm.expovariate(lam)
     arrival = np.zeros(N)
     arrival[0] = arrival_poisson
@@ -57,10 +60,24 @@ def M_D_1(lam,mu,max_time):
 
     return queue,arrival
 
+lam = 1/90
+a,b = M_D_1(1/83,1/90,3)
+max(a)
+def create_distribution(v):
+    "funzione che crea una distribuzione discreta di probabilità"
+    "serve per avere la distribuzione sulle possibili lunghezze della queue"
+    N = len(v)
+    massimo = int(max(v))
+    dix = np.zeros(massimo + 1)
+    # viaggio su tutte le possibili lunghezze della coda
+    for i in range(massimo+1):
+        cont = len(v[(v==i)])
+        dix[i] = cont/N
+    return dix
 
-a,b = M_D_1(1/30,1/90,1)
 
-a
+
+
 queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
 queue,delay,arrival=sm.PSRA(3,"uni",20)
 plt.plot(queue_u,label="triangular service")
@@ -68,6 +85,12 @@ plt.plot(queue,label="deterministic service")
 plt.legend()
 
 
-###########################################################
 
-q = Queue()
+domain = []
+for i in range(12):
+    domain.append(i)
+x = create_distribution(queue_u)
+y = create_distribution(a)
+plt.plot(x,label = "PRSA")
+plt.plot(y,label = "M/D/1")
+plt.legend()

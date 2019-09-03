@@ -123,13 +123,7 @@ def PSRA(lasso_temporale_in_ore,distributione,fattore_sigma):
         arrival_in_slot=len(arrival[(arrival>=90*(i-1)) & (arrival<90*i)])
         queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
 
-    # plt.plot(arrival)
-    # plt.plot(np.arange(0,T,90))
-    # plt.show()
-#
-    # plt.plot(delay/90,label="delay")
-    # plt.plot(queue,label="queue")
-    # plt.legend()
+
 
     return queue,delay,arrival
 
@@ -137,6 +131,7 @@ def PSRA(lasso_temporale_in_ore,distributione,fattore_sigma):
 
 
 "simulazioni"
+
 k=20
 dist=np.zeros(2000)
 for i in range(2000):

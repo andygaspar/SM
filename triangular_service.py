@@ -58,9 +58,9 @@ def M_D_1(lam,mu,max_time):
     return queue,arrival
 
 
-a,b = M_D_1(1/70,1/90,1)
+a,b = M_D_1(1/30,1/90,1)
 
-b
+a
 queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
 queue,delay,arrival=sm.PSRA(3,"uni",20)
 plt.plot(queue_u,label="triangular service")

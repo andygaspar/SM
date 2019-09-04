@@ -88,8 +88,8 @@ def M_D_1(arrival_time,max_time,service_time=1/90):
 
 
 lam = 1/90
-a,b,c,thrpughput = M_D_1(1/90,1)
-thrpughput
+a,b,c = M_D_1(1/90,1)
+a
 
 for i in range(len(c)):
     c[i]=c[i]/90
@@ -99,6 +99,7 @@ c
 def create_distribution(v):
     "funzione che crea una distribuzione discreta di probabilità"
     "serve per avere la distribuzione sulle possibili lunghezze della queue"
+    v = np.array(v)
     N = len(v)
     massimo = int(max(v))
     dix = np.zeros(massimo + 1)
@@ -109,13 +110,15 @@ def create_distribution(v):
     return dix
 
 
-
+md_dix =create_distribution(a)
 
 queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
 queue,delay,arrival=sm.PSRA(3,"uni",20)
 plt.plot(queue_u,label="triangular service")
 plt.plot(queue,label="deterministic service")
+plt.plot(a, label="M/D/1")
 plt.legend()
+plt.grid()
 
 
 
@@ -124,6 +127,8 @@ for i in range(12):
     domain.append(i)
 x = create_distribution(queue_u)
 y = create_distribution(a)
+
+
 plt.plot(x,label = "PRSA",)
 plt.plot(y,label = "M/D/1")
 plt.grid()

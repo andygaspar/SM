@@ -1,7 +1,7 @@
 import sampling as samp
 import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas
 
 
 
@@ -26,6 +26,11 @@ obiettivi nell'ordine:
 
 
 """
+
+
+
+
+
 
 
 

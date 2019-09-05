@@ -1,0 +1,8 @@
+Usali così:
+parti dal file arrivi e separali per aeroporto (EGLL Londra, EDDF Francoforte e LEMD Madrid)
+tramite il codice ifps_id fai il merge per trovarti i punti
+Il file arrivi contiene dati che potrebbero non interessarti, io nel dubbio li ho lasciati e gli orari di arrivo sulla pista del volo identificato dal codice univoco ifps_id.
+Il file punti contiene, per ogni volo, tutti i punti(geografici e waypoint) attraversati da quel volo, quindi anche punti che non ti serviranno; filtrali tu.
+Per quanto riguarda i punti nella "control zone" di Madrid e Francoforte, oggi mi sa che non riesco a dirteli. Se vuoi intanto abbozzare il lavoro, prenditi i punti "nei paraggi" usando distanze analoghe a quelle di Heathrow, penso che poi i risultati saranno simili.
+Appena torno ti faccio avere anche questi dati.
+Ultima cosa, per i dati che ti ho dato cioè " This trajectory represents the closest estimate available in official NEST data files of the flight trajectories actually  handled by controllers on the day of operations" il mese di febbraio non è disponibile. Se vuoi ci sono i dati del 2014 ma sempre di settembre.

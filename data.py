@@ -184,7 +184,72 @@ while i < df_entry_day1.shape[0]-1:
     #if(j>1):
     i+=1
     print(i)
+df_traj
+#ORA   : prendo il dataset relativo agli arrivi e lo pulisco nel modo seguente:
+#   -considero gli arrivi solo a Francoforte cancellando le altre righe
+#   -cancello la colonna relativa all'origine (inutile per noi)
+#   -metto a posto le colonne relative al timing (divido data e ora) e considero solo la nostra dataset
 
+#dopo di chè dovrò creare la colonna arrivi
+
+df_ar
+
+#condizione di arrivo a Francoforte-->nuovo dataset con Francoforte
+Frankfurt_cond = df_ar["D"]=="EDDF"
+df_ar_frank = df_ar[Frankfurt_cond]
+df_ar_frank
+
+#metto a posto arr_time
+arr_date = []
+arr_land = []
+for i in range(df_ar_frank.shape[0]):
+    temp = df_ar_frank.iloc[i]["arr_time"]
+    temp=temp.split(" ")
+    arr_date.append(temp[0])
+    arr_land.append(temp[1])
+
+
+df_ar_frank["date"]=arr_date
+df_ar_frank["time"]=arr_land
+
+df_ar_frank= df_ar_frank.drop(columns=["O","arr_time"])
+
+df_ar_frank
+
+#considero solo i voli in data 2017-09-13
+date_condition = df_ar_frank["date"]=="2017-09-13"
+df_ar_frank_day1 = df_ar_frank[date_condition]
+
+
+df_ar_frank_day1
+
+#creiamo file csv di questi arrivi
+arr_frankfurt_13_09_17 = df_ar_frank_day1.to_csv(r'../data/arr_frankfurt_13_09_17.csv',index = None, header=True)
+
+
+arrivi = [] # non so se serve però intanto lo metto
+voli = []
+#ora la parte più difficile
+for i in range(df_traj.shape[0]):
+    flight = df_traj.iloc[i]["flight"]
+    cont = 0
+    for j in range(df_ar_frank_day1.shape[0]):
+        aereo = df_ar_frank_day1.iloc[j]["ifps_id"]
+        if(aereo==flight):
+            cont = 1
+            temp = df_ar_frank_day1.iloc[j]["time"]
+            arrivi.append(temp)
+    if(cont==0):
+        arrivi.append("None")
+
+    print(cont)
+
+
+#aggiungo la colonna
+len(arrivi)
+
+
+df_traj["arrival"] = arrivi
 
 
 df_traj

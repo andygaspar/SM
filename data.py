@@ -76,7 +76,7 @@ def df_coor_to_dist(df):
         split_coordinate=[float(split_coordinate[0]),float(split_coordinate[1])]
         ENTRY=tuple(split_coordinate)
         dist=geodesic(ENTRY,AIRPORT).kilometers
-        wp_dist[i]=dist[waypoint_per_fl==0]
+        wp_dist[i]=dist
     #df_wp_dist.rename(columns={'coor':'distance'},inplace=True)
     return wp_dist
 
@@ -84,6 +84,9 @@ wp_dist=df_coor_to_dist(df_wp)
 df_wp["distance"]=wp_dist
 #df_wp.to_csv()
 
+"Ora questo dataset contiene anche una colonna in cui è presente la distanza"
+"dall'aereoporto di Francoforte"
+df_wp
 
 entry_condition=df_wp['distance']<200
 df_entry=df_wp[entry_condition]
@@ -137,11 +140,11 @@ df_entry=df_entry.drop(columns=["trajectory_id","geopoint_id","time_over","coor"
 
 
 
+df_entry
 
 
 
-
-########################################### primo dataframe
+########################################### primo dataframe,relativo al 13 settembre
 cond_day1=df_entry["date"]=="2017-09-13"
 df_entry_day1=df_entry[cond_day1]
 df_entry_day1.shape
@@ -150,20 +153,38 @@ df_entry_day1.shape
 df_traj=pd.DataFrame(columns=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
 
 
+df_entry_day1
+export_df = df_entry_day1.to_csv(r'../data/file.csv',index = None, header=True)
 
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
 i=0
 while i < df_entry_day1.shape[0]-1:
     row=[df_entry_day1.iloc[i]["ifps_id"],'None','None','None','None','None','None','None','None','None','None']
     j=1
+    cont = 0 #contare quante volte si entra
     while (df_entry_day1.iloc[i]["ifps_id"]==df_entry_day1.iloc[i+1]["ifps_id"] and j<=4):
         j+=1
+        cont = cont + 1
+    if cont ==0:
+        print("A SHIT")
+        i = i+ 1
+        continue
     for k in range(j):
         row[1+k]=df_entry_day1.iloc[i+j-k-1]["sid"]
         row[1+k+5]=df_entry_day1.iloc[i+j-k-1]["time"]
-    df_traj=df_traj.append(dict(zip(names,row)))
+    df_traj=df_traj.append(dict(zip(names,row)),ignore_index = True)
+    print("**********************************************")
+    for m in range(len(row)):
+        print(row[m])
+    print("**********************************************")
     i+=j
     while (i<=df_entry_day1.shape[0]-2 and df_entry_day1.iloc[i]["ifps_id"]==df_entry_day1.iloc[i+1]["ifps_id"]):
         i+=1
+    print("questa è la j:",j)
+    #if(j>1):
+    i+=1
     print(i)
+
+
+
 df_traj

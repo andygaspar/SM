@@ -35,7 +35,12 @@ df_entry_day1.shape[0]
 
 p= df_entry_day1.to_csv (r'../data/ppt.csv', index = None, header=True)
 
-#ora procedo con la creazione del data-set
+"""
+Ora procedo con la costruzione del dataset: in questo dataset ci saranno le traiettorie_13_09
+relative ai voli avvenuti il giorno 13 settembre nell'aereoporto di Frankfurt.
+Per semplicità (da migliorare) consideriamo solo i flight con più di 5 waypoint e
+consideriamo solo i primi 5 waypoint [ai fini del tempo è importante il primo]
+"""
 df_traj=pd.DataFrame(columns=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
 i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
@@ -61,13 +66,16 @@ while(i<df_entry_day1.shape[0]-1):
             i+=1
         i+=1
     else:
-        print("NON CONSIDERO QUESTO VOLO PERCHE': ",cont)
         i=j
         #while (i<=df_entry_day1.shape[0]-2 and df_entry_day1.iloc[i]["ifps_id"]==df_entry_day1.iloc[i+1]["ifps_id"]):
         #    i+=1
         i+=1
     print(i)
 
+
+"""
+Al dataset creato aggiungo gli arrivi, contenuti nel dataset df_ar
+"""
 df_traj
 Frankfurt_cond = df_ar["D"]=="EDDF"
 df_ar_frank = df_ar[Frankfurt_cond]
@@ -126,7 +134,7 @@ df_traj["arrival"] = arrivi
 
 df_traj
 
-ved = df_traj.to_csv(r'../data/ved.csv',index = None, header=True)
+arrivi = df_traj.to_csv(r'../data/arrivi_13_09.csv',index = None, header=True)
 
 #controllo
 """
@@ -154,6 +162,7 @@ for i in  range(df_traj.shape[0]):
         if(b-a<=0):
             print("fuck off")
 
+"aggiungo anche i tempi di arrivo"
 df_traj["tempi di arrivo"] = tempistiche
 
 ######################################
@@ -166,6 +175,12 @@ none_cond = df_traj["arrival"]!="None"
 df_traj = df_traj[none_cond]
 #######fare  vettore di traiettorie
 df_traj
+
+"""
+ora creo un dict, chiamato tr_dict, che ha come chiavi tutte le pox traiettorie_13_09
+e come valori il numero di volte che queste traiettorie appaiono
+
+"""
 trajectory = []
 
 barra = "-"
@@ -192,12 +207,16 @@ tr_dict= sorted(tr_dict.items(),key =lambda kv:(kv[1], kv[0]),reverse=True)
 tr_dict = dict(tr_dict)
 tr_dict
 
-percorsi = list(tr_dict.keys())
-num_percorsi = list(tr_dict.values())
+percorsi = list(tr_dict.keys()) #lista di tutte le pox traiettorie
+num_percorsi = list(tr_dict.values()) #lista del numero di volte in cui le traiettorie si presentano
 num_percorsi
 len(percorsi)
-#lavoro sui waypoint ora--> creo un dizionario dove per ogni waypoint ho la
-#rispettiva coordinata
+
+"""
+Ora creo un dict,chiamato wp_coord, che ha come chiavi tutti i pox waypoints
+e come valori le loro coordinate
+"""
+
 wp_coord ={}
 
 #riprendo il dataframe  df_entry_day1
@@ -210,13 +229,20 @@ for i in range(df_entry_day1.shape[0]):
     else:
         continue
 
-wayp = list(wp_coord.keys())
+wayp = list(wp_coord.keys()) #lista di tutti i waypoint
 wayp
 wp_coord
-cord_list = list(wp_coord.values())
+cord_list = list(wp_coord.values()) #lista di tutte le coordinate
 cord_list
 #ora ogni percorso salvato in tr_dict avrà la sua coordinata
 #ci sono 119 percorsi
+
+"""
+Ora creo un Dataframe, chiamato coord_traj, il quale contiene per ogni
+traiettoria le coordinate di ogni singolo waypoint attraversato dalla TRAIETTORIA
+in più contiene il numero di volte che questa traiettori viene percorsa
+
+"""
 name = ["wp1","wp2","wp3","wp4","wp5","coord1","coord2","coord3","coord4","coord5","times"]
 
 coord_traj=pd.DataFrame(columns=["wp1","wp2","wp3","wp4","wp5","coord1","coord2","coord3","coord4","coord5","times"])
@@ -245,29 +271,12 @@ for i in range(len(percorsi)):
 
 coord_traj
 #proviamo a disegnare il primo percorso
-primo = coord_traj.iloc[0]
-type(primo)
 
-#faccio vettore con precentuale di ogni percorso
 
-x = np.zeros(5)
-type(primo["coord1"][0])
-y = np.zeros(5)
-x[0]=primo["coord1"][0]
-x[1]=primo["coord2"][0]
-x[2]=primo["coord3"][0]
-x[3]=primo["coord4"][0]
-x[4]=primo["coord5"][0]
-y[0]=primo["coord1"][1]
-y[1] = primo["coord2"][1]
-y[2]=primo["coord3"][1]
-y[3]=primo["coord4"][1]
-y[4]=primo["coord5"][1]
+"""
+plotto le traiettorie
+"""
 
-plt.plot(x,y,'o-',linewidth=1)
-plt.scatter(50.037753, 8.560964,color="red")
-plt.grid()
-plt.show()
 
 coordinate_x = np.zeros((coord_traj.shape[0],5))
 coordinate_y = np.zeros((coord_traj.shape[0],5))
@@ -287,11 +296,7 @@ for i in range(coord_traj.shape[0]):
 
 
 for i in range(coord_traj.shape[0]):
-    if(coord_traj.iloc[i]["times"]<=5):
-        continue
-    else:
-        plt.plot(coordinate_x[i,:],coordinate_y[i,:],label = "trajectory"+str(i))
-
+    plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory"+str(i))
 plt.scatter(50.037753, 8.560964,color="red")
 #plt.legend()
 plt.show()

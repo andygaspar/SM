@@ -348,3 +348,27 @@ def perc_per_waypoint(waypoint):
 a=perc_per_waypoint('SIRPO')
 a=np.array(a)
 np.mean(a)
+
+
+
+
+
+
+"""
+******************** calcolo wp più frequenti
+"""
+df_wp_dist=pd.read_csv("../data/df_entry.csv")
+entry_condition=df_wp_dist['distance']<200
+df_wp_dist=df_wp_dist[entry_condition]
+wp_dict={}
+for i in range(df_wp_dist.shape[0]):
+    way_p=df_wp_dist.iloc[i]["sid"]
+    if way_p in wp_dict:
+        wp_dict[way_p]+=1
+    else:
+        wp_dict[way_p]=1
+
+#riordino dizionario
+wp_dict=sorted(wp_dict.items(), key =lambda kv:(kv[1], kv[0]),reverse=True)
+wp_dict=dict(wp_dict)
+wp_dict['UNOKO']

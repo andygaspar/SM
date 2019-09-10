@@ -54,11 +54,11 @@ def frequency(df,label):
 *********************************************************************
 calcolo tempi arrivo
 """
-df_traj
+
 def time_to_sec(arr):
     arr=arr.replace(":"," ")
     arr=arr.split(" ")
-    arr=int(arr[0])*3600  +  int(arr[1])*60   +  int(arr[2])come dataframe
+    arr=int(arr[0])*3600  +  int(arr[1])*60   +  int(arr[2])#come dataframe
     return arr
 
 def percorrenza(entry,arr):
@@ -72,6 +72,3 @@ def perc_per_waypoint(waypoint):
         if df_traj.iloc[i]["wp1"]==waypoint:
             perc.append(percorrenza(df_traj.iloc[i]["t1"],df_traj.iloc[i]["arrival"]))
     return perc
-a=perc_per_waypoint('SIRPO')
-a=np.array(a)
-np.mean(a)

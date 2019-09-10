@@ -2,100 +2,40 @@ import pandas as pd
 import numpy as np
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
+import functions as fun
 
 df_ar=pd.read_csv("../data/arrivi_1709.csv")
 df_wp=pd.read_csv("../data/punti_1709.csv")
+#rinominazione colonna coordinate
 df_wp.rename(columns={'astext(k.coords)':'coor'},inplace=True)
 
-"""
-    #calcolo distanza da areoporto
-    AIRPORT=(50.03793, 8.56215)
-    dist=geodesic(ENTRY,AIRPORT).kilometers
-    dist
-
-
-
-    # rielaborazione stringhe
-    df_wp.head(100)
-    type(df_wp["coor"][2])
-    test=df_wp["coor"][2]
-    test
-    test=test.replace("POINT","")
-    test=test.replace("(","")
-    test=test.replace(")","")
-    test
-    split_test=test.split(" ")
-    split_test
-    split_test=[float(split_test[0]),float(split_test[1])]
-    split_test=tuple(split_test)
-    split_test
-
-
-    #primo test su primo volo
-    flight_1=df_wp['ifps_id']=="AA66960337"
-
-    flight_1=df_wp[flight_1]
-    flight_1
-
-    #ricerca per caratteristtica, crea oggetto true false che può essere letto da df
-    ar_1=df_ar['ifps_id']=="AA66960337"
-    #df da oggetto true false
-    ar_fl_1=df_ar[ar_1]
-    ar_fl_1
-
-
-    df_wp.shape
-    n=flight_1=df_wp['sid']=="ODIPI"
-
-    prova=df_wp[n]
-    prova.loc[,"trajectory_id"]
-    type(prova)
-    prova["astext(k.coords)"]
-
-
-
 
 """
+DISTANZE
 
-
-
-
-
-
-
+creazione del dataset con le distanze dall'aereoporto
+"""
 #costruzione del vettore distanza dall'areoporto per ogni waypoint
-def df_coor_to_dist(df):
-    AIRPORT=(50.03793, 8.56215)
-    wp_dist=np.zeros(df.shape[0])
-    for i in range(df.shape[0]):
-        coordinate=df["coor"][i]
-        coordinate=coordinate.replace("POINT","")
-        coordinate=coordinate.replace("(","")
-        coordinate=coordinate.replace(")","")
-        split_coordinate=coordinate.split(" ")
-        split_coordinate=[float(split_coordinate[0]),float(split_coordinate[1])]
-        ENTRY=tuple(split_coordinate)
-        dist=geodesic(ENTRY,AIRPORT).kilometers
-        wp_dist[i]=dist
-        if (i%1000)==0:
-            print(i)
-    #df_wp_dist.rename(columns={'coor':'distance'},inplace=True)
-    return wp_dist
 
-wp_dist=df_coor_to_dist(df_wp)
+
+wp_dist=fun.df_coor_to_dist(df_wp)
 df_wp["distance"]=wp_dist
-#df_wp.to_csv()
-export_csv = df_wp.to_csv (r'../data/df_wp.csv', index = None, header=True)
-
-
 #limitazione agli waypoint più vicini di 200km dall'aeroporto
 entry_condition=df_wp['distance']<200
 df_entry=df_wp[entry_condition]
 
+"""
+*****************************************************************
+"""
 
-#come esportare un csv da un df
-export_csv = df_entry.to_csv (r'../data/df_entry.csv', index = None, header=True)
 
+
+
+
+"""
+NUMERO DI WP PER VOLO
+vettore
+"""
 
 #vettore numero di waypoint per volo
 waypoint_per_fl=[]
@@ -114,14 +54,49 @@ plt.plot(waypoint_per_fl)
 np.sum(waypoint_per_fl==0)
 len(waypoint_per_fl)
 
-
 """
-kk=df_entry.iloc[0]["time_over"]
-kk=kk.split(" ")
-kk=kk[0]
-kk
+***********************************************************
 """
 
+
+
+
+
+"""
+PER BUBBLEPLOT
+DF DATA E ORA SEPARATE SENZA TRAIETTORIA, GEOPOINT
+"""
+#aggiunta colonna "data volo" e rimpiazzo colonna touch down con "time"
+date=[]
+landing=[]
+df_wp_dist=df_entry.copy
+for i in range(df_entry.shape[0]):
+    kk=df_entry.iloc[i]["time_over"]
+    kk=kk.split(" ")
+    date.append(kk[0])
+    landing.append(kk[1])
+
+
+#tolte colonne inutili e aggiunte nuove
+df_to_plot=df_entry.copy()
+df_to_plot["date"]=date
+df_to_plot["time"]=landing
+df_to_plot=df_to_plot.drop(columns=["trajectory_id","geopoint_id","time_over"])
+df_to_plot.shape
+export_csv = df_to_plot.to_csv (r'../data/df_to_plot.csv', index = None, header=True)
+
+"""
+**************************************************
+"""
+
+
+
+
+
+"""
+
+DF DATA E ORA SEPARATE SENZA TRAIETTORIA, GEOPOINT MA CON COORDINATE E COOR
+"""
 #aggiunta colonna "data volo" e rimpiazzo colonna touch down con "time"
 date=[]
 landing=[]
@@ -132,19 +107,23 @@ for i in range(df_entry.shape[0]):
     landing.append(kk[1])
 
 
-
-
 #tolte colonne inutili e aggiunte nuove
 df_entry["date"]=date
 df_entry["time"]=landing
-df_entry=df_entry.drop(columns=["trajectory_id","geopoint_id","time_over","coor"])
+df_entry=df_entry.drop(columns=["trajectory_id","geopoint_id","time_over"])
 df_entry.shape
-export_csv = df_entry.to_csv (r'../data/df_entry.csv', index = None, header=True)
+#export_csv = df_toplot.to_csv (r'../data/df_entry.csv', index = None, header=True)
+
+"""
+**************************************************
+"""
 
 
 
 
-
+"""
+DF CON SOLO VOLI DI UNA DETERMINATA GIORNATA
+"""
 
 
 ########################################### primo dataframe
@@ -155,30 +134,7 @@ df_entry_day1.shape
 #creazione dataframe con ultimi waypoint
 df_traj=pd.DataFrame(columns=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
 
-
-
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
-i=0
-while i < df_entry_day1.shape[0]-1:
-    row=[df_entry_day1.iloc[i]["ifps_id"],'None','None','None','None','None','None','None','None','None','None']
-    j=1
-    while (df_entry_day1.iloc[i]["ifps_id"]==df_entry_day1.iloc[i+1]["ifps_id"] and j<=4):
-        j+=1
-    for k in range(j):
-        row[1+k]=df_entry_day1.iloc[i+j-k-1]["sid"]
-        row[1+k+5]=df_entry_day1.iloc[i+j-k-1]["time"]
-    df_traj=df_traj.append(dict(zip(names,row)),ignore_index=True)
-    i+=j
-    while (i<=df_entry_day1.shape[0]-2 and df_entry_day1.iloc[i]["ifps_id"]==df_entry_day1.iloc[i+1]["ifps_id"]):
-        i+=1
-    print(i)
-df_traj
-
-"""
-************************parte albi
-"""
-
-
 
 #creazione dataframe con ultimi waypoint
 df_traj=pd.DataFrame(columns=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
@@ -219,7 +175,9 @@ df_traj
 #ORA   : prendo il dataset relativo agli arrivi e lo pulisco nel modo seguente:
 #   -considero gli arrivi solo a Francoforte cancellando le altre righe
 #   -cancello la colonna relativa all'origine (inutile per noi)
-#   -metto a posto le colonne relative al timing (divido data e ora) e considero solo la nostra dataset
+#   -mettdf_wp_dist=pd.read_csv("../data/df_entry.csv")
+entry_condition=df_wp_dist['distance']<200
+df_wp_dist=df_wp_dist[entry_condition]o a posto le colo# Change the row indexes nne relative al timing (divido data e ora) e considero solo la nostra dataset
 
 #dopo di chè dovrò creare la colonna arrivi
 
@@ -289,6 +247,10 @@ df_traj
 
 """
 *****************************************************************
+"""
+
+
+"""
 aggiunta funzioni sul contteggio degli waypoint
 
 è una lista con 5 dizionari ogniuno riferito ad
@@ -323,31 +285,9 @@ stat_waypoint[0]
 
 
 
-"""
-*********************************************************************
-calcolo tempi arrivo (da fare)
-"""
-df_traj
-def time_to_sec(arr):
-    arr=arr.replace(":"," ")
-    arr=arr.split(" ")
-    arr=int(arr[0])*3600  +  int(arr[1])*60   +  int(arr[2])
-    return arr
-
-def percorrenza(entry,arr):
-    return time_to_sec(arr)-time_to_sec(entry)
 
 
-#lista percorrenza voli da SIRPO
-def perc_per_waypoint(waypoint):
-    perc=[]
-    for i in range(df_traj.shape[0]):
-        if df_traj.iloc[i]["wp1"]==waypoint:
-            perc.append(percorrenza(df_traj.iloc[i]["t1"],df_traj.iloc[i]["arrival"]))
-    return perc
-a=perc_per_waypoint('SIRPO')
-a=np.array(a)
-np.mean(a)
+
 
 
 
@@ -364,7 +304,9 @@ wp_dict={}
 for i in range(df_wp_dist.shape[0]):
     way_p=df_wp_dist.iloc[i]["sid"]
     if way_p in wp_dict:
-        wp_dict[way_p]+=1
+        wp_dict[way_p]+=1df_wp_dist=pd.read_csv("../data/df_entry.csv")
+entry_condition=df_wp_dist['distance']<200
+df_wp_dist=df_wp_dist[entry_condition]
     else:
         wp_dict[way_p]=1
 
@@ -372,3 +314,4 @@ for i in range(df_wp_dist.shape[0]):
 wp_dict=sorted(wp_dict.items(), key =lambda kv:(kv[1], kv[0]),reverse=True)
 wp_dict=dict(wp_dict)
 wp_dict['UNOKO']
+wp_dict

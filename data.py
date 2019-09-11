@@ -172,6 +172,9 @@ def arrival_matching(df_wp,df_arrivi,col_flights = "flight"):
     return new_df
 
 
+def delete_useless_aircraft(df,cond):
+    df = df[cond]
+    return df
 
 
 

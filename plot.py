@@ -57,3 +57,13 @@ for i in range(coord_traj.shape[0]):
 plt.scatter(50.037753, 8.560964,color="red")
 
 plt.savefig("plot/traj_1.png")
+
+def plotting_trajectory(df_traj,number_of_wp):
+    coordinate_x = np.zeros((df_traj.shape[0],number_of_wp))
+    coordinate_y = np.zeros((cdf_traj.shape[0],number_of_wp))
+    numb = []
+    for i in range(1,number_of_wp+1):
+        numb.append(str(i))
+    for i in range(coord_traj.shape[0]):
+        tr = coord_traj.iloc[i]
+        

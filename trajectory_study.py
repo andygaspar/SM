@@ -3,13 +3,22 @@ import numpy as np
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import functions as fun
-import data as da
+import data as data
 
 
 df_ar=pd.read_csv("../data/arrivi_1709.csv")
 df_wp=pd.read_csv("../data/punti_1709.csv")
 df_toplot = pd.read_csv("../data/df_to_plot.csv")
+df_wp
+data.rinomina(df_wp,"astext(k.coords)","coor")
+data.add_dist(df_wp)
+df_filtered=data.dist_filter(df_wp,200)
 
+df_filtered
+freq = fun.frequency(df_filtered,"sid")
+
+
+df_wp
 
 
 
@@ -46,9 +55,10 @@ consideriamo solo i primi 5 waypoint [ai fini del tempo è importante il primo]
 
 i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
-df_traj = da.creation_data_waypoint(df_entry_day1,names)
+df_traj = da.creation_data_waypoint(df_entry_day1,names,s)
 df_traj
 
+df_entry_day1
 
 
 
@@ -119,6 +129,37 @@ tr_dict
 percorsi = list(tr_dict.keys()) #lista di tutte le pox traiettorie
 num_percorsi = list(tr_dict.values()) #lista del numero di volte in cui le traiettorie si presentano
 len(percorsi)
+percorsi
+
+
+"""
+TROVO TERZA TRIAETTORIA
+"""
+df_traj
+tr_interessante = percorsi[2]
+tr_interessante = tr_interessante.replace("-"," ")
+tr_interessante = tr_interessante.split(" ")
+tr_interessante
+temp = list(df_traj.iloc[0])
+temp[1]==tr_interessante[0]
+aereo = " "
+
+
+aereo
+
+aircraft_condition = df_wp["ifps_id"]==aereo
+ddf = df_wp[aircraft_condition]
+ddf.shape[0]
+condd = ddf["distance"]<200
+
+ddf = ddf[condd]
+
+ddf
+tr_interessante = ddf["sid"].values
+tr_interessante = list(tr_interessante)
+tr_interessante
+
+
 num_percorsi
 """
 Ora creo un dict,chiamato wp_coord, che ha come chiavi tutti i pox waypoints
@@ -223,10 +264,29 @@ for i in range(coord_traj.shape[0]):
 
     else:
         continue
+df_wp
 
 tr_dict
+
 wp_coord
 
+def aircraft_repetition(df,name_of_flight):
+    dict = {}
+    i=0
+    while(i<df.shape[0]):
+        aircraft = df.iloc[i][name_of_flight]
+        cont = 1
+        j =i
+        while(j<df.shape[0]-2 and aircraft==df.iloc[j+1][name_of_flight]):
+            cont=cont+1
+            j=j+1
+        dict[aircraft]=cont
+        i=j+1
+    return dict
+
+
+s =aircraft_repetition(df_entry_day1,"ifps_id")
+s
 
 """
 ************************************
@@ -242,6 +302,7 @@ PUNTI IMPORTANTI
 lista_traiet = list(tr_dict.keys())
 lista_traiet
 wp_imp = []
+freq
 for i in range(10):
     temp = lista_traiet[i]
     temp = temp.replace("-"," ")
@@ -249,15 +310,135 @@ for i in range(10):
     wp_imp.append(temp[0])
 print("*****")
 wp_imp
+lista = list(freq.keys())
+lista
+
+
+
+list_freq
+liste_freq_value = list(freq.values())
 coord_imp = []
-for i in range(len(wp_imp)):
-    coord_imp.append(wp_coord[wp_imp[i]])
+list_freq = lista[0:20]
 
-entrance_dict = dict(zip(wp_imp,coord_imp))
+len(list_freq)
+for i in tr_interessante:
+    coord_imp.append(wp_coord[i])
+
+coord_imp
+
+int_dict = dict(zip(tr_interessante,coord_imp))
+int_dict
+entrance_dict = dict(zip(list_freq,coord_imp))
 entrance_dict
-entrance_dict['KERAX'][0]
+entrance_dict["CHA"][0]
+
+"""
+***************************************************************
+"""
+"""
+VEDO LE TRAIETTORIE IMPORTANTI COMPLETE
+"""
+"""
+**************************************************************
+"""
+
+tr_dict
+tr = list(tr_dict.keys())
+tr = tr[0:20]
+tr
+aircrafts = []
 
 
+for j in range(len(tr)):
+    temp_tr = tr[j]
+    temp_tr=temp_tr.replace("-"," ")
+    temp_tr = temp_tr.split(" ")
+    for i in range(df_traj.shape[0]):
+        temp = df_traj.iloc[i]
+        if(temp_tr[0]==temp["wp1"] and temp_tr[1]==temp["wp2"] and temp_tr[2]==temp["wp3"] and
+           temp_tr[3]==temp["wp4"] and temp_tr[4]==temp["wp5"]):
+           aircrafts.append(temp["flight"])
+           break
+
+df_wp
+aircrafts
+d_cond = df_wp["distance"]<200
+df_wp = df_wp[d_cond]
+df_cond = df_wp["ifps_id"]==aircrafts[0]
+df = df_wp[df_cond]
+df
+tr_sing = df["sid"].values
+tr_sing
+def traiettorie_complete(lista_aircrafts):
+    traiettorie = []
+    for i in range(len(aircrafts)):
+        tr = lista_aircrafts[i]
+        df_cond = df_wp["ifps_id"]==tr
+        df = df_wp[df_cond]
+        tr_sing = list(df["sid"].values)
+        traiettorie.append(tr_sing)
+    return traiettorie
+
+
+traiettorie  = traiettorie_complete(aircrafts)
+traiettorie[0]
+wp_coord
+lista_coordinate = list(wp_coord.values())
+lista_wp = list(wp_coord.keys())
+lista_coordinate
+
+coord_traiettorie = []
+
+
+
+
+def coordinate_list(traiettoria,lista_wp,lista_coordinate):
+    N = len(traiettoria)
+    coordinate_x = np.zeros(N)
+    coordinate_y = np.zeros(N)
+    for i in range(N):
+        st = traiettoria[i]
+        for j in range(len(lista_wp)):
+            if(st==lista_wp[j]):
+                coordinate_x[i]=lista_coordinate[j][0]
+                coordinate_y[i]=lista_coordinate[j][1]
+    return coordinate_x,coordinate_y
+
+
+
+p,q = coordinate_list(traiettorie[0],lista_wp,lista_coordinate)
+plt.plot(p,q)
+
+"""
+provo a plottare le traiettorie
+"""
+
+p,q =
+plt.figure(figsize=(20,15))
+for i in range(len(traiettorie)):
+    tr_i = traiettorie[i]
+    print(tr_i)
+    x_cord,y_cord = coordinate_list(tr_i,lista_wp,lista_coordinate)
+    plt.plot(x_cord,y_cord,)
+plt.scatter(50.037753, 8.560964,color="red")
+for i in int_dict:
+    plt.scatter(int_dict[i][0], int_dict[i][1],linewidth = 6,label = i)
+    plt.annotate(i,xy=(int_dict[i][0],int_dict[i][1]), xytext=(int_dict[i][0]-0.25,int_dict[i][1] -0.25),arrowprops=dict(facecolor='red', shrink=0.05))
+
+
+
+
+
+
+
+
+freq
+list_freq = list(freq.keys())
+list_freq
+list_freq_2 = []
+for i in range(10):
+    list_freq_2.append(list_freq[i])
+list_freq_2
 coordinate_x[1,:]
 coordinate_x[1,:-2]
 plt.figure(figsize=(20,15))
@@ -288,11 +469,17 @@ for i in range(coord_traj.shape[0]):
         else:
             continue
 plt.scatter(50.037753, 8.560964,color="red")
-for i in wp_imp:
+for i in entrance_dict:
     plt.scatter(entrance_dict[i][0], entrance_dict[i][1],linewidth = 6,label = i)
+    plt.annotate(i,xy=(entrance_dict[i][0],entrance_dict[i][1]), xytext=(entrance_dict[i][0]-0.15,entrance_dict[i][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
+for i in int_dict:
+    plt.scatter(int_dict[i][0], int_dict[i][1],linewidth = 6,label = i)
+    plt.annotate(i,xy=(int_dict[i][0],int_dict[i][1]), xytext=(int_dict[i][0]-0.25,int_dict[i][1] -0.25),arrowprops=dict(facecolor='red', shrink=0.05))
 
-plt.savefig("plot/traj_1.png")
+
 plt.legend()
+plt.savefig("plot/traj_1_bis.png")
+
 plt.show()
 
 

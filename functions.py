@@ -80,26 +80,16 @@ def sec_to_time(x):
 
 
 
-def percorrenza(entry,arr):
+def tempo_volo(entry,arr):
     """
-    UTILE ALLA FUN PERC_PER_WAYPOINT
     dato entry_time e arrival_time numerici
     ritorna il tempo di percorrenza
 
     """
-    return time_to_sec(arr)-time_to_sec(entry)
-
-
-
-def perc_per_waypoint(waypoint):
-    """
-    dati due waypoints calcola il tempo di percorrenza
-    """
-    perc=[]
-    for i in range(df_traj.shape[0]):
-        if df_traj.iloc[i]["wp1"]==waypoint:
-            perc.append(percorrenza(df_traj.iloc[i]["t1"],df_traj.iloc[i]["arrival"]))
-    return perc
+    if type(entry)==str:
+        return time_to_sec(arr)-time_to_sec(entry)
+    else:
+        return arr-entry
 
 
 
@@ -117,3 +107,21 @@ def waypoint_per_volo(df):
             waypoint_per_fl.append(j)
             j=0
     return np.array(waypoint_per_fl)
+
+
+
+"Da finire ***********************"
+def min_time_dict(df,lista):
+    """
+    dato un dataframe ed una lista di wp
+    ritorna un dict con {wp: min_time}
+    """
+    min_t={}
+    for wp in lista:
+        cond=df["sid"]==wp
+        df_aux=df[cond]
+        m=min(df_aux["fly time"])
+        print(m)
+        min_t[wp]=min(df_aux["fly time"])
+
+    return min_t

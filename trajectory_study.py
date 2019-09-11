@@ -41,7 +41,11 @@ relative ai voli avvenuti il giorno 13 settembre nell'aereoporto di Frankfurt.
 Per semplicità (da migliorare) consideriamo solo i flight con più di 5 waypoint e
 consideriamo solo i primi 5 waypoint [ai fini del tempo è importante il primo]
 """
-df_traj=pd.DataFrame(columns=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
+df_traj=pd.DataFrame(columnfor i in range(coord_traj.shape[0]):
+    plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory"+str(i))
+plt.scatter(50.037753, 8.560964,color="red")
+#plt.legend()
+plt.show()s=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5'])
 i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
 while(i<df_entry_day1.shape[0]-1):
@@ -123,7 +127,7 @@ for i in range(df_traj.shape[0]):
         if(aereo==flight):
             cont = 1
             temp = df_ar_frank_day1.iloc[j]["time"]
-            arrivi.append(temp)
+            arrivi.df_ar.iloc[i]["date"]append(temp)
     if(cont==0):
         arrivi.append("None")
 
@@ -220,7 +224,7 @@ e come valori le loro coordinate
 wp_coord ={}
 
 #riprendo il dataframe  df_entry_day1
-df_entry_day1["sid"]
+df_entry_day1["sid"]plt.savefig('foo.png')
 
 for i in range(df_entry_day1.shape[0]):
     sid = df_entry_day1.iloc[i]["sid"]
@@ -294,9 +298,14 @@ for i in range(coord_traj.shape[0]):
     coordinate_y[i,3]=tr["coord4"][1]
     coordinate_y[i,4]=tr["coord5"][1]
 
-
+plt.figure(figsize=(20,15))
 for i in range(coord_traj.shape[0]):
     plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory"+str(i))
 plt.scatter(50.037753, 8.560964,color="red")
+
+plt.savefig("plot/traj_1.png")
 #plt.legend()
 plt.show()
+
+
+help(fun.frequency)

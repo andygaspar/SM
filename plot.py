@@ -46,3 +46,14 @@ z
 plt.scatter(x, y, s=z*0.1, alpha=0.5)
 plt.scatter(50.037753, 8.560964,color="red")
 plt.show()
+
+
+
+
+
+plt.figure(figsize=(20,15))
+for i in range(coord_traj.shape[0]):
+    plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory"+str(i))
+plt.scatter(50.037753, 8.560964,color="red")
+
+plt.savefig("plot/traj_1.png")

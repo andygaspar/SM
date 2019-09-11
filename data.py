@@ -4,6 +4,8 @@ from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import functions as fun
 
+#CIAO
+
 df_ar=pd.read_csv("../data/arrivi_1709.csv")
 df_wp=pd.read_csv("../data/punti_1709.csv")
 

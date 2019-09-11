@@ -106,7 +106,22 @@ def waypoint_per_volo(df):
 """
 FUNZIONI ALBERTO PRESTA
 """
-def creation_data_waypoint(df,name,ss,number_of_wp=5,name_of_col = "ifps_id"):
+def aircraft_repetition(df,name_of_flight):
+    dict = {}
+    i=0
+    while(i<df.shape[0]):
+        aircraft = df.iloc[i][name_of_flight]
+        cont = 1
+        j =i
+        while(j<df.shape[0]-2 and aircraft==df.iloc[j+1][name_of_flight]):
+            cont=cont+1
+            j=j+1
+        dict[aircraft]=cont
+        i=j+1
+    return dict
+
+
+def creation_data_waypoint(df,name,number_of_wp=5,name_of_col = "ifps_id"):
     """
     INPUT:
         -DataFrame
@@ -116,12 +131,15 @@ def creation_data_waypoint(df,name,ss,number_of_wp=5,name_of_col = "ifps_id"):
         -dataframe dove per ogni aereo viene associato il percorso degli
          ultimi "number_of_wp" waypints e i tempi
     """
+    d = aircraft_repetition(df,name_of_col)
+    list = list(d.values())
     df_traj=pd.DataFrame(columns=name)
     i = 0
     while(i<df.shape[0]-1):
         aereo = df.iloc[i][name_of_col]
-        num = sl[i] -1
         row = []
+        num = list[i] - 1
+        print(num)
         row.append(aereo)
         for s in range(2*number_of_wp + 1):
             row.append('None')

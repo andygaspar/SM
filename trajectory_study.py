@@ -51,11 +51,13 @@ relative ai voli avvenuti il giorno 13 settembre nell'aereoporto di Frankfurt.
 Per semplicità (da migliorare) consideriamo solo i flight con più di 5 waypoint e
 consideriamo solo i primi 5 waypoint [ai fini del tempo è importante il primo]
 """
-
+df_entry_day1
 
 i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
-df_traj = da.creation_data_waypoint(df_entry_day1,names,s)
+sl = list(s.values())
+sl[3]
+df_traj = da.creation_data_waypoint(df_entry_day1,names)
 df_traj
 
 df_entry_day1
@@ -270,19 +272,7 @@ tr_dict
 
 wp_coord
 
-def aircraft_repetition(df,name_of_flight):
-    dict = {}
-    i=0
-    while(i<df.shape[0]):
-        aircraft = df.iloc[i][name_of_flight]
-        cont = 1
-        j =i
-        while(j<df.shape[0]-2 and aircraft==df.iloc[j+1][name_of_flight]):
-            cont=cont+1
-            j=j+1
-        dict[aircraft]=cont
-        i=j+1
-    return dict
+
 
 
 s =aircraft_repetition(df_entry_day1,"ifps_id")

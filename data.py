@@ -37,8 +37,6 @@ def dist_filter(df,dist):
     dato un df MUNITO DELLA CLONNA DISTANZA, e una distanza
     ritorna un dataset con solo le righe taliche df["distanza"]<dist
     """
-    wp_dist=fun.df_coor_to_dist(df)
-    df["distance"]=wp_dist
     #limitazione agli waypoint più vicini di 200km dall'aeroporto
     entry_condition=df['distance']<dist
     return df[entry_condition]

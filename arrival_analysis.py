@@ -23,8 +23,8 @@ df_wp=pd.read_csv("../data/punti_1709.csv")
 data.data_time(df_ar,"arr_time")
 data.data_time(df_wp)
 
-
-
+cond=df_ar["date"]==df_ar.iloc[0]["date"]
+cond
 
 data.add_time_in_sec(df_ar)
 sec_to_time(df_ar.iloc[0]["time_sec"])

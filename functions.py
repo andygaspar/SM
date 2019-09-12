@@ -121,7 +121,6 @@ def min_time_dict(df,lista):
         cond=df["sid"]==wp
         df_aux=df[cond]
         m=min(df_aux["fly time"])
-        print(m)
         min_t[wp]=min(df_aux["fly time"])
 
     return min_t

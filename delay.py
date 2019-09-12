@@ -27,6 +27,7 @@ ddd.iloc[180080:180110]
 def df_wp(df,wp,voli):
     """
     sotto fun di df_lista_wp
+    seleziona i voli per wp e controllando che non siano nella lista voli e aggiorna la lista
     """
     df_n=df.copy()
     cond=df_n["sid"]==wp
@@ -40,6 +41,14 @@ def df_wp(df,wp,voli):
 
 
 def df_lista_wp(df,lista_wp):
+
+
+    """
+    sotto fun di df_finale
+
+    lancia le iterazioni di df_wp, calcolando la prima e creando la relativa lista voli
+    aggunge al df_new quello creato da df_wp
+    """
     #primo volo
 
     df_new=df.copy()
@@ -57,6 +66,11 @@ def df_lista_wp(df,lista_wp):
 
 
 def df_finale(df,df_ar,date,lista_waypoint):
+
+    """
+    dati df entrate e arrivi, una data, e una lista di wp
+    ritorna un df con il tempo di arrivo e il flytime
+    """
     lista_wp=copy.deepcopy(lista_waypoint)
     df_day=data.df_per_data(df,date)
     df_new=df_lista_wp(df_day,lista_wp)
@@ -77,6 +91,10 @@ def df_finale(df,df_ar,date,lista_waypoint):
     return df_new
 
 def df_finale_delay(df,df_ar,date,lista_waypoint):
+    """
+    uguale a df dinale solo con l'aggiunta del delay
+    ritorna df finale e un dict con i tempi minimi di percorrenza di ciascun wp
+    """
     df_delay=df_finale(df,df_ar,date,lista_waypoint)
     delay_dict=fun.min_time_dict(df_delay,lista_waypoint)
     delay=np.zeros(df_delay.shape[0])

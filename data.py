@@ -132,14 +132,13 @@ def creation_data_waypoint(df,name,number_of_wp=5,name_of_col = "ifps_id"):
          ultimi "number_of_wp" waypints e i tempi
     """
     d = aircraft_repetition(df,name_of_col)
-    list = list(d.values())
+
     df_traj=pd.DataFrame(columns=name)
     i = 0
     while(i<df.shape[0]-1):
         aereo = df.iloc[i][name_of_col]
         row = []
-        num = list[i] - 1
-        print(num)
+
         row.append(aereo)
         for s in range(2*number_of_wp + 1):
             row.append('None')
@@ -150,8 +149,8 @@ def creation_data_waypoint(df,name,number_of_wp=5,name_of_col = "ifps_id"):
             cont =cont+1 #contiamo gli stack
         if(cont<=number_of_wp):
             for k in range(cont):
-                row[1+k] = df.iloc[i+cont-k-1+num]["sid"]
-                row[1+k+number_of_wp]=df.iloc[i+cont-k-1+num]["time"]
+                row[1+k] = df.iloc[i+cont-k-1]["sid"]
+                row[1+k+number_of_wp]=df.iloc[i+cont-k-1]["time"]
             df_traj=df_traj.append(dict(zip(name,row)),ignore_index = True)
             i=j
             while (i<=df.shape[0]-2 and df.iloc[i][name_of_col]==df.iloc[i+1][name_of_col]):
@@ -196,19 +195,7 @@ def delete_useless_aircraft(df,cond):
     return df
 
 
-def aircraft_repetition(df,name_of_flight):
-    dict = {}
-    i=0
-    while(i<df.shape[0]):
-        aircraft = df.iloc[i][name_of_flight]
-        cont = 1
-        j =i
-        while(j<df.shape[0]-2 and aircraft==df.iloc[j+1][name_of_flight]):
-            cont=cont+1
-            j=j+1
-        dict[aircraft]=continue
-        i=j+1
-    return dict
+
 
 
 

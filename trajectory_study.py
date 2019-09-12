@@ -57,7 +57,7 @@ i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
 sl = list(s.values())
 sl[3]
-df_traj = da.creation_data_waypoint(df_entry_day1,names)
+df_traj = data.creation_data_waypoint(df_entry_day1,names)
 df_traj
 
 df_entry_day1

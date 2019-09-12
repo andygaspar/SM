@@ -105,6 +105,9 @@ def df_finale_delay(df,df_ar,date,lista_waypoint):
     return df_delay,delay_dict
 
 
+
+
+"********************** programma ******************************"
 l=lista_wp[0:3]
 d=lista_date[0]
 l

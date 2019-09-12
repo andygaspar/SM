@@ -16,14 +16,11 @@ lista_date
 lista_wp
 lista_freq_wp
 
-
+df
 
 """
-ddd.iloc[180080:180110]_dayone
-ddd.iloc[180080]
-df.iloc[180093]
-ddd.iloc[180109]
-df.iloc[180110]
+ddd=pd.read_csv("../data/punti_1709.csv")
+ddd.iloc[180080:180110]
 """
 
 
@@ -87,14 +84,16 @@ def df_finale_delay(df,df_ar,date,lista_waypoint):
         delay[i]=df_delay.iloc[i]["fly time"]-delay_dict[df_delay.iloc[i]["sid"]]
 
     df_delay["delay"]=delay
-    return df_delay
+    return df_delay,delay_dict
 
 
 l=lista_wp[0:3]
 d=lista_date[0]
 l
-df_uno=df_finale_delay(df,df_ar,d,l)
+df_uno,min_dict=df_finale_delay(df,df_ar,d,l)
 df_uno
+min_dict
+
 
 df_ordinato=df_uno.sort_values(by="a_time_sec")
 df_ordinato

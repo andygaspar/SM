@@ -4,6 +4,8 @@ from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import functions as fun
 import data as data
+from numpy import linalg as LA
+from scipy.spatial import distance
 
 
 df_ar=pd.read_csv("../data/arrivi_1709.csv")
@@ -17,16 +19,16 @@ df_filtered=data.dist_filter(df_wp,200)
 df_filtered
 freq = fun.frequency(df_filtered,"sid")
 
+freq
+df_filtered = data.data_time(df_filtered)
 
-df_wp
 
 
-
-df_toplot
+df_toplot O
 
 #considero solo un giorno e solo la condizione di frankfurt!
-cond_day1=df_toplot["date"]=="2017-09-13"  #data in considerazione
-df_entry_day1=df_toplot[cond_day1]
+cond_day1=df_filtered["date"]=="2017-09-13"  #data in considerazione
+df_entry_day1=df_filtered[cond_day1]
 df_entry_day1.shape
 df_entry_day1
 f_cont = df_entry_day1["D"]="EDDF"
@@ -55,12 +57,11 @@ df_entry_day1
 
 i = 0
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
-sl = list(s.values())
-sl[3]
+
 df_traj = data.creation_data_waypoint(df_entry_day1,names)
 df_traj
 
-df_entry_day1
+
 
 
 
@@ -69,11 +70,16 @@ df_entry_day1
 """
 Al dataset creato aggiungo gli arrivi, contenuti nel dataset df_ar
 """
-arr = pd.read_csv("../data/arr_frankfurt_13_09_17.csv")
 
+f_cont = arr["D"]=="EDDF"
+arr=arr[f_cont]
 arr
-df_traj = da.arrival_matching(df_traj,arr)
+date_cond = arr["date"]=="2017-09-13"
+arr = arr[date_cond]
+data.rinomina(arr,"ifps_id","flight")
 
+df_traj = data.arrival_matching(df_traj,arr)
+df_traj
 #df_traj rappresenta i primi 5 waypoints e i vari tempi + tempo arrivo
 #ora aggiungo le tempistiche
 tempistiche = []
@@ -90,7 +96,7 @@ for i in  range(df_traj.shape[0]):
 "aggiungo anche i tempi di arrivo"
 df_traj["tempi di arrivo"] = tempistiche
 df_traj
-traiettorie_13_09 = df_traj.to_csv(r'../data/traiettorie_13_09.csv',index = None, header=True)
+traiettorie_13_09 = df_traj.to_csv(r'../traiettorie_13_09.csv',index = None, header=True)
 
 none_cond = df_traj["arrival"]!="None"
 df_traj = df_traj[none_cond]
@@ -103,7 +109,7 @@ e come valori il numero di volte che queste traiettorie appaiono
 
 """
 trajectory = []
-
+df_traj
 barra = "-"
 for i in range(df_traj.shape[0]):
     percorso = df_traj.iloc[i]["wp1"]+barra+df_traj.iloc[i]["wp2"]+barra+df_traj.iloc[i]["wp3"]+barra+df_traj.iloc[i]["wp4"]+barra+df_traj.iloc[i]["wp5"]
@@ -134,35 +140,6 @@ len(percorsi)
 percorsi
 
 
-"""
-TROVO TERZA TRIAETTORIA
-"""
-df_traj
-tr_interessante = percorsi[2]
-tr_interessante = tr_interessante.replace("-"," ")
-tr_interessante = tr_interessante.split(" ")
-tr_interessante
-temp = list(df_traj.iloc[0])
-temp[1]==tr_interessante[0]
-aereo = " "
-
-
-aereo
-
-aircraft_condition = df_wp["ifps_id"]==aereo
-ddf = df_wp[aircraft_condition]
-ddf.shape[0]
-condd = ddf["distance"]<200
-
-ddf = ddf[condd]
-
-ddf
-tr_interessante = ddf["sid"].values
-tr_interessante = list(tr_interessante)
-tr_interessante
-
-
-num_percorsi
 """
 Ora creo un dict,chiamato wp_coord, che ha come chiavi tutti i pox waypoints
 e come valori le loro coordinate
@@ -266,61 +243,56 @@ for i in range(coord_traj.shape[0]):
 
     else:
         continue
-df_wp
-
-tr_dict
-
-wp_coord
-
-
-
-
-s =aircraft_repetition(df_entry_day1,"ifps_id")
-s
 
 """
-************************************
+TROVIAMO WAYPOINTS PIU' VICINI AD ARRIVO E PLOTTIAMOLI
 """
-"""
-PUNTI IMPORTANTI
-"""
+trajectory #vettore delle traiettorie
 
-"""
-**************************************
-"""
-
-lista_traiet = list(tr_dict.keys())
-lista_traiet
-wp_imp = []
-freq
-for i in range(10):
-    temp = lista_traiet[i]
+wp1 = []
+for i in range(len(trajectory)):
+    temp = trajectory[i]
     temp = temp.replace("-"," ")
     temp = temp.split(" ")
-    wp_imp.append(temp[0])
-print("*****")
-wp_imp
-lista = list(freq.keys())
-lista
+    if temp[0] not in wp1:
+        wp1.append(temp[0])
+    else:
+        continue
+
+wp1 #ordinati
+wp_coord
+coord_of_wp = list(wp_coord.values())
+coord_of_wp[0][0]
+wayp
+#provo a plottarli
+plt.figure(figsize=(20,15))
+for i in range(len(wp1)):
+    wp = wp1[i]
+    print(wp)
+    for j in  range(len(wp_coord)):
+        if wp==wayp[j]:
+            print("ciao")
+            plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1],label = wp)
 
 
 
-list_freq
-liste_freq_value = list(freq.values())
-coord_imp = []
-list_freq = lista[0:20]
 
-len(list_freq)
-for i in tr_interessante:
-    coord_imp.append(wp_coord[i])
 
-coord_imp
+plt.plot(coord_of_wp[][0],coord_of_wp[0][1],label = wp)
 
-int_dict = dict(zip(tr_interessante,coord_imp))
-int_dict
-entrance_dict = dict(zip(list_freq,coord_imp))
-entrance_dict
-entrance_dict["CHA"][0]
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 """
 ***************************************************************
@@ -373,31 +345,19 @@ def traiettorie_complete(lista_aircrafts):
 traiettorie  = traiettorie_complete(aircrafts)
 traiettorie[0]
 wp_coord
-lista_coordinate = list(wp_coord.values())
-lista_wp = list(wp_coord.keys())
-lista_coordinate
 
+lista_coordinate
+wp_coord
 coord_traiettorie = []
 
 
-
-
-def coordinate_list(traiettoria,lista_wp,lista_coordinate):
-    N = len(traiettoria)
-    coordinate_x = np.zeros(N)
-    coordinate_y = np.zeros(N)
-    for i in range(N):
-        st = traiettoria[i]
-        for j in range(len(lista_wp)):
-            if(st==lista_wp[j]):
-                coordinate_x[i]=lista_coordinate[j][0]
-                coordinate_y[i]=lista_coordinate[j][1]
-    return coordinate_x,coordinate_y
+lista_wp = list(wp_coord.keys())
+lista_coordinate = list(wp_coord.values())
+lista_coordinate
 
 
 
-p,q = coordinate_list(traiettorie[0],lista_wp,lista_coordinate)
-plt.plot(p,q)
+
 
 """
 provo a plottare le traiettorie
@@ -419,7 +379,7 @@ for i in int_dict:
 
 
 
-
+entrance_dict
 
 
 freq
@@ -428,9 +388,9 @@ list_freq
 list_freq_2 = []
 for i in range(10):
     list_freq_2.append(list_freq[i])
-list_freq_2
-coordinate_x[1,:]
-coordinate_x[1,:-2]
+freq
+wp_freq=list(freq.keys())
+wp_freq
 plt.figure(figsize=(20,15))
 for i in range(coord_traj.shape[0]):
     tr = coord_traj.iloc[i]
@@ -459,18 +419,243 @@ for i in range(coord_traj.shape[0]):
         else:
             continue
 plt.scatter(50.037753, 8.560964,color="red")
-for i in entrance_dict:
-    plt.scatter(entrance_dict[i][0], entrance_dict[i][1],linewidth = 6,label = i)
-    plt.annotate(i,xy=(entrance_dict[i][0],entrance_dict[i][1]), xytext=(entrance_dict[i][0]-0.15,entrance_dict[i][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
-for i in int_dict:
-    plt.scatter(int_dict[i][0], int_dict[i][1],linewidth = 6,label = i)
-    plt.annotate(i,xy=(int_dict[i][0],int_dict[i][1]), xytext=(int_dict[i][0]-0.25,int_dict[i][1] -0.25),arrowprops=dict(facecolor='red', shrink=0.05))
-
-
+for i in range(10):
+    wp = wp_freq[i]
+    print(wp)
+    for j in  range(len(wp_coord)):
+        if wp==wayp[j]:
+            plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1])
+            plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][0],coord_of_wp[j][1]), xytext=(coord_of_wp[j][0]-0.15,coord_of_wp[j][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
+len(coord_traj)
+freq
+wp_freq=list(freq.keys())
+wp_freq
 plt.legend()
 plt.savefig("plot/traj_1_bis.png")
 
 plt.show()
-
+wp_dict
 
 help(fun.frequency)
+
+"""
+********************************************************
+"""
+"""
+CALCOLO DISTANZE TRA traiettorie
+"""
+
+
+for i in range(len(trajectory)):
+    print(trajectory[i])
+    trajectory[i] = trajectory[i].replace("-"," ")
+    trajectory[i] = trajectory[i].split(" ")
+trajectory
+
+
+
+#sperimentiamo
+
+def distance_trajectory(tr1,tr2):
+    """
+    tr1 e tr2 sono traiettorie già divise in una lista
+    df è il dict con le coordinate di ogni way_point
+    """
+    n1 = 0
+    n2 = 0
+    for i in range(len(tr1)):
+        if(tr1[i]!="None"):
+            n1+=1
+    for i in range(len(tr2)):
+        if(tr2[i]!="None"):
+            n2+=1
+    dist = []
+    if(n1==n2):
+        for j in range(n1):
+            dist.append(distance.euclidean(wp_coord[tr1[j]],wp_coord[tr2[j]]))
+    if (n1!=n2):
+        minimo = min(n1,n2)
+
+        for j in range(minimo):
+            dist.append(distance.euclidean(wp_coord[tr1[j]], wp_coord[tr2[j]]))
+    dist = np.array(dist)
+    return dist.mean()
+
+
+
+p_arr = percorsi.copy()
+for i in range(len(p_arr)):
+    p_arr[i] = p_arr[i].replace("-"," ")
+    p_arr[i] = p_arr[i].split(" ")
+
+p_arr
+
+# vediamo quante trajettorie sono "simili alla traiettoria 0"
+
+
+
+
+
+
+
+
+
+
+
+
+for i in range(len(similar_to_one_coord)):
+    x = []
+    y = []
+    for j in range(5):
+        if(similar_to_one_coord[i][j]!=0):
+            x.append(similar_to_one_coord[i][j][0])
+            y.append(similar_to_one_coord[i][j][1])
+    plt.plot(x,y,linewidth=1)
+
+plt.scatter(50.037753, 8.560964,color="red")
+
+plt.plot(coordinate_x[0],coordinate_y[0],linewidth=4,label = "trajectory_0")
+
+"""
+stessa cosa con il secondo
+"""
+
+
+def controlla_traiettoria(trajectories,df = df_traj):
+    voli = []
+    for j in range(df.shape[0]):
+        aircraft = df.iloc[j]["flight"]
+        cond = df["flight"]==aircraft
+        x = df[cond]
+        x = x.iloc[0]
+        x = x[1:6]
+        x = list(x)
+        for i in range(len(trajectories)):
+            if(x==trajectories[i]):
+                if(aircraft not in voli):
+                    voli.append(aircraft)
+                break
+            else:
+                continue
+    return voli
+
+
+
+qwerty=controlla_traiettoria(similar_to_one)
+
+df_traj.shape[0]
+
+similar_to_one
+similar_to_2_coord = []
+for i in range(len(similar_to_2)):
+    temp = similar_to_2[i]
+    coord = []
+    for j in range(len(temp)):
+        if (temp[j]!="None"):
+            print(wp_coord[temp[j]])
+            coord.append(wp_coord[temp[j]])
+        else:
+            coord.append(0)
+    similar_to_2_coord.append(coord)
+
+for i in range(len(similar_to_2_coord)):
+    x = []
+    y = []
+    for j in range(5):
+        if(similar_to_2_coord[i][j]!=0):
+            x.append(similar_to_2_coord[i][j][0])
+            y.append(similar_to_2_coord[i][j][1])
+    plt.plot(x,y,linewidth=1)
+
+plt.scatter(50.037753, 8.560964,color="red")
+
+plt.plot(coordinate_x[1],coordinate_y[1],linewidth=5,label = "trajectory_1")
+
+
+
+
+
+"scrivo una funzione che restituisca due liste:"
+"la prima da la traiettoria simile ad una determinata traiettoria"
+"la seconda le coordinate"
+
+
+
+trajectory
+
+def trova_percorsi_simili(tr_princ,d,trajectories = trajectory):
+    similar = []
+    for i in range(len(trajectories)):
+        dist = distance_trajectory(tr_princ,trajectories[i])
+        if (dist< d and trajectories[i] not in similar and trajectories[i]!=tr_princ):
+            similar.append(trajectories[i])
+
+    similar_cord = []
+    for i in range(len(similar)):
+        temp = similar[i]
+        coord = []
+        for j in range(len(temp)):
+            if (temp[j]!="None"):
+                coord.append(wp_coord[temp[j]])
+            else:
+                coord.append(0)
+        similar_cord.append(coord)
+    return similar,similar_cord
+
+coordinate_x
+tr_dict
+
+
+def coordinate_list(traiettoria,lista_wp=lista_wp,lista_coordinate=lista_coordinate):
+    N = len(traiettoria)
+    coordinate_x = np.zeros(N)
+    coordinate_y = np.zeros(N)
+    for i in range(N):
+        st = traiettoria[i]
+        for j in range(len(lista_wp)):
+            if(st==lista_wp[j]):
+                coordinate_x[i]=lista_coordinate[j][0]
+                coordinate_y[i]=lista_coordinate[j][1]
+    return coordinate_x,coordinate_y
+lista_coordinate
+
+
+def plotting_percorsi_simili(tr_princ,sim,sim_cord):
+    coordinate_x,coordinate_y = coordinate_list(tr_princ)
+    plt.figure(figsize=(20,15))
+    for i in range(len(sim_cord)):
+        x = []
+        y = []
+        for j in range(5):
+            if(sim_cord[i][j]!=0):
+                x.append(sim_cord[i][j][0])
+                y.append(sim_cord[i][j][1])
+        plt.plot(x,y,linewidth=1)
+    plt.scatter(50.037753, 8.560964,color="red")
+    plt.plot(coordinate_x[0],coordinate_y[0],linewidth=10,label = "trajectory_1")
+    plt.show()
+    plt.legend()
+
+
+a,b = trova_percorsi_simili(p_arr[0],1)
+
+plotting_percorsi_simili(p_arr[0],a,b)
+
+coordinate_x[1]
+
+plt.plot(coordinate_x[1],coordinate_y[1],linewidth=10,label = "trajectory_1")
+
+
+for i in range(len(similar_to_2_coord)):
+    x = []
+    y = []
+    plt.figure(figsize=(20,15))
+    for j in range(5):
+        if(similar_to_2_coord[i][j]!=0):
+            x.append(similar_to_2_coord[i][j][0])
+            y.append(similar_to_2_coord[i][j][1])
+    plt.plot(x,y,linewidth=
+
+plt.scatter(50.037753, 8.560964,color="red")
+
+plt.plot(coordinate_x[1],coordinate_y[1],linewidth=5,label = "trajectory_1")

@@ -1,11 +1,3 @@
-import pandas as pd
-import numpy as np
-from geopy.distance import geodesic
-import matplotlib.pyplot as plt
-import functions as fun
-import data as data
-import csv
-import copy
 
 
 df=pd.read_csv("../data/completo.csv")

@@ -394,19 +394,19 @@ for i in range(coord_traj.shape[0]):
     tr = coord_traj.iloc[i]
     if(i<5):
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and tr["wp4"]!="None" and tr["wp5"]!="None"):
-            plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory "+str(i))
+            plt.plot(coordinate_y[i,:],coordinate_x[i,:],linewidth=num_percorsi[i]/10,label = "trajectory "+str(i))
 
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
             tr["wp4"]!="None" and tr["wp5"]=="None"):
-                plt.plot(coordinate_x[i,:-1],coordinate_y[i,:-1],linewidth=num_percorsi[i]/10)
+                plt.plot(coordinate_y[i,:-1],coordinate_x[i,:-1],linewidth=num_percorsi[i]/10)
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
             tr["wp4"]=="None" and tr["wp5"]=="None"):
-                plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
+                plt.plot(coordinate_y[i,:-2],coordinate_x[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
     if(i>=5):
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and tr["wp4"]!="None" and tr["wp5"]!="None"):
-            plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10)
+            plt.plot(coordinate_y[i,:],coordinate_x[i,:],linewidth=num_percorsi[i]/10)
 
         #if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
         #    tr["wp4"]!="None" and tr["wp5"]=="None"):
@@ -416,14 +416,14 @@ for i in range(coord_traj.shape[0]):
         #        plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
-plt.scatter(50.037753, 8.560964,color="red")
+plt.scatter(8.560964,50.037753,color="red")
 for i in range(10):
     wp = wp_freq[i]
 
     for j in  range(len(wp_coord)):
         if wp==wayp[j]:
-            plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1])
-            plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][0],coord_of_wp[j][1]), xytext=(coord_of_wp[j][0]-0.15,coord_of_wp[j][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
+            plt.scatter(coord_of_wp[j][1],coord_of_wp[j][0])
+            plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][1],coord_of_wp[j][0]), xytext=(coord_of_wp[j][1]-0.15,coord_of_wp[j][0] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
 
 plt.legend()
 plt.savefig("plot/traj_1_bis.png")
@@ -728,8 +728,8 @@ for i in range(len(aircraft)):
         else:
             continue
 
-
-
+wp_coord
+wp_dict
 def raggruppa_aerei(list_sim,index,air_list="aircr",df=df_traj):
      air = []
      for i in range(len(aircraft)):
@@ -746,6 +746,10 @@ def raggruppa_aerei(list_sim,index,air_list="aircr",df=df_traj):
      return air
 
 
-air_1 = raggruppa_aerei(list_sim)
+air_1 = raggruppa_aerei(list_sim,0)
 
 len(air_1)
+
+
+
+for i in range()

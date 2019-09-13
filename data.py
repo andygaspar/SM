@@ -154,7 +154,14 @@ def carica_liste():
     for i in range(len(freq_wp)):
         freq_wp[i]=int(freq_wp[i])
 
-    return lista_date[0],wp[0],freq_wp
+    wp_coordinate=[]
+    with open('../data/wp_coor.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            wp_coordinate.append(row)
+
+
+    return lista_date[0],wp[0],freq_wp,wp_coordinate
 
 
 

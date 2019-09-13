@@ -1,5 +1,8 @@
 import numpy as np
 from geopy.distance import geodesic
+import csv
+import pandas as pd
+import data as data
 
 
 def coord(coordinate):
@@ -19,7 +22,7 @@ def coord(coordinate):
 def df_coor_to_dist(df):
     """
     dato un df con la colonna coor
-    ritorna un np.array con le distanze dall'aeroporto
+    ritorna un np.array co=['XINLA', 'XIBGI', 'KOVAN', 'NELLI', 'EMPAX']n le distanze dall'aeroporto
     """
     AIRPORT=(50.03793, 8.56215)
     wp_dist=np.zeros(df.shape[0])
@@ -110,7 +113,6 @@ def waypoint_per_volo(df):
 
 
 
-"Da finire ***********************"
 def min_time_dict(df,lista):
     """
     dato un dataframe ed una lista di wp
@@ -124,3 +126,47 @@ def min_time_dict(df,lista):
         min_t[wp]=min(df_aux["fly time"])
 
     return min_t
+
+
+def dict_wp_coor():
+    wp_coordinate=[]
+    with open('../data/wp_coor.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            wp_coordinate.append(row)
+
+    wp=[]
+    with open('../data/lista_wp.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            wp.append(row)
+    wp_coor=dict(zip(wp[0],wp_coordinate[0]))
+    return wp_coor
+
+
+
+def wp_neighbours(wp,dist_max):
+    wp_dict=dict_wp_coor()
+    neighbours=[]
+
+    coordinate=wp_dict[wp]
+    coordinate=coordinate.replace("POINT","")
+    coordinate=coordinate.replace("(","")
+    coordinate=coordinate.replace(")","")
+    split_coordinate=coordinate.split(" ")
+    split_coordinate=[float(split_coordinate[0]),float(split_coordinate[1])]
+    WP=tuple(split_coordinate)
+
+    for key in wp_dict:
+        if key!=wp:
+            coordinate=wp_dict[key]
+            coordinate=coordinate.replace("POINT","")
+            coordinate=coordinate.replace("(","")
+            coordinate=coordinate.replace(")","")
+            split_coordinate=coordinate.split(" ")
+            split_coordinate=[float(split_coordinate[0]),float(split_coordinate[1])]
+            NEIGH=tuple(split_coordinate)
+            dist=geodesic(WP,NEIGH).kilometers
+            if dist<=dist_max:
+                neighbours.append(key)
+    return neighbours

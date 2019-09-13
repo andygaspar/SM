@@ -12,16 +12,18 @@ df=pd.read_csv("../data/completo.csv")
 df_ar=pd.read_csv("../data/arrivi_completo.csv")
 df=data.dist_filter(df,200)
 lista_date,lista_wp,lista_freq_wp=data.carica_liste()
+
+
+
 lista_date
 lista_wp
 lista_freq_wp
 
-df
 
-"""
-ddd=pd.read_csv("../data/punti_1709.csv")
-ddd.iloc[180080:180110]
-"""
+
+#ddd=pd.read_csv("../data/punti_1709.csv")
+#ddd.iloc[180080:180110]
+
 
 
 def df_wp(df,wp,voli):
@@ -43,12 +45,14 @@ def df_wp(df,wp,voli):
 def df_lista_wp(df,lista_wp):
 
 
+
     """
     sotto fun di df_finale
 
     lancia le iterazioni di df_wp, calcolando la prima e creando la relativa lista voli
     aggunge al df_new quello creato da df_wp
     """
+
     #primo volo
 
     df_new=df.copy()
@@ -106,19 +110,41 @@ def df_finale_delay(df,df_ar,date,lista_waypoint):
 
 
 
+def sort_df(df):
+    df_ordinato=df.sort_values(by="a_time_sec")
+    delay=df_ordinato["delay"].values
+    return df_ordinato,delay
+
+
+
 
 "********************** programma ******************************"
-l=lista_wp[0:3]
+l=["KERAX","PSA","ROLIS","UNOKO"]
 d=lista_date[0]
-l
 df_uno,min_dict=df_finale_delay(df,df_ar,d,l)
-df_uno
-min_dict
-
-
-df_ordinato=df_uno.sort_values(by="a_time_sec")
-df_ordinato
-delay=df_ordinato["delay"].values
+df_tot,min_dict_tot=df_finale_delay(df,df_ar,d,lista_wp)
 
 np.mean(delay)
-plt.plot(delay/60)
+plt.plot(delay/60,color="red")
+
+p=plt.hist(df_ordinato["a_time_sec"].values,bins=24)
+plt.show()
+
+
+
+df_day1=data.df_per_data(df,lista_date[0])
+df_day1.shape
+
+
+
+
+
+
+
+
+
+num_fl=1
+for i in range(df_day1.shape[0]-1):
+    if df_day1.iloc[i]["aereo"]!=df_day1.iloc[i+1]["aereo"]:
+        num_fl+=1
+num_fl

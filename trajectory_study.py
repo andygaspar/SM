@@ -116,9 +116,7 @@ for i in range(df_traj.shape[0]):
     trajectory.append(percorso)
 
 
-trajectory
 len(trajectory)
-
 
 #contare quante traiettorie ci sono e quante volte compaiono
 tr_dict = {}
@@ -247,7 +245,7 @@ for i in range(coord_traj.shape[0]):
 """
 TROVIAMO WAYPOINTS PIU' VICINI AD ARRIVO E PLOTTIAMOLI
 """
-trajectory #vettore delle traiettorie
+ #vettore delle traiettorie
 
 wp1 = []
 for i in range(len(trajectory)):
@@ -394,7 +392,7 @@ wp_freq
 plt.figure(figsize=(20,15))
 for i in range(coord_traj.shape[0]):
     tr = coord_traj.iloc[i]
-    if(i<3):
+    if(i<5):
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and tr["wp4"]!="None" and tr["wp5"]!="None"):
             plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10,label = "trajectory "+str(i))
 
@@ -406,30 +404,27 @@ for i in range(coord_traj.shape[0]):
                 plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
-    if(i>=3):
+    if(i>=5):
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and tr["wp4"]!="None" and tr["wp5"]!="None"):
             plt.plot(coordinate_x[i,:],coordinate_y[i,:],linewidth=num_percorsi[i]/10)
 
-        if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
-            tr["wp4"]!="None" and tr["wp5"]=="None"):
-                plt.plot(coordinate_x[i,:-1],coordinate_y[i,:-1],linewidth=num_percorsi[i]/10)
-        if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
-            tr["wp4"]=="None" and tr["wp5"]=="None"):
-                plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
+        #if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
+        #    tr["wp4"]!="None" and tr["wp5"]=="None"):
+        #        plt.plot(coordinate_x[i,:-1],coordinate_y[i,:-1],linewidth=num_percorsi[i]/10)
+        #if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
+        #    tr["wp4"]=="None" and tr["wp5"]=="None"):
+        #        plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
 plt.scatter(50.037753, 8.560964,color="red")
 for i in range(10):
     wp = wp_freq[i]
-    print(wp)
+
     for j in  range(len(wp_coord)):
         if wp==wayp[j]:
             plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1])
             plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][0],coord_of_wp[j][1]), xytext=(coord_of_wp[j][0]-0.15,coord_of_wp[j][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
-len(coord_traj)
-freq
-wp_freq=list(freq.keys())
-wp_freq
+
 plt.legend()
 plt.savefig("plot/traj_1_bis.png")
 
@@ -451,7 +446,6 @@ for i in range(len(trajectory)):
     trajectory[i] = trajectory[i].replace("-"," ")
     trajectory[i] = trajectory[i].split(" ")
 trajectory
-
 
 
 #sperimentiamo
@@ -617,7 +611,7 @@ def coordinate_list(traiettoria,lista_wp=lista_wp,lista_coordinate=lista_coordin
                 coordinate_x[i]=lista_coordinate[j][0]
                 coordinate_y[i]=lista_coordinate[j][1]
     return coordinate_x,coordinate_y
-lista_coordinate
+
 
 
 def plotting_percorsi_simili(tr_princ,sim,sim_cord):
@@ -632,30 +626,126 @@ def plotting_percorsi_simili(tr_princ,sim,sim_cord):
                 y.append(sim_cord[i][j][1])
         plt.plot(x,y,linewidth=1)
     plt.scatter(50.037753, 8.560964,color="red")
-    plt.plot(coordinate_x[0],coordinate_y[0],linewidth=10,label = "trajectory_1")
-    plt.show()
-    plt.legend()
+
 
 
 a,b = trova_percorsi_simili(p_arr[0],1)
-
+c,d =trova_percorsi_simili(p_arr[1],1)
 plotting_percorsi_simili(p_arr[0],a,b)
+plotting_percorsi_simili(p_arr[1],c,d)
+plt.plot(coordinate_x[0],coordinate_y[0],linewidth=10,label = "trajectory_1")
+plt.legend()
+plt.show()
 
-coordinate_x[1]
-
-plt.plot(coordinate_x[1],coordinate_y[1],linewidth=10,label = "trajectory_1")
 
 
-for i in range(len(similar_to_2_coord)):
-    x = []
-    y = []
-    plt.figure(figsize=(20,15))
-    for j in range(5):
-        if(similar_to_2_coord[i][j]!=0):
-            x.append(similar_to_2_coord[i][j][0])
-            y.append(similar_to_2_coord[i][j][1])
-    plt.plot(x,y,linewidth=
+"""
+CLUSTERING
+"""
+df_traj
+cont = 0
+p_arr
+len(tr_dict)
+list_sim = []
+list_sim_cord = []
+i=0
+percorsi_trovati = []
+while(i<10):
+    print("len",len(trajectory))
+    sim_i,sim_i_cord = trova_percorsi_simili(p_arr[i],1.0)
+    print(sim_i)
+    for j in range(len(sim_i)):
+        if sim_i[j] in trajectory:
+            trajectory.remove(sim_i[j])
+        else:
+            print("boh")
+    print("len traj",trajectory)
+    list_sim.append(sim_i)
+    list_sim_cord.append(sim_i_cord)
+    print(i)
+    i=i+1
+len(list_sim)
 
-plt.scatter(50.037753, 8.560964,color="red")
+for m in range(3):
+    plotting_percorsi_simili(p_arr[m],list_sim[m],list_sim_cord[m])
+    plt.plot(coordinate_x[m],coordinate_y[m],linewidth=10,label = "trajectory_"+str(m))
+    plt.scatter(50.037753, 8.560964,color="red")
+    for i in range(10):
+        wp = wp_freq[i]
+        for j in  range(len(wp_coord)):
+            if wp==wayp[j]:
+                plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1])
+                plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][0],coord_of_wp[j][1]), xytext=(coord_of_wp[j][0]-0.15,coord_of_wp[j][1] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
+plt.legend()
+plt.show()
+len(trajectory)
 
-plt.plot(coordinate_x[1],coordinate_y[1],linewidth=5,label = "trajectory_1")
+list_sim[0]
+aircraft = list(df_traj["flight"])
+aircraft
+df_traj
+#quali aircraft passano per il primo gruppo ?
+air_1 = []
+air_2 = []
+for i in range(len(aircraft)):
+    line = df_traj.iloc[i]
+    aircr = df_traj.iloc[i]["flight"]
+    for j in range(len(list_sim[0])):
+        if(line["wp1"]==list_sim[0][j][0] and line["wp2"]==list_sim[0][j][1] and
+            line["wp3"]==list_sim[0][j][2] and line["wp4"]==list_sim[0][j][3] and
+            line["wp5"]==list_sim[0][j][4]):
+            air_1.append(aircr)
+            break
+        else:
+            continue
+
+len(air_1)
+for i in range(len(aircraft)):
+    line = df_traj.iloc[i]
+    aircr = df_traj.iloc[i]["flight"]
+    for j in range(len(list_sim[1])):
+        if(line["wp1"]==list_sim[1][j][0] and line["wp2"]==list_sim[1][j][1] and
+            line["wp3"]==list_sim[1][j][2] and line["wp4"]==list_sim[1][j][3] and
+            line["wp5"]==list_sim[1][j][4]):
+            air_2.append(aircr)
+            break
+        else:
+            continue
+
+
+
+len(air_2)
+
+for i in range(len(aircraft)):
+    line = df_traj.iloc[i]
+    aircr = df_traj.iloc[i]["flight"]
+    for j in range(len(list_sim[1])):
+        if(line["wp1"]==list_sim[1][j][0] and line["wp2"]==list_sim[1][j][1] and
+            line["wp3"]==list_sim[1][j][2] and line["wp4"]==list_sim[1][j][3] and
+            line["wp5"]==list_sim[1][j][4]):
+            air_2.append(aircr)
+            break
+        else:
+            continue
+
+
+
+def raggruppa_aerei(list_sim,index,air_list="aircr",df=df_traj):
+     air = []
+     for i in range(len(aircraft)):
+         line = df.iloc[i]
+         aircr = line["flight"]
+         for j in range(len(list_sim[0])):
+             if(line["wp1"]==list_sim[1][j][0] and line["wp2"]==list_sim[1][j][1] and
+                 line["wp3"]==list_sim[1][j][2] and line["wp4"]==list_sim[1][j][3] and
+                 line["wp5"]==list_sim[1][j][4]):
+                 air.append(aircr)
+                 break
+             else:
+                 continue
+     return air
+
+
+air_1 = raggruppa_aerei(list_sim)
+
+len(air_1)

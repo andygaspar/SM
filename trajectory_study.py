@@ -386,9 +386,10 @@ list_freq
 list_freq_2 = []
 for i in range(10):
     list_freq_2.append(list_freq[i])
-freq
+
+
 wp_freq=list(freq.keys())
-wp_freq
+len(wp_freq)
 plt.figure(figsize=(20,15))
 for i in range(coord_traj.shape[0]):
     tr = coord_traj.iloc[i]

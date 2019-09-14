@@ -1,15 +1,26 @@
-
+import pandas as pd
+import numpy as np
+from geopy.distance import geodesic
+import matplotlib.pyplot as plt
+import functions as fun
+import data as data
+import csv
+import copy
 
 df=pd.read_csv("../data/completo.csv")
 df_ar=pd.read_csv("../data/arrivi_completo.csv")
 df=data.dist_filter(df,200)
-lista_date,lista_wp,lista_freq_wp=data.carica_liste()
+lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
+d_wp_coor=fun.dict_wp_coor()
+df=data.df_per_data(df,lista_date[0])
 
 
 
 lista_date
 lista_wp
 lista_freq_wp
+d_wp_coor
+df
 
 
 
@@ -18,25 +29,7 @@ lista_freq_wp
 
 
 
-def df_wp(df,wp,voli):
-    """
-    sotto fun di df_lista_wp
-    seleziona i voli per wp e controllando che non siano nella lista voli e aggiorna la lista
-    """
-    df_n=df.copy()
-    cond=df_n["sid"]==wp
-    df_n=df_n[cond]
-    for volo in voli:
-        cond=df_n["aereo"]!=volo
-        df_n=df_n[cond]
-    voli+=list(df_n["aereo"].values)
-    return df_n,voli
-
-
-
 def df_lista_wp(df,lista_wp):
-
-
 
     """
     sotto fun di df_finale
@@ -44,20 +37,12 @@ def df_lista_wp(df,lista_wp):
     lancia le iterazioni di df_wp, calcolando la prima e creando la relativa lista voli
     aggunge al df_new quello creato da df_wp
     """
-
-    #primo volo
-
-    df_new=df.copy()
-    cond=df_new["sid"]==lista_wp[0]
-    df_new=df_new[cond]
-    voli=list(df_new["aereo"].values)
-    lista_wp.pop(0)
-    lista_wp
-
-    #altri voli
-    for wp in lista_wp:
-        df_aux,voli=df_wp(df,wp,voli)
-        df_new=df_new.append(df_aux.copy(),ignore_index=True)
+    df_new = pd.DataFrame(data=None, columns=df.columns)
+    voli=[]
+    for i in range(df.shape[0]):
+        if df.iloc[i]["sid"] in lista_wp and df.iloc[i]["aereo"] not in voli:
+            df_new=df_new.append(df.iloc[i].copy(),ignore_index=True)
+            voli.append(df.iloc[i]["aereo"])
     return df_new
 
 
@@ -67,9 +52,8 @@ def df_finale(df,df_ar,date,lista_waypoint):
     dati df entrate e arrivi, una data, e una lista di wp
     ritorna un df con il tempo di arrivo e il flytime
     """
-    lista_wp=copy.deepcopy(lista_waypoint)
     df_day=data.df_per_data(df,date)
-    df_new=df_lista_wp(df_day,lista_wp)
+    df_new=df_lista_wp(df_day,lista_waypoint)
     a=[]
     ta=[]
     tv=[]
@@ -85,6 +69,9 @@ def df_finale(df,df_ar,date,lista_waypoint):
     df_new["fly time"]=tv
 
     return df_new
+
+
+
 
 def df_finale_delay(df,df_ar,date,lista_waypoint):
     """
@@ -114,29 +101,38 @@ def sort_df(df):
 l=["KERAX","PSA","ROLIS","UNOKO"]
 d=lista_date[0]
 df_uno,min_dict=df_finale_delay(df,df_ar,d,l)
-df_tot,min_dict_tot=df_finale_delay(df,df_ar,d,lista_wp)
+#df_tot,min_dict_tot=df_finale_delay(df,df_ar,d,lista_wp)
+min_dict
+df_uno
 
-np.mean(delay)
+df_uno,delay=sort_df(df_uno)
+df_uno
+
+df_uno.iloc[np.argmax(delay)]["aereo"]
+
 plt.plot(delay/60,color="red")
 
 p=plt.hist(df_ordinato["a_time_sec"].values,bins=24)
 plt.show()
 
+cond=df["aereo"]==df_uno.iloc[np.argmax(delay)]["aereo"]
+df_max_delay=df[cond]
+
+df
 
 
-df_day1=data.df_per_data(df,lista_date[0])
-df_day1.shape
+df_max_delay
+AA67325474
+AA67325474
+
+df_base=pd.read_csv("../data/punti_1709.csv")
+dd=pd.read_csv("../data/completo.csv")
+dd.shape
+df_base.shape
+cond=df_base['ifps_id']==df_uno.iloc[np.argmax(delay)]["aereo"]
+df_max_delay_base=df_base[cond]
+df_max_delay_base
 
 
 
-
-
-
-
-
-
-num_fl=1
-for i in range(df_day1.shape[0]-1):
-    if df_day1.iloc[i]["aereo"]!=df_day1.iloc[i+1]["aereo"]:
-        num_fl+=1
-num_fl
+def print_trajectory()

@@ -115,7 +115,7 @@ for i in range(df_traj.shape[0]):
     percorso = df_traj.iloc[i]["wp1"]+barra+df_traj.iloc[i]["wp2"]+barra+df_traj.iloc[i]["wp3"]+barra+df_traj.iloc[i]["wp4"]+barra+df_traj.iloc[i]["wp5"]
     trajectory.append(percorso)
 
-
+trajectory
 len(trajectory)
 
 #contare quante traiettorie ci sono e quante volte compaiono
@@ -408,25 +408,23 @@ for i in range(coord_traj.shape[0]):
         if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and tr["wp4"]!="None" and tr["wp5"]!="None"):
             plt.plot(coordinate_y[i,:],coordinate_x[i,:],linewidth=num_percorsi[i]/10)
 
-        #if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
-        #    tr["wp4"]!="None" and tr["wp5"]=="None"):
-        #        plt.plot(coordinate_x[i,:-1],coordinate_y[i,:-1],linewidth=num_percorsi[i]/10)
-        #if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
-        #    tr["wp4"]=="None" and tr["wp5"]=="None"):
-        #        plt.plot(coordinate_x[i,:-2],coordinate_y[i,:-2],linewidth=num_percorsi[i]/10)
+        if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
+            tr["wp4"]!="None" and tr["wp5"]=="None"):
+                plt.plot(coordinate_y[i,:-1],coordinate_x[i,:-1],linewidth=num_percorsi[i]/10)
+        if(tr["wp1"]!="None" and tr["wp2"]!="None" and tr["wp3"]!="None" and
+            tr["wp4"]=="None" and tr["wp5"]=="None"):
+                plt.plot(coordinate_y[i,:-2],coordinate_x[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
 plt.scatter(8.560964,50.037753,color="red")
-for i in range(10):
+for i in range(len(wayp)):
     wp = wp_freq[i]
-
     for j in  range(len(wp_coord)):
-        if wp==wayp[j]:
+        if wp==wayp[j] and wp =="GED":
             plt.scatter(coord_of_wp[j][1],coord_of_wp[j][0])
             plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][1],coord_of_wp[j][0]), xytext=(coord_of_wp[j][1]-0.15,coord_of_wp[j][0] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
-
 plt.legend()
-plt.savefig("plot/traj_1_bis.png")
+#plt.savefig("plot/traj_1_bis.png")
 
 plt.show()
 wp_dict

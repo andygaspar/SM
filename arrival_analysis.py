@@ -7,45 +7,48 @@ import data as data
 
 
 
-def sec_to_time(x):
-    sec=x%60
-    x-=sec
-    min=int(x/60)%60
-    x-=min
-    h=int(x/3600)
-    return str(h)+":"+str(min)+":"+str(sec)
-
-df_ar=pd.read_csv("../data/arrivi_1709.csv")
-df_wp=pd.read_csv("../data/punti_1709.csv")
-
-
-#separazione colonne data e tempo e aggiunta colonna tempo in secondi
-data.data_time(df_ar,"arr_time")
-data.add_time_in_sec(df_ar)
-data.data_time(df_wp)
-df_ar
-
-#solo una giornata
-cond=df_ar["date"]==df_ar.iloc[0]["date"]
-df_new=df_ar[cond]
-df_new
-
-
-#vettore tempo in sec degli arrivi, ordinato
-arrival=df_new["time_sec"].values
-arrival=np.array(sorted(arrival))
-
-arrival_time=[]
-for i in arrival:
-    arrival_time.append(sec_to_time(i))
+def arr_hist(date,BINS=24):
+    """
+    hist(data, BINS=default 24)
+    stampa istogramma e ritorna l'array con gli arrivi
+    """
+    df_ar=pd.read_csv("../data/arrivi_completo.csv")
+    arr_day1=data.df_per_data(df_ar,date)
+    arr_day1=arr_day1.sort_values(by="time_sec")
+    arr_array=arr_day1["time_sec"].values
+    max_bin=max(arr_array)
+    min_bin=min(arr_array)
+    width_bin=(max_bin-min_bin)/BINS
+    plt.hist(arr_array,bins=BINS, histtype='bar', ec='black')
+    plt.xticks(np.arange(min_bin,max_bin, width_bin),range(1,25))
+    plt.show()
+    return arr_array
 
 
 
+def freq_busy(start,end,date):
+    """
+    dato ora iniziale, ora finale, data
+    ritorna frequenza dei voli e df arrival con i voli nella fascia oraria
+    """
+    df_ar=pd.read_csv("../data/arrivi_completo.csv")
+    arr_day=data.df_per_data(df_ar,date)
+
+    #selezione in base al plot della fascia oraria le start-end
+    cond=arr_day["time_sec"]>start*3600
+    busy_arrival=arr_day[cond]
+    cond=busy_arrival["time_sec"]<end*3600
+    busy_arrival=busy_arrival[cond]
+
+    #calcolo frequenza
+    freq=(end-start)*3600/busy_arrival.shape[0]
+    return freq,busy_arrival
+
+
+"""
 #distribuzione frequenza nelle ore della giornata
 
-p=plt.hist(arrival,bins=48)
-p.set_xticklabels(range(24))
-plt.show()
+
 
 
 
@@ -64,3 +67,26 @@ sec_to_time(busy_arrival[-1])
 #calcolo frequenza
 freq=(21-5)*3600/len(busy_arrival)
 freq
+"""
+
+
+
+
+"""
+problemino, il numero di arrival è inferiore al numero di aerei nel completo
+
+
+date='2017-08-27'
+df=pd.read_csv("../data/completo.csv")
+df=data.df_per_data(df,date)
+count=1
+for i in range(df.shape[0]-1):
+    if df.iloc[i]["aereo"]!=df.iloc[i+1]["aereo"]:
+        count+=1
+count
+df_ar=pd.read_csv("../data/arrivi_completo.csv")
+arr_day=data.df_per_data(df_ar,date)
+arr_day.shape[0]
+
+
+"""

@@ -152,7 +152,12 @@ for i in range(df_entry_day1.shape[0]):
 
 wayp = list(wp_coord.keys()) #lista di tutti i waypoint
 wayp
-wp_coord
+wp_c = list(wp_coord.values())
+wp_coord_df = pd.DataFrame(wp_coord,columns=["waypoints","coord"])
+
+wp_coord_df
+
+wp_coord = .to_csv (name, index = None, header=True)
 cord_list = list(wp_coord.values()) #lista di tutte le coordinate
 cord_list
 #ora ogni percorso salvato in tr_dict avrà la sua coordinata

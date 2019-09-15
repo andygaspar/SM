@@ -75,6 +75,7 @@ def arr(N,f,lam,fattore_sigma=20):
     f={uni,triang,exp,norm}
     sigma=varianza
     """
+    lam=1/lam
     delay=np.zeros(N)
 
 
@@ -139,6 +140,13 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
 
 
 
+
+
+
+
+
+
+"""
 "simulazioni"
 
 k=20
@@ -157,7 +165,12 @@ plt.legend()
 
 
 
-queue_u,delay_u,arrival_u=PSRA(3,"uni",90,k)
+queue_u,delay_u,arrival_u=PSRA(3,"uni",30,200)
+queue_u_1,delay_u_1,arrival_u_1=PSRA_(3,"uni",k)
+plt.plot(queue_u,label="uniform")
+
+queue_u==queue_u_1
+
 queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
 queue_tri,delay_tri,arrival_tri=PSRA(3,"tri",k)
 d=tot_dist(queue_u,queue_n)

@@ -118,7 +118,7 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
     dato lasso temporale, distribuzione: ("exp", "uni", "norm", "tri"), lam, fattore_sigma
     ritorna liste con queue, delay, arrival
     """
-
+    print("ciao")
     #conversione in secondi
     T=lasso_temporale_in_ore*60*60
     N=int(T/lam)
@@ -140,7 +140,7 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
 
 
 "simulazioni"
-"""
+
 k=20
 dist=np.zeros(2000)
 for i in range(2000):
@@ -157,7 +157,7 @@ plt.legend()
 
 
 
-queue_u,delay_u,arrival_u=PSRA(3,"uni",k)
+queue_u,delay_u,arrival_u=PSRA(3,"uni",90,k)
 queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
 queue_tri,delay_tri,arrival_tri=PSRA(3,"tri",k)
 d=tot_dist(queue_u,queue_n)

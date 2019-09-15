@@ -55,7 +55,7 @@ np.std(clean)
 # run del modello
 queue, delay_sim, arr=ss.PSRA(20-5,"uni",freq,np.std(clean))
 
-queue, delay_sim, arr=ss.PSRA(20-5,"uni",90,20)
+queue, delay_sim, arr=ss.PSRA(15,"uni",90,20)
 
 
 max(delay_sim)

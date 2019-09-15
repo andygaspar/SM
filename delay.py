@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import chisquare
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import functions as fun
@@ -7,6 +8,7 @@ import arrival_analysis as aa
 import data as data
 import csv
 import copy
+import simple_simulation as ss
 
 df=pd.read_csv("../data/completo.csv")
 df_ar=pd.read_csv("../data/arrivi_completo.csv")
@@ -17,15 +19,68 @@ df=data.df_per_data(df,lista_date[0])
 
 
 
-lista_date
-lista_wp
-lista_freq_wp
-d_wp_coor
-df
-
-aa.arr_hist(lista_date[0])
 
 
+wp=["KERAX","PSA","ROLIS","UNOKO"]
+date=lista_date[0]
+
+#vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
+arr_vect=aa.arr_hist(lista_date[0])
+help(aa)
+help(data)
+help(fun)
+help(ss)
+
+#df completo della giornata in questione
+df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
+
+
+#calcolo frequenza e creazione del df busy
+freq,df_arr_busy=aa.freq_busy(5,20,date)
+freq
+df_busy=data.df_busy(df_delay,5,20)
+df_busy,delay=data.sort_df(df_busy)
+df_busy
+np.mean(delay)
+np.var(delay)
+
+plt.plot(delay)
+
+#pulizia dagli outliers, clean sono i DATI FINALI EFFETTIVI
+clean=fun.reject_outliers(delay)
+plt.plot(clean/60)
+np.std(clean)
+
+
+# run del modello
+queue, delay_sim, arr=ss.PSRA(20-5,"uni",freq,np.std(clean))
+
+queue, delay_sim, arr=ss.PSRA(20-5,"uni",90,20)
+
+
+max(delay_sim)
+#plot
+plt.plot(clean/60,color="red")
+plt.plot(delay_sim,color="blue")
+plt.show()
+
+queue
+plt.plot(queue)
+plt.plot(arr)
+delay_sim
+
+
+test=np.random.normal(0, np.std(clean)/freq, len(clean))
+test1=np.random.normal(0, 20/90, len(clean))
+
+max(clean)/60
+max(test)
+max(test1)
+
+
+e=chisquare(clean/60,np.random.choice(delay_sim,len(clean)))
+
+e
 """
 "********************** programma ******************************"
 

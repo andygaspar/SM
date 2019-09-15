@@ -20,7 +20,7 @@ def arr_hist(date,BINS=24):
     min_bin=min(arr_array)
     width_bin=(max_bin-min_bin)/BINS
     plt.hist(arr_array,bins=BINS, histtype='bar', ec='black')
-    plt.xticks(np.arange(min_bin,max_bin, width_bin),range(1,25))
+    plt.xticks(np.arange(min_bin,max_bin, width_bin),range(0,23))
     plt.show()
     return arr_array
 

@@ -229,3 +229,12 @@ def traiettorie_complete(df):
             traj_list.append([df.iloc[i]["sid"]])
             j+=1
     return traj_list
+
+
+"  funzioni statistiche *****************************"
+def reject_outliers(data, m=2):
+    """
+    dato un array e un fattore moltiplicativo
+    ritorna un array senza gli outliers
+    """
+    return data[abs(data - np.mean(data)) < m * np.std(data)]

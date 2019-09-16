@@ -9,21 +9,49 @@ import copy
 
 
 df=pd.read_csv("../data/completo.csv")
+df_ar = pd.read_csv("../data/arrivi_1709.csv")
 df=data.dist_filter(df,200)
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
 d_wp_coor=fun.dict_wp_coor()
-df=data.df_per_data(df,lista_date[0])
+df=data.df_per_data(df,'2017-08-17')
 df
 
 main=["KERAX","PSA","ROLIS","UNOKO"]
 
 
+#lavoro solo su una data
+
+
+
+"""
+"""
+
+
+df_ar
+df_ar =data.data_time(df_ar,"arr_time")
+cond = df_ar["date"]=='2017-08-17'
+df_ar =df_ar[cond]
+df_ar
+
+
+
+
+
 
 trajectory=traiettorie_complete(df)
+trajectory[1]
+
+
 
 
 
 def traiettorie_complete(df):
+    """
+        INPUT:
+              -dataframe con notizie traiettorie_complete
+        OUTPUT:
+            -lista di liste delle traiettorie
+    """
     aereo = df.iloc[0]["aereo"]
     traj_list = [[df.iloc[0]["sid"]]]
     j = 0
@@ -37,10 +65,11 @@ def traiettorie_complete(df):
     return traj_list
 
 
+df
 
 
-
-def shift_coor(d_wp_coor):len(traj_list)
+def shift_coor(d_wp_coor):
+    len(traj_list)
     """
     dato il dict_wp_coor
     shift coordinate vicino all'origine
@@ -69,7 +98,7 @@ plt.scatter(scaled_long,scaled_lat)
 
 
 """
-CREAZIONE WP_COORD
+CREAZIONE WP_COORD--> da funzionalizzare
 """
 df.shape[0]
 cc = df.iloc[0]["coor"]
@@ -98,6 +127,16 @@ calcolo la distanza per ogni coppia
 
 
 def distanza_coppie(traj = trajectory,dict_wp = wp_coord):
+    """
+    INPUT:
+        -lista di liste delle trajettorie
+        -dizionario con le coordinate di ogni singolo waypoint_per_fl
+
+    OUTPUT:
+        -dizionario dove per ogni coppia (utile) di traiettorie ritorna la
+            distanza
+
+    """
     res = {}
     for i in range(len(traj)):
         traiettoria = traj[i]
@@ -111,73 +150,128 @@ def distanza_coppie(traj = trajectory,dict_wp = wp_coord):
                 c1 = wp_coord[p1]
                 c2 = wp_coord[p2]
                 dist=geodesic(c1,c2).kilometers
-                if(stringa not in w):
+                if(stringa not in res):
                     res[stringa]=dist
     return res
 
 dictionario_distanza_coppie = distanza_coppie()
 
+dictionario_distanza_coppie["MTR-ORVIV"]
+trajectory
+len(trajectory)
+
+dictionario_distanza_coppie
 
 
 
 
 
-pr = trajectory[0]
-df
+def trovo_ripetizioni(perc,tr = trajectory):
+    """
+    INPUT: perc: percorso d'interesse, introdotto come array dove ogni
+                waypoint è un elemento distinto
+          tr : dataframe con tutti i ipercorsi
+    OUTPUT: array con indici relativi alle ripetizioni del percorso di input
+    """
+    res = []
+    for i in range(len(tr)):
+        if(perc == tr[i]):
+            res.append(i)
+
+    return res
+
+
+ì
+
+len(trajectory)
 
 cont = 0
-for i in range(len(pr)-1):
-    p1 = df.iloc[i]
-    p2=df.iloc[i+1]
-    t1 = p1["time_sec"]
-    t2 = p2["time_sec"]
-    cont += t2-t1
-
-cont = df.iloc[len(pr)-1]["time_sec"] - df.iloc[0]["time_sec"]
+for i in range(len(trajectory)):
+    tr = trajectory[i]
+    for j in range(len(tr)-1):
+        if(tr[j]=="MTR" and tr[j+1]=="ORVIV"):
+            print(i)
+            print(tr)
+            cont+=1
+            print("************************************************")
 
 cont
-#1029
+df
 
-def tempo_di_percorrenza_percorsi(df = df,traj = trajectory):
-    res = []
-    i = 0
+def minimo_coppia(wp1,wp2,df=df):
+    """
+    auxiliary function che calcola, dati due waypoint, il minimo tempo per
+    passare dal primo al secondo
+    """
+    min = 100000000000
+    for i in range(df.shape[0]-1):
+        temp_i = df.iloc[i]
+        temp_2i= df.iloc[i+1]
+        if(temp_i["sid"]==wp1 and temp_2i["sid"]==wp2 and temp_i["aereo"]==temp_2i["aereo"]):
+            if(temp_2i["time_sec"]-temp_i["time_sec"]<=min):
+                min = temp_2i["time_sec"]-temp_i["time_sec"]
+            if(temp_2i["time_sec"]-temp_i["time_sec"]<0):
+                print(i)
+    return min
 
-    lunghezza = 0
-    for cont in range(len(traj)):
-        temp = traj[cont]
-        lunghezza = len(temp) - 1
-        if len(temp)==1:
-            res.append(0)
-            i = i+1+lunghezza
-        
-        else:
-            tp = df.iloc[lunghezza + i]["time_sec"] - df.iloc[i]["time_sec"]
-            res.append(tp)
-        i = i+1+lunghezza
+dictionario_distanza_coppie = distanza_coppie()
+lista_coppie = list(dictionario_distanza_coppie.keys())
+lista_coppie
+dictionario_distanza_coppie["MTR-ORVIV"]
 
+def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df):
+    """
+    INPUT :
+        -lista_coppie = lista con tutte le coppie sotto forma di stringa
+        -df = dataframe con i dati relativi agli aerei di un unica giornata
+
+    OUTPUT:
+        -dictionary dove per ogni coppia viene restituito il tempo minimo
+    """
+    res = {}
+    for i in range(len(lista_coppie)):
+        temp = lista_coppie[i]
+        temp = temp.replace("-"," ")
+        temp = temp.split(" ")
+        c = minimo_coppia(temp[0],temp[1])
+        res[lista_coppie[i]]=c
     return res
 
+tempi_coppie = tempi_minimi_coppie()
+tempi_coppie
+tempi_coppie["MTR-ORVIV"]
 
-q = tempo_di_percorrenza_percorsi()
-len(q)
-len(trajectory)
-def merge_percorsi_tempi(traj = trajectory,df = df):
-    tempi = tempo_di_percorrenza_percorsi(df,traj)
+trajectory
+
+
+def minimo_percorsi(tempi_coppie = tempi_coppie,df = df,traj = trajectory):
+    """
+    INPUT:
+        - tempi_coppie = dictionary con i minimi tempi per ogni coppia
+
+    OUTPUT:
+        -dictionary dove per ogni percorso c'è il tempo minimo calcolato sui minimo_coppia
+        di ogni coppia che forma il percorso
+    """
     res = {}
     for i in range(len(traj)):
-        #trasformo i percorsi in stringhe
         traiettoria = traj[i]
         s = ""
+        tempo = 0
+        #formo la stringa che andrà a descrivere la traiettoria
         for j in range(len(traiettoria)):
-            if(j<len(traiettoria)-1):
-                s = s+traiettoria[j]+"-"
+            if j<len(traiettoria)-1:
+                s = s + traiettoria[j] + "-"
             else:
-                s = s+traiettoria[j]
-        print(s)
-        if(s not in res):
-            res[s]=tempi[i]
+                s = s + traiettoria[j]
+        # ora calcolo il tempo
+        for j in range(len(traiettoria)-1):
+            wp1 = traiettoria[j]
+            wp2 = traiettoria[j+1]
+            ss = wp1 + "-" + wp2
+            tempo += tempi_coppie[ss]
+        res[s]= tempo
     return res
 
-
-
-pp = merge_percorsi_tempi()
+min_tempi_percorsi = minimo_percorsi()
+len(min_tempi_percorsi)

@@ -141,7 +141,7 @@ def traiettorie_complete(df):
 
 
 trajectory=traiettorie_complete(df_tot)
-trajectory[5]
+trajectory[0]
 
 
 
@@ -244,22 +244,10 @@ dictionario_distanza_coppie
 
 
 
-def trovo_ripetizioni(perc,tr = trajectory):
-    """
-    INPUT: perc: percorso d'interesse, introdotto come array dove ogni
-                waypoint è un elemento distinto
-          tr : dataframe con tutti i ipercorsi
-    OUTPUT: array con indici relativi alle ripetizioni del percorso di input
-    """
-    res = []
-    for i in range(len(tr)):
-        if(perc == tr[i]):
-            res.append(i)
-
-    return res
 
 
 df_tot
+
 
 def minimo_coppia(wp1,wp2,df=df_tot):
     """
@@ -280,8 +268,8 @@ def minimo_coppia(wp1,wp2,df=df_tot):
 
 lista_coppie = list(dictionario_distanza_coppie.keys())
 lista_coppie
-
-
+len(lista_coppie)
+df_tot
 def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
     """
     INPUT :
@@ -293,12 +281,17 @@ def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
     """
     res = {}
     for i in range(len(lista_coppie)):
+        print(i)
+        print(lista_coppie[i])
+        print("*****************************")
         temp = lista_coppie[i]
         temp = temp.replace("-"," ")
         temp = temp.split(" ")
         c = minimo_coppia(temp[0],temp[1])
         res[lista_coppie[i]]=c
     return res
+
+
 
 tempi_coppie = tempi_minimi_coppie()
 tempi_coppie

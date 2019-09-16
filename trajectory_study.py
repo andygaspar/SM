@@ -73,11 +73,13 @@ Al dataset creato aggiungo gli arrivi, contenuti nel dataset df_ar
 
 f_cont = arr["D"]=="EDDF"
 arr=arr[f_cont]
-arr
+arr = df_ar.copy()
+df_filtered = data.data_time(df_filtered)
+arr = data.data_time(arr,"arr_time")
 date_cond = arr["date"]=="2017-09-13"
 arr = arr[date_cond]
 data.rinomina(arr,"ifps_id","flight")
-
+arr
 df_traj = data.arrival_matching(df_traj,arr)
 df_traj
 #df_traj rappresenta i primi 5 waypoints e i vari tempi + tempo arrivo
@@ -137,7 +139,7 @@ num_percorsi = list(tr_dict.values()) #lista del numero di volte in cui le traie
 len(percorsi)
 percorsi
 
-
+freq
 """
 Ora creo un dict,chiamato wp_coord, che ha come chiavi tutti i pox waypoints
 e come valori le loro coordinate
@@ -157,7 +159,7 @@ wp_coord_df = pd.DataFrame(wp_coord,columns=["waypoints","coord"])
 
 wp_coord_df
 
-wp_coord = .to_csv (name, index = None, header=True)
+
 cord_list = list(wp_coord.values()) #lista di tutte le coordinate
 cord_list
 #ora ogni percorso salvato in tr_dict avrà la sua coordinata
@@ -265,7 +267,7 @@ for i in range(len(trajectory)):
 wp1 #ordinati
 wp_coord
 coord_of_wp = list(wp_coord.values())
-coord_of_wp[0][0]
+type(coord_of_wp[0][1])
 wayp
 #provo a plottarli
 plt.figure(figsize=(20,15))
@@ -276,13 +278,7 @@ for i in range(len(wp1)):
         if wp==wayp[j]:
             print("ciao")
             plt.scatter(coord_of_wp[j][0],coord_of_wp[j][1],label = wp)
-
-
-
-
-
-plt.plot(coord_of_wp[][0],coord_of_wp[0][1],label = wp)
-
+plt.show()
 
 
 
@@ -297,92 +293,23 @@ plt.plot(coord_of_wp[][0],coord_of_wp[0][1],label = wp)
 
 
 
-"""
-***************************************************************
-"""
-"""
-VEDO LE TRAIETTORIE IMPORTANTI COMPLETE
-"""
-"""
-**************************************************************
-"""
-
-tr_dict
-tr = list(tr_dict.keys())
-tr = tr[0:20]
-tr
-aircrafts = []
 
 
-for j in range(len(tr)):
-    temp_tr = tr[j]
-    temp_tr=temp_tr.replace("-"," ")
-    temp_tr = temp_tr.split(" ")
-    for i in range(df_traj.shape[0]):
-        temp = df_traj.iloc[i]
-        if(temp_tr[0]==temp["wp1"] and temp_tr[1]==temp["wp2"] and temp_tr[2]==temp["wp3"] and
-           temp_tr[3]==temp["wp4"] and temp_tr[4]==temp["wp5"]):
-           aircrafts.append(temp["flight"])
-           break
-
-df_wp
-aircrafts
-d_cond = df_wp["distance"]<200
-df_wp = df_wp[d_cond]
-df_cond = df_wp["ifps_id"]==aircrafts[0]
-df = df_wp[df_cond]
-df
-tr_sing = df["sid"].values
-tr_sing
-def traiettorie_complete(lista_aircrafts):
-    traiettorie = []
-    for i in range(len(aircrafts)):
-        tr = lista_aircrafts[i]
-        df_cond = df_wp["ifps_id"]==tr
-        df = df_wp[df_cond]
-        tr_sing = list(df["sid"].values)
-        traiettorie.append(tr_sing)
-    return traiettorie
 
 
-traiettorie  = traiettorie_complete(aircrafts)
-traiettorie[0]
-wp_coord
 
-lista_coordinate
-wp_coord
-coord_traiettorie = []
+
+
 
 
 lista_wp = list(wp_coord.keys())
 lista_coordinate = list(wp_coord.values())
-lista_coordinate
 
 
 
 
 
-"""
-provo a plottare le traiettorie
-"""
 
-p,q =
-plt.figure(figsize=(20,15))
-for i in range(len(traiettorie)):
-    tr_i = traiettorie[i]
-    print(tr_i)
-    x_cord,y_cord = coordinate_list(tr_i,lista_wp,lista_coordinate)
-    plt.plot(x_cord,y_cord,)
-plt.scatter(50.037753, 8.560964,color="red")
-for i in int_dict:
-    plt.scatter(int_dict[i][0], int_dict[i][1],linewidth = 6,label = i)
-    plt.annotate(i,xy=(int_dict[i][0],int_dict[i][1]), xytext=(int_dict[i][0]-0.25,int_dict[i][1] -0.25),arrowprops=dict(facecolor='red', shrink=0.05))
-
-
-
-
-
-entrance_dict
 
 
 freq
@@ -424,25 +351,31 @@ for i in range(coord_traj.shape[0]):
             continue
 plt.scatter(8.560964,50.037753,color="red")
 for i in range(len(wayp)):
+
     wp = wp_freq[i]
     for j in  range(len(wp_coord)):
-        if wp==wayp[j] and wp =="GED":
+        if wp==wayp[j] and ((wp =="PSA" or wp=="KERAX" or wp=="ROLIS" or wp=="UNOKO") or wp in wp_freq_l) :
+
             plt.scatter(coord_of_wp[j][1],coord_of_wp[j][0])
             plt.annotate(wp+" "+str(i),xy=(coord_of_wp[j][1],coord_of_wp[j][0]), xytext=(coord_of_wp[j][1]-0.15,coord_of_wp[j][0] -0.15),arrowprops=dict(facecolor='black', shrink=0.05))
 plt.legend()
-#plt.savefig("plot/traj_1_bis.png")
-
+plt.savefig("plot/traj_1_bis_bis.png")
 plt.show()
+wp_freq_l = wp_freq[:20]
+wp_freq_l
+wp_coord["KERAX"]
 wp_dict
-
+"KERAX" in wayp
+plt.show()
+freq
+frequenze = list(freq.keys())
+wp_freq
+wp_coord["PSA"]
+wp_coord
+wayp
 help(fun.frequency)
 
-"""
-********************************************************
-"""
-"""
-CALCOLO DISTANZE TRA traiettorie
-"""
+
 
 
 for i in range(len(trajectory)):

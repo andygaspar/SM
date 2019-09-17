@@ -69,6 +69,15 @@ def dist_filter(df,dist):
     entry_condition=df['distance']<dist
     return df[entry_condition]
 
+def airport(df,airp):
+    """
+    dato un df MUNITO DELLA CLONNA DISTANZA, e una distanza
+    ritorna un dataset con solo le righe taliche df["distanza"]<dist
+    """
+    #limitazione agli waypoint più vicini di 200km dall'aeroporto
+    entry_condition=df['D']==airp
+    return df[entry_condition]
+
 
 def data_time(df,label="time_over"):
     """
@@ -76,6 +85,7 @@ def data_time(df,label="time_over"):
     crea un df con data e time separati e cancella la colonna time_over
     """
     #aggiunta colonna "data volo" e rimpiazzo colonna touch down con "time"
+    print(type(df))
     date=[]
     landing=[]
     for i in range(df.shape[0]):
@@ -120,19 +130,15 @@ def crea_completo():
     return df
 
 
-d=crea_completo()
-
-
-
 def crea_arrivi():
     """
     crea df arrivi pulito e con day e time separati e arrivo in sec
     """
     df_ar=pd.read_csv("../data/arrivi_1709.csv")
-    da_togliere=["ac_id","D","O"]
-    df_ar=taglio_colonne(df_ar,da_togliere)
+    da_togliere=["ac_id","O"]
+    taglio_colonne(df_ar,da_togliere)
     data_time(df_ar,"arr_time")
-    df_ar=taglio_colonne(df_ar,["arr_time"])
+    taglio_colonne(df_ar,["arr_time"])
     rinomina(df_ar,"ifps_id","aereo")
     add_time_in_sec(df_ar)
     return df_ar

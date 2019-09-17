@@ -73,20 +73,20 @@ tot_dist(a,b)
 
 
 "costruzione della funzione arrivi"
-def arr(N,f,lam,fattore_sigma=20):
+def arr(N,f,freq,fattore_sigma=20):
     """
     N=numero di slot (derivanti dal lasso temporale indicato)
     f={uni,triang,exp,norm}
     sigma=varianza
     """
-    lam=1/lam
+    lam=1/freq
     delay=np.zeros(N)
 
 
 
     #caso exp
     if f=="exp":
-        delay=np.array(samp.sample_from_exp(lam/fattore_sigma,N))
+        delay=np.array(samp.sample_from_exp(fattore_sigma/lam,N))
 
 
     if f=="uni":
@@ -118,7 +118,7 @@ def arr(N,f,lam,fattore_sigma=20):
 
 
 "costruzione PSRA"
-def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
+def PSRA(lasso_temporale_in_ore,distributione,freq,fattore_sigma):
     """
     dato lasso temporale, distribuzione: ("exp", "uni", "norm", "tri"), lam, fattore_sigma
     ritorna liste con queue, delay, arrival
@@ -126,17 +126,17 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
 
     #conversione in secondi
     T=lasso_temporale_in_ore*60*60
-    N=int(T/lam)
+    N=int(T/freq)
 
     #costruzione del vettore degli arrivi con ritardi
-    arrival,delay=arr(N,distributione,lam,fattore_sigma)
+    arrival,delay=arr(N,distributione,freq,fattore_sigma)
 
 
     #costruzione del PSRA
     queue=np.zeros(N)
     #queue_old=np.zeros(N)
     for i in range(1,N):
-        arrival_in_slot=len(arrival[(arrival>=lam*(i-1)) & (arrival<lam*i)])
+        arrival_in_slot=len(arrival[(arrival>=freq*(i-1)) & (arrival<freq*i)])
         #queue_old[i]=queue_old[i-1]+arrival_in_slot-int(queue_old[i-1]!=0)
         queue[i]=queue[i-1]   +   arrival_in_slot   -    int(queue[i-1]!=0)
 

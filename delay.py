@@ -42,20 +42,23 @@ arr_vect=aa.arr_hist(date,airport)
 
 
 #calcolo frequenza e creazione del df busy
-freq,df_arr_busy=aa.freq_busy(2,21,date,airport)
+freq,df_arr_busy=aa.freq_busy(3,21,date,airport)
 df_arr_busy=df_arr_busy.sort_values(by="time_sec")
+freq
+
+#definizione del periodo
 start_time=2
 end_time=21
 
 
 
+
+#costruzione del df_finale ma solo con gli aerei del lasso temporale in esame
 df_busy=data.df_busy(df_delay,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
-df_busy.shape
 
-plt.plot(df_busy["time_sec"].values/70000)
-plt.plot(df_busy["delay"].values)
+
 
 
 
@@ -71,65 +74,74 @@ clean.shape
 
 
 # run del modello
-queue,delay_sim, arr=ss.PSRA(end_time-start_time,"norm",freq,40)
-
-#plot modello
-plt.plot(queue)
-
-plt.plot(df_busy["a_time_sec"].values)
-plt.plot(df_busy["delay"].values)
+queue,delay_sim, arr=ss.PSRA(end_time-start_time,"norm",freq,20)
+queue_d=plot_queues(df_busy,queue,freq)
 
 
 
+#plot modello già convertito in delay (*freq) espresso in minuti (/60)
+#plot dei delay in minuti
+plt.plot(queue*freq/60)
+plt.plot(df_busy["delay"].values/60)
 
 
-def make_queue_from_data(df_busy,queue,freq):
+df_busy
+
+#comparazione medie
+np.mean(queue*freq/60)
+np.mean(df_busy["delay"].values/60)
+
+#comparazione st deviation
+np.std(queue*freq/60)
+np.std(df_busy["delay"].values/60)
+
+
+
+
+
+
+def plot_queues(df_busy,queue,freq):
     """
     dato il df_busy e la coda simulata
     crea un array coda_da_data e i sui indici (per il plot)
     """
+    df=df_busy.sort_values(by="a_time_sec")
     queue_d=np.zeros(len(queue))
-    shift=min(df_busy["time_sec"])
-    queue_index=np.zeros(len(queue))
+    shift=min(df_busy["a_time_sec"])
     for i in range(df_busy.shape[0]):
-        index=int((df_busy.iloc[i]["time_sec"]-shift)/freq)
+        index=int((df_busy.iloc[i]["a_time_sec"]-shift)/freq)
         if index<len(queue):
             queue_d[index]=int(df_busy.iloc[i]["delay"]/freq)
-            queue_index[i]=index
-    cond=queue_d!=0
-    queue_d=queue_d[cond]
-    queue_index=queue_index[cond]
 
-    return queue_d,queue_index
+    #interpretazione
+    i=0
+    while i<len(queue_d)-1:
+        a=queue_d[i]
+        b=0
+        k=i+1
+        while k<(len(queue_d)-1) and queue_d[k]==0:
+            k+=1
+        b=queue_d[k]
+        for j in range(i+1,k):
+            queue_d[j]=a+(j-i)*(b-a)/(k+1-i)
+        i=k
 
-queue_d,queue_index=make_queue_from_data(df_busy,queue)
+    plt.plot(queue/60,label="simulation")
+    plt.plot(queue_d/60,label="actual data")
+    plt.legend()
+    plt.show()
 
-#plot
-plt.plot(np.linspace(0,len(queue),len(queue)),queue)
-plt.plot(queue_index,queue_d)
-
-
-
-
-
-
-
-
-
-
+    return queue_d
 
 
 
 
+queue_d=plot_queues(df_busy,queue,freq)
 
 
 
-plt.plot(np.random.choice(delay_sim,len(clean)),label="delay_sim")
-plt.plot(delay,label="clean")
-plt.legend()
-plt.show()
 
-
+#test....ma ancora non vuole dire nulla e bisogna capire bene
 
 e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
 
@@ -137,18 +149,7 @@ e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
 """
 "********************** programma ******************************"
 
-l=["KERAX","PSA","ROLIS","UNOKO"]
-d=lista_date[0]
-df_uno,min_dict=df_finale_delay(df,df_ar,d,l)
-df_uno,delay=sort_df(df_uno)
-np.mean(delay)
-
-#df_uno.iloc[np.argmax(delay)]["aereo"]  #max delay
-
-plt.plot(delay/60,color="red")
-p=plt.hist(df_uno["a_time_sec"].values,bins=24)
-plt.show()
-
+ALBI
 
 """
 

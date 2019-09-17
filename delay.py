@@ -15,21 +15,21 @@ df_ar=pd.read_csv("../data/arrivi_completo.csv")
 df=data.dist_filter(df,300)
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
 d_wp_coor=fun.dict_wp_coor()
-df=data.df_per_data(df,lista_date[0])
 
 
 
+fff=pd.read_csv("../data/punti_1709.csv")
+fff
 
-
+#data e wp
 wp=["KERAX","PSA","ROLIS","UNOKO"]
 date=lista_date[0]
+date
+df=data.df_per_data(df,date)
 
 #vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
-arr_vect=aa.arr_hist(lista_date[0])
-help(aa)
-help(data)
-help(fun)
-help(ss)
+arr_vect=aa.arr_hist(date)
+
 
 #df completo della giornata in questione
 df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
@@ -37,49 +37,91 @@ df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
 
 #calcolo frequenza e creazione del df busy
 freq,df_arr_busy=aa.freq_busy(5,20,date)
-freq
+df_arr_busy=df_arr_busy.sort_values(by="time_sec")
+
+
+
 df_busy=data.df_busy(df_delay,5,20)
 df_busy,delay=data.sort_df(df_busy)
-df_busy
-np.mean(delay)
-np.var(delay)
 
-plt.plot(delay)
+df_busy
+
+plt.plot(df_busy["time_sec"].values/70000)
+plt.plot(df_busy["delay"].values/4000)
+
+
+
+
+
 
 #pulizia dagli outliers, clean sono i DATI FINALI EFFETTIVI
 clean=fun.reject_outliers(delay)
 plt.plot(clean/60)
-np.std(clean)
 
 
 # run del modello
-queue, delay_sim, arr=ss.PSRA(20-5,"uni",freq,np.std(clean))
+queue,delay_sim, arr=ss.PSRA(20-5,"norm",freq,40)
 
 
 
-max(delay_sim)
+plt.plot(df_busy["a_time_sec"].values)
+plt.plot(df_busy["delay"].values)
+
+
+
+
+
+def make_queue_from_data(df_busy,queue):
+    """
+    dato il df_busy e la coda simulata
+    crea un array coda_da_data e i sui indici (per il plot)
+    """
+    queue_d=np.zeros(len(queue))
+    shift=min(df_busy["time_sec"])
+    queue_index=np.zeros(len(queue))
+    for i in range(df_busy.shape[0]):
+        index=int((df_busy.iloc[i]["time_sec"]-shift)/30)
+        if index<len(queue):
+            queue_d[index]=int(df_busy.iloc[i]["delay"]/30)
+            queue_index[i]=index
+    cond=queue_d!=0
+    queue_d=queue_d[cond]
+    queue_index=queue_index[cond]
+
+    return queue_d,queue_index
+
+queue_d,queue_index=make_queue_from_data(df_busy,queue)
+
 #plot
-plt.plot(clean/60,color="red")
-plt.plot(delay_sim,color="blue")
+plt.plot(np.linspace(0,len(queue),len(queue)),queue)
+plt.plot(queue_index,queue_d)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+plt.plot(np.random.choice(delay_sim,len(clean)),label="delay_sim")
+plt.plot(delay,label="clean")
+plt.legend()
 plt.show()
 
-queue
-plt.plot(queue)
-plt.plot(arr)
-delay_sim
-
-
-test=np.random.normal(0, np.std(clean)/freq, len(clean))
-test1=np.random.normal(0, 20/90, len(clean))
-
-max(clean)/60
-max(test)
-max(test1)
 
 
 e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
 
-e
+
 """
 "********************** programma ******************************"
 

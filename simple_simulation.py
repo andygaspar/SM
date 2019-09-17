@@ -2,6 +2,7 @@ import sampling as samp
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas
+import copy
 
 
 
@@ -40,7 +41,10 @@ def tot_dist(a,b):
 
 def hell_dist(a,b):
     return np.sqrt(sum((np.abs(np.sqrt(a)-np.sqrt(b)))**2))/np.sqrt(2)
-
+plt.plot(np.random.choice(delay_sim,len(clean)),label="delay_sim")
+plt.plot(delay,label="clean")
+plt.legend()
+plt.show()
 
 
 a=np.array([1,2,3,1,2,3,1])
@@ -119,7 +123,7 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
     dato lasso temporale, distribuzione: ("exp", "uni", "norm", "tri"), lam, fattore_sigma
     ritorna liste con queue, delay, arrival
     """
-    print("ciao")
+
     #conversione in secondi
     T=lasso_temporale_in_ore*60*60
     N=int(T/lam)
@@ -127,11 +131,14 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
     #costruzione del vettore degli arrivi con ritardi
     arrival,delay=arr(N,distributione,lam,fattore_sigma)
 
+
     #costruzione del PSRA
     queue=np.zeros(N)
+    #queue_old=np.zeros(N)
     for i in range(1,N):
         arrival_in_slot=len(arrival[(arrival>=lam*(i-1)) & (arrival<lam*i)])
-        queue[i]=queue[i-1]+arrival_in_slot-int(queue[i-1]!=0)
+        #queue_old[i]=queue_old[i-1]+arrival_in_slot-int(queue_old[i-1]!=0)
+        queue[i]=queue[i-1]   +   arrival_in_slot   -    int(queue[i-1]!=0)
 
 
 
@@ -168,7 +175,7 @@ plt.legend()
 queue_u,delay_u,arrival_u=PSRA(3,"uni",30,200)
 queue_u_1,delay_u_1,arrival_u_1=PSRA_(3,"uni",k)
 plt.plot(queue_u,label="uniform")
-
+10
 queue_u==queue_u_1
 
 queue_n,delay_n,arrival_n=PSRA(3,"norm",k)

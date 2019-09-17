@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import functions as fun
 import csv
 
-#CIAO
+
 
 df_ar=pd.read_csv("../data/arrivi_1709.csv")
 df_wp=pd.read_csv("../data/punti_1709.csv")
@@ -109,15 +109,19 @@ def crea_completo():
     rinomina(df,3,"coor")
     rinomina(df,4,"sid")
     rinomina(df,5,"aereo")
-    da_togliere=["trajectory_id","geopoint_id","ac_id","D","O"]
+    da_togliere=["trajectory_id","geopoint_id","ac_id","O"]
     taglio_colonne(df,da_togliere)
-    df=df[["aereo","sid","coor","distance","time_over"]]
+    #df=df[["aereo","sid","coor","distance","time_over"]]
     add_dist(df)
     data_time(df)
     taglio_colonne(df,["time_over"])
     add_time_in_sec(df)
     df=df[~df.duplicated()]
     return df
+
+
+d=crea_completo()
+
 
 
 def crea_arrivi():
@@ -186,9 +190,9 @@ def df_busy(df,start,end):
     """
     df_new=df.copy()
     #selezione in base al plot della fascia oraria le start-end
-    cond=df["time_sec"]>start*3600
+    cond=df["a_time_sec"]>start*3600
     busy_arrival=df[cond]
-    cond=busy_arrival["time_sec"]<end*3600
+    cond=busy_arrival["a_time_sec"]<end*3600
     busy_arrival=busy_arrival[cond]
 
     return busy_arrival

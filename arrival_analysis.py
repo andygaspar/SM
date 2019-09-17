@@ -13,7 +13,8 @@ def arr_hist(date,BINS=24):
     stampa istogramma e ritorna l'array con gli arrivi
     """
     df_ar=pd.read_csv("../data/arrivi_completo.csv")
-    arr_day1=data.df_per_data(df_ar,date)
+    arr_day1=data.df_per_data(df_ar,'2017-09-11')
+    arr_day1
     arr_day1=arr_day1.sort_values(by="time_sec")
     arr_array=arr_day1["time_sec"].values
     max_bin=max(arr_array)

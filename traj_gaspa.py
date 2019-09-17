@@ -331,3 +331,7 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
 
 min_tempi_percorsi = minimo_percorsi()
 min_tempi_percorsi
+
+"""
+costruisco il dataframe dove c'è aereo-traiettoria-tempo_percorso-tempo_minimo-delay
+"""

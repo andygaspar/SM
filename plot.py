@@ -12,62 +12,127 @@ import data as data
 plot utilizzo degli waypoint
 """
 
-df_bubble=pd.read_csv("../data/completo.csv")
-lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
-df_bubble=data.dist_filter(df_bubble,200)
-df_bubble=data.df_per_data(df_bubble,lista_date[0])
 
-def make_coor_dict(df):
+
+def freq_list_to_plot(df,num_more_freq,additional_list):
     """
-    calcola le frequenze degli waypoint
+    dato un df,  il numero di wp più frequenti che si vuole ottenere
+    (e opzionale una lista di punti da aggiungere alla lista cmq)
+    ritorna la lista voluta
     """
-    waypoint=fun.frequency(df,"sid")
-    N=len(waypoint)
+    fr_dict=fun.dict_wp_freq()
+    fr=list(fr_dict.keys())
+    fr=[x for x in fr if x not in additional_list]
+    fr=fr[0:num_more_freq]
+    return fr+additional_list
 
-    coor_dict={}
-    for i in range(df_bubble.shape[0]):
-        key=df_bubble.iloc[i]["sid"]
-        if key not in coor_dict:
-            coor_dict[key]=df_bubble.iloc[i]["coor"]
 
-    return coor_dict
-#vettore x
 
-def bubble_plot(df,coor_dict,wp_list,al=0.5,scale=0.1):
-    N=len(coor_dict)
+
+def bubble_plot(df,wp_list,al=0.5,scale=0.1,textsize=22):
+    """
+    dato un df una lista di punti ()
+    ritorna il bubble plot
+    """
+    """
+    dato un df una lista di punti ()
+    ritorna il bubble plot
+    """
+    coor_dict=fun.dict_wp_coor()
+    N=len(wp_list)
     x=np.zeros(N)
     y=np.zeros(N)
     z=np.zeros(N)
     i=0
-    fr_dict=fun.frequency(df,"sid")
-    for key in coor_dict:
+    fr_dict=fun.dict_wp_freq()
+    for key in wp_list:
         c=fun.coord(coor_dict[key])
         x[i]=c[0]
         y[i]=c[1]
         z[i]=fr_dict[key]
         i=i+1
-    #plt.figure(figsize=(20,15))
-    plt.scatter(y,x ,s=z*0.3, alpha=al)
+    plt.figure(figsize=(20,15))
+    #plt.scatter(y,x ,s=z*0.3, alpha=al)
     lon=8.560964
     lat=50.037753
-    plt.scatter( lon,lat,color="red")
-    plt.annotate("FR",xy=(lat,lon),xytext=(lat-0.15, lon-0.15))
+    AIR="FR AIRPORT"
+    plt.scatter( lon,lat,color="red",s=150)
+    plt.annotate(AIR,xy=(lon,lat),xytext=(lon-0.3, lat-0.1),size=textsize+1)
     for wp in wp_list:
         c=fun.coord(coor_dict[wp])
         plt.scatter(c[1],c[0],color="green")
-        plt.annotate(wp,xy=(c[1],c[0]),xytext=(c[1]-0.15, c[0]-0.15))
+        plt.annotate(wp,xy=(c[1],c[0]),xytext=(c[1]-0.08, c[0]-0.08),size=textsize)
+
 
     plt.show()
 
 
-coor_dict=make_coor_dict(df_bubble)
-coor_dict
-wp_list=["KERAX","PSA","ROLIS","UNOKO"]
-fr_dict=fun.frequency(df_bubble,"sid")
-fr_dict
-fr=list(fr_dict.keys())
-fr=[x for x in fr if x not in wp_list]
-fr[0:20]
-bubble_plot(df_bubble,coor_dict,wp_list+fr[0:10],scale=0.3)
 
-coor_dict["UNOKO"]
+
+def bubble_plot_2(df,wp_list,al=0.5,scale=0.1,textsize=22):
+    """
+    dato un df una lista di punti ()
+    ritorna il bubble plot con bubble size
+    """
+    coor_dict=fun.dict_wp_coor()
+    N=len(wp_list)
+    x=np.zeros(N)
+    y=np.zeros(N)
+    z=np.zeros(N)
+    i=0
+    fr_dict=fun.dict_wp_freq()
+    for key in wp_list:
+        c=fun.coord(coor_dict[key])
+        x[i]=c[0]
+        y[i]=c[1]
+        z[i]=fr_dict[key]
+        i=i+1
+    plt.figure(figsize=(20,15))
+    plt.scatter(y,x ,s=z*0.4, alpha=al)
+    lon=8.560964
+    lat=50.037753
+    AIR="FR AIRPORT"
+    plt.scatter( lon,lat,color="red",s=150)
+    plt.annotate(AIR,xy=(lon,lat),xytext=(lon-0.3, lat-0.1),size=textsize+1)
+    for wp in wp_list:
+        c=fun.coord(coor_dict[wp])
+        plt.annotate(wp,xy=(c[1],c[0]),xytext=(c[1]-0.1, c[0]-0.1),size=textsize)
+
+    plt.show()
+
+
+
+def plot_queues(df_busy,queue,freq):
+    """
+    dato il df_busy e la coda simulata
+    crea un array coda_da_data e i sui indici (per il plot)
+
+    poi plotta
+    """
+    df=df_busy.sort_values(by="a_time_sec")
+    queue_d=np.zeros(len(queue))
+    shift=min(df_busy["a_time_sec"])
+    for i in range(df_busy.shape[0]):
+        index=int((df_busy.iloc[i]["a_time_sec"]-shift)/freq)
+        if index<len(queue):
+            queue_d[index]=int(df_busy.iloc[i]["delay"]/freq)
+
+    #interpretazione
+    i=0
+    while i<len(queue_d)-1:
+        a=queue_d[i]
+        b=0
+        k=i+1
+        while k<(len(queue_d)-1) and queue_d[k]==0:
+            k+=1
+        b=queue_d[k]
+        for j in range(i+1,k):
+            queue_d[j]=a+(j-i)*(b-a)/(k+1-i)
+        i=k
+
+    plt.plot(queue/60,label="simulation")
+    plt.plot(queue_d/60,label="actual data")
+    plt.legend()
+    plt.show()
+
+    return queue_d

@@ -11,3 +11,7 @@
 -altre traiettorie
 
 -modifica modello
+-funzione delle frequenze
+
+
+-stima dello scheduling

@@ -9,6 +9,7 @@ import data as data
 import csv
 import copy
 import simple_simulation as ss
+import plot as p
 
 df=pd.read_csv("../data/completo.csv")
 df_ar=pd.read_csv("../data/arrivi_completo.csv")
@@ -77,7 +78,7 @@ clean.shape
 
 # run del modello
 queue,delay_sim, arr=ss.PSRA_2(end_time-start_time,"norm",freq,10)
-queue_d=plot_queues(df_busy,queue,freq)
+queue_d=p.plot_queues(df_busy,queue,freq)
 
 
 
@@ -97,47 +98,6 @@ np.std(queue*freq/60)
 np.std(df_busy["delay"].values/60)
 
 
-
-
-
-
-def plot_queues(df_busy,queue,freq):
-    """
-    dato il df_busy e la coda simulata
-    crea un array coda_da_data e i sui indici (per il plot)
-    """
-    df=df_busy.sort_values(by="a_time_sec")
-    queue_d=np.zeros(len(queue))
-    shift=min(df_busy["a_time_sec"])
-    for i in range(df_busy.shape[0]):
-        index=int((df_busy.iloc[i]["a_time_sec"]-shift)/freq)
-        if index<len(queue):
-            queue_d[index]=int(df_busy.iloc[i]["delay"]/freq)
-
-    #interpretazione
-    i=0
-    while i<len(queue_d)-1:
-        a=queue_d[i]
-        b=0
-        k=i+1
-        while k<(len(queue_d)-1) and queue_d[k]==0:
-            k+=1
-        b=queue_d[k]
-        for j in range(i+1,k):
-            queue_d[j]=a+(j-i)*(b-a)/(k+1-i)
-        i=k
-
-    plt.plot(queue/60,label="simulation")
-    plt.plot(queue_d/60,label="actual data")
-    plt.legend()
-    plt.show()
-
-    return queue_d
-
-
-
-
-queue_d=plot_queues(df_busy,queue,freq)
 
 
 

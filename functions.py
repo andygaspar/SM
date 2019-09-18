@@ -27,6 +27,17 @@ def frequency(df,label):
 
 
 
+
+def dict_wp_freq():
+    """
+    crea dict wp: frequenze
+    """
+    lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
+
+
+    return dict(zip(lista_wp,lista_freq_wp))
+
+
 "funzioni coordinate e waypoint ***************"
 
 def coord(coordinate):

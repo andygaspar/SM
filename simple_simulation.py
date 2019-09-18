@@ -150,7 +150,10 @@ def PSRA(lasso_temporale_in_ore,distributione,freq,fattore_sigma):
 
 
 
-"***************************************************"
+"****************   PRSA con delay negativi   *******************************"
+
+
+
 "costruzione della funzione arrivi"
 def arr_2(N,f,freq,fattore_sigma=20):
     """
@@ -227,9 +230,11 @@ def PSRA_2(lasso_temporale_in_ore,distributione,freq,fattore_sigma):
 
 
 
+
+
 """
 "simulazioni"
-
+""
 k=20
 dist=np.zeros(2000)
 for i in range(2000):

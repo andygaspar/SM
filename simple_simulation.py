@@ -227,10 +227,31 @@ def PSRA_2(lasso_temporale_in_ore,distributione,freq,fattore_sigma):
 
 
 
+def simulation_PRSA(N, start_time, end_time,freq,sigma, distrib="norm",f=PSRA_2):
+    """
+    dato N numero di simulazioni
+    ritorna un vettore con l'andamento medio delle simul (stady state distr)
+    """
+    T=(end_time-start_time)*3600
+    M=int(T/freq)
+    sim_matrix=np.zeros((N,M))
+
+    sim=np.zeros(M)
+
+
+    for i in range(N):
+        sim_matrix[i],x,y=PSRA_2(end_time-start_time,distrib,freq,sigma)
+
+    for i in range(M):
+        sim[i]=np.mean(sim_matrix[:,i])
+
+    return sim
 
 
 
+sim=simulation_PRSA(1000,3,10,90,20,"norm")
 
+plt.plot(sim)
 
 """
 "simulazioni"

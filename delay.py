@@ -27,7 +27,7 @@ df=data.dist_filter(df,300)
 
 "data e wp"
 wp=["KERAX","PSA","ROLIS","UNOKO"]
-date=lista_date[5]
+date=lista_date[1]
 df=data.df_per_data(df,date)
 df_ar=data.df_per_data(df_ar,date)
 df_ar=df_ar.sort_values(by="time_sec")
@@ -37,12 +37,12 @@ df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
 
 
 #vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
-arr_vect=aa.arr_hist(date,airport)
+arr_vect=aa.arr_hist(date,airport,24)
 
 
 #definizione del periodo
-start_time=2
-end_time=20
+start_time=3
+end_time=10
 
 
 #calcolo frequenza e creazione del df busy
@@ -145,6 +145,9 @@ queue_d=plot_queues(df_busy,queue,freq)
 #test....ma ancora non vuole dire nulla e bisogna capire bene
 
 #e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
+
+
+
 
 
 """

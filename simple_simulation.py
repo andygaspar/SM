@@ -200,7 +200,7 @@ def M_D_1(arrival_time,max_time,service_time=1/90):
 
 
 a,b,c = M_D_1(1/90,24)
-
+a
 a = create_distribution(a)
 plt.plot(a)
 
@@ -209,9 +209,21 @@ plt.plot(a)
 ***********************SIMULATION PART***************************
 *****************************************************************
 """
+def simulation_M_D_1(arrival_time,max_time,s_time=1/90,volte =10):
+    p = []
+    for i in range(volte):
+        m_d_1,a,b = M_D_1(arrival_time,max_time,service_time=s_time)
+        m_d_1 = create_distribution(m_d_1)
+        p.append(m_d_1)
+
+    res = media_vettori(p)
+    return res
+
+ciccio = simulation_M_D_1(1/90,24)
+plt.plot(ciccio)
 
 
-def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
+def simulation_PSRA(time_freq,freq,fattore_sigma,volte=100):
     """
     questa funzione simula PSRA utilizzando tutte e 4 le distribuzioni che
     abbiamo preso in considerazione (norm,exp,tri,uni)
@@ -234,10 +246,10 @@ def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
 
     for i in range(volte):
         print(i)
-        queue_uni,delay_sim, arr=PSRA(24,"uni",freq,20)
-        queue_norm,delay_sim, arr = PSRA(24,"norm",freq,20)
-        queue_tri , a,b = PSRA(24,"tri",freq,20)
-        queue_exp,c,d = PSRA(24,"exp",freq,20)
+        queue_uni,delay_sim, arr=PSRA(time_freq,"uni",freq,20)
+        queue_norm,delay_sim, arr = PSRA(time_freq,"norm",freq,20)
+        queue_tri , a,b = PSRA(time_freq,"tri",freq,20)
+        queue_exp,c,d = PSRA(time_freq,"exp",freq,20)
 
 
         queue_uni = create_distribution(queue_uni)
@@ -276,20 +288,21 @@ def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
     plt.savefig("plot/simulation_PSRA.png")
 
 
-    return uni,norma,tri,esp,m_d_1
+    return uni,norma,tri,esp
 
 freq= 88.88888888888889
 m_d_1,r,t = M_D_1(1/freq,24)
 m_d_1 = create_distribution(m_d_1)
 plt.plot(m_d_1)
 
-a,b,c,d = simulation_PSRA(24,90,20,volte = 1000)
+a,b,c,d = simulation_PSRA(24,90,20,volte = 100)
 
 plt.plot(a,label="UNI")
 plt.plot(b,label="NORM")
 plt.plot(c,label="TRI")
 plt.plot(d,label="EXP")
-plt.plot(m_d_1,label="M_D_1")
+plt.plot(ciccio,label="M_D_1")
 
 plt.legend()
 plt.show()
+plt.savefig("plot/difference_with_M_D_.png")

@@ -11,39 +11,38 @@ import copy
 import simple_simulation as ss
 import plot as p
 
-df=pd.read_csv("../data/completo.csv")
-df_ar=pd.read_csv("../data/arrivi_completo.csv")
+d=pd.read_csv("../data/completo.csv")
+d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
+lista_date.sort()
 d_wp_coor=fun.dict_wp_coor()
-
 
 "aeroporto destinazione"
 airport="EDDF"
-df=data.airport(df,airport)
-df_ar=data.airport(df_ar,airport)
+df=data.airport(d,airport)
+df_ar=data.airport(d_ar,airport)
 df=data.dist_filter(df,300)
 
+#vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
+
+for i in range(len(lista_date)):
+    arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
 
 
 "data e wp"
 wp=["KERAX","PSA","ROLIS","UNOKO"]
-date=lista_date[0]
-df=data.df_per_data(df,date)
-df_ar=data.df_per_data(df_ar,date)
-df_ar=df_ar.sort_values(by="time_sec")
-df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
+date=lista_date[23]
+dff=data.df_per_data(df,date)
+dff_ar=data.df_per_data(df_ar,date)
+dff_ar=df_ar.sort_values(by="time_sec")
+df_delay,min_dict=data.df_finale_delay(dff,dff_ar,date,wp)
 
-
-
-
-#vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
-arr_vect=aa.arr_hist(date,airport,24)
 
 
 #definizione del periodo
 start_time=3
-end_time=15
+end_time=10
 
 
 #calcolo frequenza e creazione del df busy
@@ -94,13 +93,18 @@ np.std(queue*freq/60)
 np.std(df_busy["delay"].values/60)
 max(queue)
 queue.shape
+delay
 
-sim,sim_matrix=ss.simulation_PRSA(1000, 3, 10,90,20)
+help(ss.simulation_PRSA)
+sim,sim_matrix=ss.simulation_PRSA(1000, start_time, end_time, freq, 10)
 sim_d=ss.sim_distribution(sim_matrix)
 
 
-data_d=ss.data_distribution(queue)
 
+
+data_queue=delay/freq
+data_queue=data_queue.astype(int)
+data_d=ss.data_distribution(data_queue)
 
 plt.plot(sim_d)
 plt.plot(data_d)

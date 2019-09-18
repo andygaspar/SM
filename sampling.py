@@ -50,9 +50,41 @@ def sample_discrete_rv(P,N):
 
 
 
+def rejection_sampling(f,N,a,b):
+    """g is uniform; to obtain g>=f we compute the max M; c is obtained such that int(M) in [a,b] is equal to 1"""
+
+    I=linspace(a,b,10**5)
+    M=max(f(I))
+    g= lambda x:M
+    c=1/(M*(b-a))
+    u=sample_from_uniform(N)
+    u_y=sample_from_uniform(N)
+
+    sample=zeros(N)
+    reject=0
+    i=0
+    j=0
+    NN=N
+    while(j<N):
+        y=(u_y)[i]/c
+        if u[i]<=f(y)/g(y):
+            sample[j]=y
+            j+=1
+        else:
+            reject+=1;
+        i+=1
+        if(i==NN and reject>0):
+            u=sample_from_uniform(reject)
+            u_y=sample_from_uniform(reject)
+            i=0
+            NN=reject
+
+    print(reject)
+
+    return sample
+
 # exp=lambda x: 2*e**(-2*x)
 # prob=exp(linspace(0,2,200))
 # cont=sum(prob)
 # prob=prob/cont
 # s=sample_discrete_rv(prob,10000)
- 

@@ -245,13 +245,22 @@ def simulation_PRSA(N, start_time, end_time,freq,sigma, distrib="norm",f=PSRA_2)
     for i in range(M):
         sim[i]=np.mean(sim_matrix[:,i])
 
-    return sim
+    return sim,sim_matrix
 
 
+sim,sim_matrix=simulation_PRSA(1000, 3, 10,90,20)
 
-sim=simulation_PRSA(1000,3,10,90,20,"norm")
 
-plt.plot(sim)
+def sim_distribution(sim_matrix):
+    n=int(np.max(sim_matrix))+1
+    prob=np.zeros(n)
+    for i in range(n):
+        h=sim_matrix==i
+        prob[i]=len(sim_matrix[h])
+    prob/=sum(prob)
+    return prob
+
+
 
 """
 "simulazioni"

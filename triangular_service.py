@@ -96,21 +96,7 @@ for i in range(len(c)):
 
 c
 
-def create_distribution(v):
-    "funzione che crea una distribuzione discreta di probabilità"
-    "serve per avere la distribuzione sulle possibili lunghezze della queue"
-    v = np.array(v)
-    N = len(v)
-    massimo = int(max(v))
-    dix = np.zeros(massimo + 1)
-    # viaggio su tutte le possibili lunghezze della coda
-    for i in range(massimo+1):
-        cont = len(v[(v==i)])
-        dix[i] = cont/N
-    return dix
 
-
-md_dix =create_distribution(a)
 
 queue_u,delay_u,arrival_u=PSRA_G(3,"uni",20)
 queue,delay,arrival=sm.PSRA(3,"uni",20)

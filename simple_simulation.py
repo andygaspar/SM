@@ -3,73 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas
 import copy
-
-
-
-"""
-# TODO:
-
-- leggere articoli presenti nel paper, in particolare nell'ordine: Iovanella, Willemain, Guadagni (sulla stationary distribution), possibilmentte gli altri
-
-- tramite gli articoli capire bene se siamo sulla strada giiusta specialmente per quello che riguarda l'interpretazione e quindi l'implementazione della distribuzione dei ritardi (con particolare riguardo ai valori di sigma e lamda)
-
-- ALBI scrivere agli altri professori del paper
-
-- GASPA scrivere a castelli
-
-- cercare autonomamente dataset
-
-obiettivi nell'ordine:
-1)confermare i risultati del paper
-2)implementare e confermare la stationary distribution
-3)varie ed eventuali idee di modifiche
-4)se a disposizione il dataset originale fare un ragionamento sul flusso OCK escluso dal paper
-
-
-"""
+import random as rm
 
 
 
 
 
-
-"""
-
-def tot_dist(a,b):
-
-    return sum(np.abs(a-b))/len(a)
-
-def hell_dist(a,b):
-    return np.sqrt(sum((np.abs(np.sqrt(a)-np.sqrt(b)))**2))/np.sqrt(2)
-plt.plot(np.random.choice(delay_sim,len(clean)),label="delay_sim")
-plt.plot(delay,label="clean")
-plt.legend()
-plt.show()
-
-
-a=np.array([1,2,3,1,2,3,1])
-b=np.array([1,2,3,1,1,3,1])
-tot_dist(a,b)
-# arrival=np.zeros(100)
-# lam=1/90
-# delay=np.array(samp.sample_from_exp(np.sqrt(lam/20),100))
-# for i in range(100):
-
-
-
-
-# print(arrival)
-# print(delay)
-# min_delay=delay/60
-# min_delay
-#
-
-#
-# plt.plot(min_delay)
-# plt.plot(arrival)
-# plt.plot(delay)
-
-"""
 
 
 "costruzione della funzione arrivi"
@@ -214,6 +153,62 @@ def media_vettori(lista):
     return res
 
 
+def M_D_1(arrival_time,max_time,service_time=1/90):
+    """
+    arrival_time = frequency of the exponential distribution related to the arrival time in 1/seconds
+    service_time = deterministic service time in 1/seconds
+    max_time = time of simulation in hour to be converted in seconds in the program
+
+    OUTPUT: arrivi e vettore della coda
+    """
+    #conversion in seconds
+    max_seconds = max_time*60*60
+    sim_time = 0.0 # simulation time
+    t_1 = 0.0 # time for next event (arrival)
+    t_2 = max_seconds # time for next event (departure)
+    t_n = 0.0 #last event time--> tempo dell'ultimo avvenimento generico
+    t_b = 0.0 # last start of busy time--> tempo in cui la queue inizia ad essere non vuota per l'ultima volta
+    c = 0 # numero di servizi completati
+    queue_aircraft = [] # number of aircraft in the queue
+    aircraft = 0
+    arrival = [] # time of arrival
+    attesa = [] # attesa per gli aerei-->NON SICURO CHE SI CALCOLI COSI'
+    # simulation loop
+    while(sim_time < max_seconds):
+        if(t_1<t_2): #event1:arrival
+            sim_time = t_1
+            arrival.append(t_1)
+            aircraft += 1
+            queue_aircraft.append(aircraft)
+            t_n = sim_time
+            t_1 = sim_time + rm.expovariate(arrival_time)
+            if(aircraft==1):
+                t_b = sim_time
+                t_2 = sim_time + 1/service_time
+        else:
+            sim_time = t_2
+            aircraft = aircraft -1
+            queue_aircraft.append(aircraft)
+            t_n = sim_time
+            attesa.append( t_2 - arrival[c])
+            c+=1
+            if(aircraft>0):
+                t_2=sim_time + 1/service_time
+            else:
+                t_2 = max_seconds
+    return queue_aircraft,arrival,attesa
+
+
+a,b,c = M_D_1(1/90,24)
+
+a = create_distribution(a)
+plt.plot(a)
+
+"""
+*****************************************************************
+***********************SIMULATION PART***************************
+*****************************************************************
+"""
 
 
 def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
@@ -236,6 +231,7 @@ def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
     queue_norm_tot = []
     queue_tri_tot = []
     queue_exp_tot = []
+
     for i in range(volte):
         print(i)
         queue_uni,delay_sim, arr=PSRA(24,"uni",freq,20)
@@ -243,14 +239,17 @@ def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
         queue_tri , a,b = PSRA(24,"tri",freq,20)
         queue_exp,c,d = PSRA(24,"exp",freq,20)
 
+
         queue_uni = create_distribution(queue_uni)
         queue_norm = create_distribution(queue_norm)
         queue_tri = create_distribution(queue_tri)
         queue_exp = create_distribution(queue_exp)
+
         queue_uni_tot.append(queue_uni)
         queue_norm_tot.append(queue_norm)
         queue_tri_tot.append(queue_tri)
         queue_exp_tot.append(queue_exp)
+
 
     queue_uni_tot = media_vettori(queue_uni_tot)
 
@@ -266,18 +265,31 @@ def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
     tri = list(queue_tri_tot)
     esp = list(queue_exp_tot)
 
+
     plt.plot(uni,label="UNI")
     plt.plot(norma,label="NORM")
     plt.plot(tri,label="TRI")
     plt.plot(esp,label="EXP")
+
     plt.legend()
     plt.show()
     plt.savefig("plot/simulation_PSRA.png")
 
 
-    return uni,norma,tri,esp
+    return uni,norma,tri,esp,m_d_1
 
-
-
+freq= 88.88888888888889
+m_d_1,r,t = M_D_1(1/freq,24)
+m_d_1 = create_distribution(m_d_1)
+plt.plot(m_d_1)
 
 a,b,c,d = simulation_PSRA(24,90,20,volte = 1000)
+
+plt.plot(a,label="UNI")
+plt.plot(b,label="NORM")
+plt.plot(c,label="TRI")
+plt.plot(d,label="EXP")
+plt.plot(m_d_1,label="M_D_1")
+
+plt.legend()
+plt.show()

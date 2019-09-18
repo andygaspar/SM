@@ -58,7 +58,7 @@ df_delay
 arr_vect=aa.arr_hist(date,airport)
 arr_vect
 #considero solo le ore dalle 3 alle 22
-freq,df_arr_busy=aa.freq_busy(3,10,date,airport)
+freq,df_arr_busy=aa.freq_busy(3,9,date,airport)
 freq
 df_arr_busy=df_arr_busy.sort_values(by="time_sec")
 
@@ -123,17 +123,22 @@ def coda_dai_dati(df = df_arr_busy, factor = freq):
 
     return queue_aircraft
 
+prova = coda_dai_dati()
+
+prova
+prova = create_distribution(prova)
+plt.plot(prova)
 """
 ************************************************************************
 """
 """
-    FINE ESPERIMENTO--> PROVO A SCRIVERE FUNZIONE CHE FACCIA CODA UTILIZZANDO I DATI 
+    FINE ESPERIMENTO--> PROVO A SCRIVERE FUNZIONE CHE FACCIA CODA UTILIZZANDO I DATI
 """
 """
 ***************************************************************************
 """
 
-
+freq
 
 
 

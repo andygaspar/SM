@@ -27,7 +27,7 @@ df=data.dist_filter(df,300)
 
 "data e wp"
 wp=["KERAX","PSA","ROLIS","UNOKO"]
-date=lista_date[0]
+date=lista_date[5]
 df=data.df_per_data(df,date)
 df_ar=data.df_per_data(df_ar,date)
 df_ar=df_ar.sort_values(by="time_sec")
@@ -40,15 +40,17 @@ df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
 arr_vect=aa.arr_hist(date,airport)
 
 
+#definizione del periodo
+start_time=2
+end_time=20
+
 
 #calcolo frequenza e creazione del df busy
-freq,df_arr_busy=aa.freq_busy(3,21,date,airport)
+freq,df_arr_busy=aa.freq_busy(start_time,end_time,date,airport)
 df_arr_busy=df_arr_busy.sort_values(by="time_sec")
 freq
 
-#definizione del periodo
-start_time=2
-end_time=21
+
 
 
 
@@ -65,7 +67,7 @@ df_busy,delay=data.sort_df(df_busy)
 
 
 
-#pulizia dagli outliers, clean sono i DATI FINALI EFFETTIVI
+#pudlizia dagli outliers, clean sono i DATI FINALI EFFETTIVI
 clean=fun.reject_outliers(delay)
 plt.plot(clean)
 clean.shape
@@ -74,7 +76,7 @@ clean.shape
 
 
 # run del modello
-queue,delay_sim, arr=ss.PSRA(end_time-start_time,"norm",freq,20)
+queue,delay_sim, arr=ss.PSRA_2(end_time-start_time,"norm",freq,10)
 queue_d=plot_queues(df_busy,queue,freq)
 
 
@@ -83,9 +85,8 @@ queue_d=plot_queues(df_busy,queue,freq)
 #plot dei delay in minuti
 plt.plot(queue*freq/60)
 plt.plot(df_busy["delay"].values/60)
+plt.show()
 
-
-df_busy
 
 #comparazione medie
 np.mean(queue*freq/60)
@@ -143,7 +144,7 @@ queue_d=plot_queues(df_busy,queue,freq)
 
 #test....ma ancora non vuole dire nulla e bisogna capire bene
 
-e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
+#e=chisquare(clean,np.random.choice(delay_sim,len(clean)))
 
 
 """

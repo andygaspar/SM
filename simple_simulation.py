@@ -79,6 +79,7 @@ def arr(N,f,lam,fattore_sigma=20):
     f={uni,triang,exp,norm}
     sigma=varianza
     """
+    print("ciao ciao")
     lam=1/lam
     delay=np.zeros(N)
 
@@ -93,12 +94,12 @@ def arr(N,f,lam,fattore_sigma=20):
         max_delay=fattore_sigma*np.sqrt(12)/lam
         int_a_b=fattore_sigma/2*np.sqrt(12)/lam
         delay=np.random.uniform(-int_a_b,int_a_b,N)
-        delay[delay<0]=0
+        #delay[delay<0]=0
 
 
     if f=="norm":
         delay=np.random.normal(0, fattore_sigma/lam, N)
-        delay[delay<0]=0
+        #delay[delay<0]=0
 
     if f=="tri":
         b = (20/lam)*np.sqrt(6)

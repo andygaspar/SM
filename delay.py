@@ -10,34 +10,226 @@ import csv
 import copy
 import simple_simulation as ss
 
-df=pd.read_csv("../data/completo.csv")
-df_ar=pd.read_csv("../data/arrivi_completo.csv")
+df=pd.read_csv("../data/punti_1709.csv")
+df_ar=pd.read_csv("../data/arrivi_1709.csv")
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
 d_wp_coor=fun.dict_wp_coor()
 
-
+df
 "aeroporto destinazione"
 airport="EDDF"
 df=data.airport(df,airport)
 df_ar=data.airport(df_ar,airport)
+data.rinomina(df,"astext(k.coords)","coor")
+data.rinomina(df,"ifps_id","aereo")
+data.rinomina(df_ar,"ifps_id","aereo")
+data.add_time_in_sec(df)
+data.add_dist(df)
+df = data.data_time(df)
+data.taglio_colonne(df,["trajectory_id","geopoint_id","O","ac_id"])
+data.taglio_colonne(df,["time_over"])
 df=data.dist_filter(df,300)
-
-
-
+df_ar
+df
+df_ar = data.data_time(df_ar,"arr_time")
+data.add_time_in_sec(df_ar)
+data.add_time_in_sec(df)
 "data e wp"
 wp=["KERAX","PSA","ROLIS","UNOKO"]
-date=lista_date[0]
+date="2017-08-17"
 df=data.df_per_data(df,date)
 df_ar=data.df_per_data(df_ar,date)
+data.taglio_colonne(df_ar,["O","arr_time"])
 df_ar=df_ar.sort_values(by="time_sec")
 df_delay,min_dict=data.df_finale_delay(df,df_ar,date,wp)
 
+data.save_df(df,"../data/completo.csv")
+data.save_df(df_ar,"../data/arrivi_completo.csv")
+df=pd.read_csv("../data/completo.csv")
+df_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 
 
+"""
+************************PROVO A SIMULARE**************************
+"""
+df_delay
+arr_vect=aa.arr_hist(date,airport)
+arr_vect
+#considero solo le ore dalle 3 alle 22
+freq,df_arr_busy=aa.freq_busy(1,4,date,airport)
+freq
+df_arr_busy=df_arr_busy.sort_values(by="time_sec")
+
+
+#creare una coda usando i dati<--questo dobbiamo fare !!!
+
+def coda_dai_dati(df = df_arr_busy, factor = freq):
+    w = df.iloc[0]["time_sec"]
+
+    for i in range(df.shape[0]):
+        df.iloc[i]["time_sec"] = df.iloc[0]["time_sec"]
+    print(df)
+    service_time = 1/factor
+    queue_aircraft = []
+    max_seconds = df.iloc[df.shape[0]-1]["time_sec"]
+    sim_time = df.iloc[0]["time_sec"]# simulation time
+    t_1 = df.iloc[0]["time_sec"] # time for next event (arrival)
+    t_2 = max_seconds # time for next event (departure)
+    t_n = 0.0 #last event time--> tempo dell'ultimo avvenimento generico
+    aircraft = 0
+    t_b = 0.0 # last start of busy time--> tempo in cui la queue inizia ad essere non vuota per l'ultima volta
+    i = 1
+    while(sim_time<max_seconds and i<df.shape[0]):
+        print("***********************")
+        print("SITUAZIONE ALL' ",i," esimo giro")
+        print("arrival_time",t_1)
+        print("service_time",t_2)
+        if(t_1<t_2): #event1:arrival
+                print("ORA ARRIVO")
+                sim_time = t_1
+                aircraft += 1
+                queue_aircraft.append(aircraft)
+                t_n = sim_time
+                print("i: ",i)
+                print("dove sono")
+                print(df.iloc[i]["time_sec"])
+                t_1 =  df.iloc[i]["time_sec"]
+                print(t_1)
+                i = i+1
+                if(aircraft==1):
+                    print("entro qua!!!!!!")
+                    t_b = sim_time
+                    t_2 = sim_time + 1/service_time
+        else:
+                print("ORA SERVO!!")
+                sim_time = t_2
+                aircraft = aircraft -1
+                queue_aircraft.append(aircraft)
+                t_n = sim_time
+                if(aircraft>0):
+                    t_2=sim_time + 1/service_time
+                else:
+                    t_2 = max_seconds
+
+    return queue_aircraft
+#proviamo a creare una distribuizon
+def create_distribution(vector):
+    res = []
+    N = len(vector)
+    vector_np = np.array(vector)
+    massimo = np.max(vector)
+    for i in range(int(massimo+1)):
+        cont = 0
+        for j in range(len(vector)):
+            if vector[j]==i:
+                cont+=1
+        res.append(cont/N)
+
+    return res
+
+d = [[2,3],[2,3,4]]
+len(d[1])
+
+def trovo_massimo(lista):
+     v = []
+     for i in range(len(lista)):
+         v.append(len(lista[i]))
+     v = np.array(v)
+     return np.max(v)
+
+def media_vettori(lista):
+    res = []
+    N = len(lista)
+    n = trovo_massimo(lista)
+    #trasformo tutti i vettori con la stessa dimensione
+    for i in range(len(lista)):
+        temp = lista[i]
+        if(len(temp)<n):
+            for j in range(len(temp),n):
+                lista[i].append(0)
+        else:
+            continue
+    #ora faccio la media
+    #print(lista[0])
+    #print(lista[1])
+    for i in range(n):
+        t = 0
+        for j in range(N):
+            t = t + lista[j][i]
+        res.append(t/N)
+    #for i in range(len(res)):
+    #    res[i]=res[i]/sum(res)
+
+    return res
+
+
+c = [[0.4,0.5,0.1],[0.6,0.4]]
+w = media_vettori(c)
+w
+sum(w)
+"funzionalizziamo il confronto del PSRA-->PER ORA NON"
+def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
+    queue_uni_tot = []
+    queue_norm_tot = []
+    queue_tri_tot = []
+    queue_exp_tot = []
+    for i in range(volte):
+        queue_uni,delay_sim, arr=ss.PSRA(24,"uni",freq,20)
+        queue_norm,delay_sim, arr = ss.PSRA(24,"norm",freq,20)
+        queue_tri , a,b = ss.PSRA(24,"tri",freq,20)
+        queue_exp,c,d = ss.PSRA(24,"exp",freq,20)
+        queue_uni_tot.append(queue_uni)
+        queue_norm_tot.append(queue_norm)
+        queue_tri_tot.append(queue_tri)
+        queue_exp_tot.append(queue_exp)
+    print(queue_uni_tot)
+    queue_uni_tot = media_vettori(queue_uni_tot)
+    queue_uni_tot = queue_uni_tot/sum(queue_uni_tot)
+    queue_norm_tot = media_vettori(queue_norm_tot)
+    queue_norm_tot = queue_norm_tot/sum(queue_norm_tot)
+    queue_tri_tot = media_vettori(queue_tri_tot)
+    queue_tri_tot = queue_tri_tot/sum(queue_tri_tot)
+    queue_exp_tot = media_vettori(queue_exp_tot)
+    queue_exp_tot = queue_exp_tot/sum(queue_exp_tot)
+    uni = list(queue_uni_tot)
+    norma = list(queue_norm_tot)
+    tri = list(queue_tri_tot)
+    esp = list(queue_exp_tot)
+
+    uni = create_distribution(uni)
+    norma = create_distribution(norma)
+    tri = create_distribution(tri)
+    esp = create_distribution(esp)
+
+    plt.plot(uni,label="UNI")
+    plt.plot(norma,label="NORM")
+    plt.plot(tri,label="TRI")
+    plt.plot(esp,label="EXP")
+    plt.legend()
+    plt.show()
+    return uni,norma,tri,esp
+
+
+a
+a,b,c,d = simulation_PSRA(24,freq,20,volte = 1)
+sum(z)
+
+
+
+#facciamo una media
+
+"""
+*************************FINE PROVA
+"""
+
+df_delay
 #vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale
 arr_vect=aa.arr_hist(date,airport)
+
+
+df
 
 
 
@@ -83,24 +275,6 @@ plt.plot(df_busy["delay"].values)
 
 
 
-def make_queue_from_data(df_busy,queue,freq):
-    """
-    dato il df_busy e la coda simulata
-    crea un array coda_da_data e i sui indici (per il plot)
-    """
-    queue_d=np.zeros(len(queue))
-    shift=min(df_busy["time_sec"])
-    queue_index=np.zeros(len(queue))
-    for i in range(df_busy.shape[0]):
-        index=int((df_busy.iloc[i]["time_sec"]-shift)/freq)
-        if index<len(queue):
-            queue_d[index]=int(df_busy.iloc[i]["delay"]/freq)
-            queue_index[i]=index
-    cond=queue_d!=0
-    queue_d=queue_d[cond]
-    queue_index=queue_index[cond]
-
-    return queue_d,queue_index
 
 queue_d,queue_index=make_queue_from_data(df_busy,queue)
 

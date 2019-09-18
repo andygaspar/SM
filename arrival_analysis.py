@@ -4,15 +4,16 @@ from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import functions as fun
 import data as data
-
-
+q = df_ar=pd.read_csv("../data/arrivi_completo.csv")
+q
 def arr_hist(date,airport,BINS=24):
     """
     dato airport, data e numero bins  (BINS=default 24)
     stampa istogramma e ritorna l'array con gli arrivi
     """
+    print("ciao")
     df_ar=pd.read_csv("../data/arrivi_completo.csv")
-    arr_day=data.airport(df_ar,airport)
+    arr_day=data.airport(df_ar,"EDDF")
     arr_day=data.df_per_data(arr_day,date)
     arr_day=arr_day.sort_values(by="time_sec")
     arr_array=arr_day["time_sec"].values

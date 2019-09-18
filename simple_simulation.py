@@ -79,7 +79,7 @@ def arr(N,f,lam,fattore_sigma=20):
     f={uni,triang,exp,norm}
     sigma=varianza
     """
-    print("ciao ciao")
+
     lam=1/lam
     delay=np.zeros(N)
 
@@ -137,6 +137,7 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
     queue=np.zeros(N)
     #queue_old=np.zeros(N)
     for i in range(1,N):
+
         arrival_in_slot=len(arrival[(arrival>=lam*(i-1)) & (arrival<lam*i)])
         #queue_old[i]=queue_old[i-1]+arrival_in_slot-int(queue_old[i-1]!=0)
         queue[i]=queue[i-1]   +   arrival_in_slot   -    int(queue[i-1]!=0)
@@ -144,47 +145,139 @@ def PSRA(lasso_temporale_in_ore,distributione,lam,fattore_sigma):
 
 
     return queue,delay,arrival
+"""""
+ORA--> VOGLIO FARE SIMULAZIONI CON IL PSRA E VEDERE A LUNGO ANDARE SE LA DISTRIBUZIONE
+DELLA QUEUE DIPENDE O MENO DALLA DISTRIBUZIONE DEL RITARDO.
+
+"""""
+
+def create_distribution(vector):
+    """
+    funzione che serve per creare una distribuzione di probabilità sui numeri
+    contenuti dentro il vettore
+    esempio dato v = [0,1,2,2,2,1,0,3] allora il risultato sarà res = [2/8,2/8,3/8,1/8]
+    INPUT: vettore di interi sottoforma di lista
+    OUTPUT: distribuzione discreta di probabilità
+    """
+    res = []
+    N = len(vector)
+    vector_np = np.array(vector)
+    massimo = np.max(vector)
+    for i in range(int(massimo+1)):
+        cont = 0
+        for j in range(len(vector)):
+            if vector[j]==i:
+                cont+=1
+        res.append(cont/N)
+
+    return res
+
+
+
+def trovo_massimo(lista):
+    """
+    dta una lista ti trova il massimo
+    """
+    v = []
+    for i in range(len(lista)):
+         v.append(len(lista[i]))
+    v = np.array(v)
+    return np.max(v)
+
+def media_vettori(lista):
+    """
+    data una lista di lista, ti trova la media component-wise delle liste contenute
+    nella lista (ritorna uuna lista)
+    INPUT: lista di liste
+    OUTPUT: lista con le medie
+
+    """
+    res = []
+    N = len(lista)
+    n = trovo_massimo(lista)
+    #trasformo tutti i vettori con la stessa dimensione
+    for i in range(len(lista)):
+        temp = lista[i]
+        if(len(temp)<n):
+            for j in range(len(temp),n):
+                lista[i].append(0)
+        else:
+            continue
+    for i in range(n):
+        t = 0
+        for j in range(N):
+            t = t + lista[j][i]
+        res.append(t)
+    for i in range(len(res)):
+        res[i]=res[i]/N
+
+    return res
 
 
 
 
+def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
+    """
+    questa funzione simula PSRA utilizzando tutte e 4 le distribuzioni che
+    abbiamo preso in considerazione (norm,exp,tri,uni)
+
+    INPUT: time_freq = tempo in cui si fa la simulazione in ore
+            freq = frequenza del service time
+            fattore_sigma = fattore che caratterizza la deviazione standard delle
+                            distribuzioni (fattore_sigma/freq)
+            volte = numero di volte in cui si vuole far runnare a simulazione
+                    (per ogni siulazione)
+    dopo aver fatto runnare le simulazioni, per ogni distribuzione si fa la media
+    e la si plotta
+
+    OUTPUT: PLOT DELLE DISTRIBUZIONI E VETTORI DELLE DISTRIBUZIONI
+    """
+    queue_uni_tot = []
+    queue_norm_tot = []
+    queue_tri_tot = []
+    queue_exp_tot = []
+    for i in range(volte):
+        print(i)
+        queue_uni,delay_sim, arr=PSRA(24,"uni",freq,20)
+        queue_norm,delay_sim, arr = PSRA(24,"norm",freq,20)
+        queue_tri , a,b = PSRA(24,"tri",freq,20)
+        queue_exp,c,d = PSRA(24,"exp",freq,20)
+
+        queue_uni = create_distribution(queue_uni)
+        queue_norm = create_distribution(queue_norm)
+        queue_tri = create_distribution(queue_tri)
+        queue_exp = create_distribution(queue_exp)
+        queue_uni_tot.append(queue_uni)
+        queue_norm_tot.append(queue_norm)
+        queue_tri_tot.append(queue_tri)
+        queue_exp_tot.append(queue_exp)
+
+    queue_uni_tot = media_vettori(queue_uni_tot)
+
+    queue_norm_tot = media_vettori(queue_norm_tot)
+
+    queue_tri_tot = media_vettori(queue_tri_tot)
+
+    queue_exp_tot = media_vettori(queue_exp_tot)
+
+
+    uni = list(queue_uni_tot)
+    norma = list(queue_norm_tot)
+    tri = list(queue_tri_tot)
+    esp = list(queue_exp_tot)
+
+    plt.plot(uni,label="UNI")
+    plt.plot(norma,label="NORM")
+    plt.plot(tri,label="TRI")
+    plt.plot(esp,label="EXP")
+    plt.legend()
+    plt.show()
+    plt.savefig("plot/simulation_PSRA.png")
+
+
+    return uni,norma,tri,esp
 
 
 
 
-
-
-"""
-"simulazioni"
-
-k=20
-dist=np.zeros(2000)
-for i in range(2000):
-
-    queue_u,delay_u,arrival_u=PSRA(3,"uni",k)
-    queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
-    dist[i]=tot_dist(queue_u,queue_n)
-
-np.mean(dist)
-plt.plot(dist)
-plt.plot(queue_u,label="uniform")
-plt.plot(queue_n,label="normal")
-plt.legend()
-
-
-
-queue_u,delay_u,arrival_u=PSRA(3,"uni",30,200)
-queue_u_1,delay_u_1,arrival_u_1=PSRA_(3,"uni",k)
-plt.plot(queue_u,label="uniform")
-10
-queue_u==queue_u_1
-
-queue_n,delay_n,arrival_n=PSRA(3,"norm",k)
-queue_tri,delay_tri,arrival_tri=PSRA(3,"tri",k)
-d=tot_dist(queue_u,queue_n)
-plt.plot(queue_u,label="uniform")
-plt.plot(queue_n,label="normal")
-plt.plot(queue_tri,label="triangular")
-plt.legend()
-plt.title(d)
-"""
+a,b,c,d = simulation_PSRA(24,90,20,volte = 1000)

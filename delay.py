@@ -58,12 +58,20 @@ df_delay
 arr_vect=aa.arr_hist(date,airport)
 arr_vect
 #considero solo le ore dalle 3 alle 22
-freq,df_arr_busy=aa.freq_busy(1,4,date,airport)
+freq,df_arr_busy=aa.freq_busy(3,10,date,airport)
 freq
 df_arr_busy=df_arr_busy.sort_values(by="time_sec")
 
 
-#creare una coda usando i dati<--questo dobbiamo fare !!!
+"""
+************************************************************************
+"""
+"""
+    ESPERIMENTO--> PROVO A SCRIVERE FUNZIONE CHE FACCIA CODA UTILIZZANDO I DATI
+"""
+"""
+***************************************************************************
+"""
 
 def coda_dai_dati(df = df_arr_busy, factor = freq):
     w = df.iloc[0]["time_sec"]
@@ -114,115 +122,20 @@ def coda_dai_dati(df = df_arr_busy, factor = freq):
                     t_2 = max_seconds
 
     return queue_aircraft
-#proviamo a creare una distribuizon
-def create_distribution(vector):
-    res = []
-    N = len(vector)
-    vector_np = np.array(vector)
-    massimo = np.max(vector)
-    for i in range(int(massimo+1)):
-        cont = 0
-        for j in range(len(vector)):
-            if vector[j]==i:
-                cont+=1
-        res.append(cont/N)
-
-    return res
-
-d = [[2,3],[2,3,4]]
-len(d[1])
-
-def trovo_massimo(lista):
-     v = []
-     for i in range(len(lista)):
-         v.append(len(lista[i]))
-     v = np.array(v)
-     return np.max(v)
-
-def media_vettori(lista):
-    res = []
-    N = len(lista)
-    n = trovo_massimo(lista)
-    #trasformo tutti i vettori con la stessa dimensione
-    for i in range(len(lista)):
-        temp = lista[i]
-        if(len(temp)<n):
-            for j in range(len(temp),n):
-                lista[i].append(0)
-        else:
-            continue
-    #ora faccio la media
-    #print(lista[0])
-    #print(lista[1])
-    for i in range(n):
-        t = 0
-        for j in range(N):
-            t = t + lista[j][i]
-        res.append(t/N)
-    #for i in range(len(res)):
-    #    res[i]=res[i]/sum(res)
-
-    return res
-
-
-c = [[0.4,0.5,0.1],[0.6,0.4]]
-w = media_vettori(c)
-w
-sum(w)
-"funzionalizziamo il confronto del PSRA-->PER ORA NON"
-def simulation_PSRA(time_req,freq,fattore_sigma,volte=100):
-    queue_uni_tot = []
-    queue_norm_tot = []
-    queue_tri_tot = []
-    queue_exp_tot = []
-    for i in range(volte):
-        queue_uni,delay_sim, arr=ss.PSRA(24,"uni",freq,20)
-        queue_norm,delay_sim, arr = ss.PSRA(24,"norm",freq,20)
-        queue_tri , a,b = ss.PSRA(24,"tri",freq,20)
-        queue_exp,c,d = ss.PSRA(24,"exp",freq,20)
-        queue_uni_tot.append(queue_uni)
-        queue_norm_tot.append(queue_norm)
-        queue_tri_tot.append(queue_tri)
-        queue_exp_tot.append(queue_exp)
-    print(queue_uni_tot)
-    queue_uni_tot = media_vettori(queue_uni_tot)
-    queue_uni_tot = queue_uni_tot/sum(queue_uni_tot)
-    queue_norm_tot = media_vettori(queue_norm_tot)
-    queue_norm_tot = queue_norm_tot/sum(queue_norm_tot)
-    queue_tri_tot = media_vettori(queue_tri_tot)
-    queue_tri_tot = queue_tri_tot/sum(queue_tri_tot)
-    queue_exp_tot = media_vettori(queue_exp_tot)
-    queue_exp_tot = queue_exp_tot/sum(queue_exp_tot)
-    uni = list(queue_uni_tot)
-    norma = list(queue_norm_tot)
-    tri = list(queue_tri_tot)
-    esp = list(queue_exp_tot)
-
-    uni = create_distribution(uni)
-    norma = create_distribution(norma)
-    tri = create_distribution(tri)
-    esp = create_distribution(esp)
-
-    plt.plot(uni,label="UNI")
-    plt.plot(norma,label="NORM")
-    plt.plot(tri,label="TRI")
-    plt.plot(esp,label="EXP")
-    plt.legend()
-    plt.show()
-    return uni,norma,tri,esp
-
-
-a
-a,b,c,d = simulation_PSRA(24,freq,20,volte = 1)
-sum(z)
-
-
-
-#facciamo una media
 
 """
-*************************FINE PROVA
+************************************************************************
 """
+"""
+    FINE ESPERIMENTO--> PROVO A SCRIVERE FUNZIONE CHE FACCIA CODA UTILIZZANDO I DATI 
+"""
+"""
+***************************************************************************
+"""
+
+
+
+
 
 df_delay
 #vettore arrivi e istogramma,  utile al calcolo della frequenza e alla scelta del lasso temporale

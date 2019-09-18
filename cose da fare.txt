@@ -1,9 +1,3 @@
--scrivo francesca per vedersi possibilmente venerdì
-
--calcolare satdy state:
-  -media
-  -MTMC
-
 -valutazione dati
 
 -altri aeroporti
@@ -11,7 +5,5 @@
 -altre traiettorie
 
 -modifica modello
--funzione delle frequenze
-
-
--stima dello scheduling
+  -funzione delle frequenze
+  -stima dello scheduling

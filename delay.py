@@ -28,7 +28,7 @@ df=data.dist_filter(df,300)
 
 "data e wp"
 wp=["KERAX","PSA","ROLIS","UNOKO"]
-date=lista_date[1]
+date=lista_date[0]
 df=data.df_per_data(df,date)
 df_ar=data.df_per_data(df_ar,date)
 df_ar=df_ar.sort_values(by="time_sec")
@@ -43,7 +43,7 @@ arr_vect=aa.arr_hist(date,airport,24)
 
 #definizione del periodo
 start_time=3
-end_time=10
+end_time=15
 
 
 #calcolo frequenza e creazione del df busy
@@ -64,20 +64,16 @@ df_busy,delay=data.sort_df(df_busy)
 
 
 
-
-
-
-
 #pudlizia dagli outliers, clean sono i DATI FINALI EFFETTIVI
 clean=fun.reject_outliers(delay)
-plt.plot(clean)
-clean.shape
+plt.plot(clean/60)
+
 
 
 
 
 # run del modello
-queue,delay_sim, arr=ss.PSRA_2(end_time-start_time,"norm",freq,10)
+queue,delay_sim, arr=ss.PSRA(end_time-start_time,"norm",freq,10)
 queue_d=p.plot_queues(df_busy,queue,freq)
 
 
@@ -96,10 +92,18 @@ np.mean(df_busy["delay"].values/60)
 #comparazione st deviation
 np.std(queue*freq/60)
 np.std(df_busy["delay"].values/60)
+max(queue)
+queue.shape
+
+sim,sim_matrix=ss.simulation_PRSA(1000, 3, 10,90,20)
+sim_d=ss.sim_distribution(sim_matrix)
 
 
+data_d=ss.data_distribution(queue)
 
 
+plt.plot(sim_d)
+plt.plot(data_d)
 
 
 #test....ma ancora non vuole dire nulla e bisogna capire bene

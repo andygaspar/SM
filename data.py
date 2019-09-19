@@ -144,25 +144,43 @@ def crea_arrivi():
     return df_ar
 
 
-def carica_liste():
+def carica_liste(airport):
     """
     carica 4 liste:
     lista date,lista wp ,frequenza wp, lista coordinate wp
     """
+    if airport=="EDDF":
+        date='../data/lista_date.csv'
+        wpl='../data/lista_wp.csv'
+        fwp='../data/lista_freq_wp.csv'
+        wpc='../data/wp_coor.csv'
+
+    if airport=="EGLL":
+        date='../data/lista_date_H.csv'
+        wpl='../data/lista_wp_H.csv'
+        fwp='../data/lista_freq_H.csv'
+        wpc='../data/lista_coor_M.csv'
+
+    if airport=="LEMD":
+        date='../data/lista_date_M.csv'
+        wpl='../data/lista_wp_M.csv'
+        fwp='../data/lista_freq_M.csv'
+        wpc='../data/lista_coor_M.csv'
+
     lista_date=[]
-    with open('../data/lista_date.csv') as csv_file:
+    with open(date) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             lista_date.append(row)
 
     wp=[]
-    with open('../data/lista_wp.csv') as csv_file:
+    with open(wpl) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             wp.append(row)
 
     freq_wp=[]
-    with open('../data/lista_freq_wp.csv') as csv_file:
+    with open(fwp) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             freq_wp.append(row)
@@ -171,7 +189,7 @@ def carica_liste():
         freq_wp[i]=int(freq_wp[i])
 
     wp_coordinate=[]
-    with open('../data/wp_coor.csv') as csv_file:
+    with open(wpc) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             wp_coordinate.append(row)

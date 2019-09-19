@@ -12,6 +12,57 @@ import simple_simulation as ss
 import plot as p
 
 
+cond=d["D"]=="EGLL"
+
+H=d[cond]
+
+
+
+"date"
+
+
+lista_date
+for i in range(H.shape[0]):
+    if H.iloc[i]["date"] not in lista_date:
+        lista_date.append(H.iloc[i]["date"])
+lista_date
+
+
+
+wp_d
+
+"coordinate e frequenze"
+wp_d=fun.frequency(H,"sid")
+
+lista_wp=list(wp_d.keys())
+with open('../data/lista_wp_H.csv','w') as csv_file:
+    writer = csv.writer(csv_file, delimiter=',')
+    writer.writerow(lista_wp)
+
+freq_wp=list(wp_d.values())
+with open('../data/lista_freq_H.csv','w') as csv_file:
+    writer = csv.writer(csv_file, delimiter=',')
+    writer.writerow(freq_wp)
+
+
+lista_WP=[]
+with open('../data/lista_wp_H.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    for row in csv_reader:
+        lista_WP.append(row)
+lista_WP[0]
+lista_WP[0]==lista_wp
+
+
+
+
+
+
+
+
+
+
+
 
 #caricamento preliminari
 d=pd.read_csv("../data/completo.csv")

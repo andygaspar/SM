@@ -9,75 +9,53 @@ import copy
 
 
 
-df
+lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
+d_wp_coor=fun.dict_wp_coor()
+main=["KERAX","PSA","ROLIS","UNOKO"]
 
 df=pd.read_csv("../data/completo.csv") # DA AGGIUNGERE : matcho con arrivo l'aereo con sid aereoporto
 df_ar = pd.read_csv("../data/arrivi_1709.csv")
-df=data.dist_filter(df,200)
-lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
-d_wp_coor=fun.dict_wp_coor()
-df=data.df_per_data(df,'2017-08-17')
 df
 
-main=["KERAX","PSA","ROLIS","UNOKO"]
-
-df_ar
-#lavoro solo su una data
-fr_cond = df_ar["D"] =="EDDF"
-df_ar = df_ar[fr_cond]
- data.rinomina(df_ar,"ifps_id","aereo")
-data.data_time(df_ar,"arr_time")
-data.rinomina(df_ar,"ac_id","sid")
-for i in range(df_ar.shape[0]):
-    df_ar.iloc[i]["sid"] = "AIRPORT"
-
-df_ar
+def pre_processing_wp(df = df):
+    df=data.dist_filter(df,200)
+    df=data.df_per_data(df,'2017-08-17')
+    return df
 
 
-df
-"""
-idea aggiungere arrivo al df completo
-"""
+def pre_processing_ar(df = df_ar):
+    df_ar = df.copy()
+    fr_cond = df_ar["D"] =="EDDF"
+    df_ar = df_ar[fr_cond]
+    data.rinomina(df_ar,"ifps_id","aereo")
+    data.data_time(df_ar,"arr_time")
+    data.rinomina(df_ar,"ac_id","sid")
+
+    for i in range(df_ar.shape[0]):
+        df_ar.iloc[i]["sid"] = "AIRPORT"
+    tempi = []
+    for i in range(df_ar.shape[0]):
+        t = df_ar.iloc[i]["time"]
+        p = fun.time_to_sec(t)
+        tempi.append(p)
+    df_ar["time_sec"]=tempi
+    df_ar["coor"]="POINT(50.037753 8.560964)"
+    df_ar["distance"]=0
+    df_ar = df_ar.drop(["O"],axis=1)
+    df_ar = df_ar.drop(["arr_time"],axis=1)
+    return df_ar
+
+
+df = pre_processing_wp(df)
+df_ar = pre_processing_ar(df_ar)
+
 lista = ["aereo","sid","coor","distance","date","time","time_sec"]
 
 
 
 
-"""
-PARTE DI PREPROCESSING DI DF_ARR
 
-"""
-df_ar
-#lavoro solo su una data
-fr_cond = df_ar["D"] =="EDDF"
-df_ar = df_ar[fr_cond]
- data.rinomina(df_ar,"ifps_id","aereo")
-data.data_time(df_ar,"arr_time")
-data.rinomina(df_ar,"ac_id","sid")
-for i in range(df_ar.shape[0]):
-    df_ar.iloc[i]["sid"] = "AIRPORT"
-tempi = []
-for i in range(df_ar.shape[0]):
-    t = df_ar.iloc[i]["time"]
-    p = fun.time_to_sec(t)
-    tempi.append(p)
-df_ar
 
-tempi
-df_ar["time_sec"]=tempi
-df_ar
-
-df_ar
-df_ar =data.data_time(df_ar,"arr_time")
-cond = df_ar["date"]=='2017-08-17'
-df_ar =df_ar[cond]
-df_ar
-df_ar["coor"]="POINT(50.037753 8.560964)"
-df_ar["distance"]=0
-df_ar = df_ar.drop(["D","O"],axis=1)
-df_ar = df_ar.drop(["arr_time"],axis=1)
-df_ar
-df
 
 def complete_dataframe(df = df,df_ar = df_ar, lista = lista):
     """
@@ -208,14 +186,7 @@ def distanza_coppie(traj = trajectory,dict_wp = wp_coord):
 dictionario_distanza_coppie = distanza_coppie()
 
 
-dictionario_distanza_coppie
 
-
-
-
-
-
-df_tot
 
 
 def minimo_coppia(wp1,wp2,df=df_tot):
@@ -236,9 +207,7 @@ def minimo_coppia(wp1,wp2,df=df_tot):
 
 
 lista_coppie = list(dictionario_distanza_coppie.keys())
-lista_coppie
-len(lista_coppie)
-df_tot
+
 def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
     """
     INPUT :
@@ -263,9 +232,7 @@ def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
 
 
 tempi_coppie = tempi_minimi_coppie()
-tempi_coppie
 
-df_tot
 def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
     """
     INPUT:
@@ -302,14 +269,14 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
 min_tempi_percorsi = minimo_percorsi()
 
 min_tempi_percorsi
-df_tot
+
 """
 'RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT'
 costruisco il dataframe dove c'è aereo-traiettoria-tempo_percorso-tempo_minimo-delay
 """
 
 #ora ho la mia lista aerei
-df_tot
+
 def lista_aerei(df = df_tot):
 
     aerei = []
@@ -323,43 +290,40 @@ def lista_aerei(df = df_tot):
     return aerei
 
 lista_aerei = lista_aerei()
-df_tot
-
-lista = ["aereo","traiettoria","tempo percorso","tempo minimo","delay"]
 
 
+lista = ["aereo","traiettoria","partenza in sec","arrivo in sec","tempo percorso","tempo minimo","delay"]
 
-prova = prova.append(pd.Series([a1,s,fine-inizio,min,(fine-inizio)-min], index=prova.columns),ignore_index=True)
 
 def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_aerei):
-    min_tempi_percorsi = minimo_percorsi()
-    res = pd.DataFrame(columns = lista)
-    i = 0
-    cont = 0
-    while(i<df.shape[0]-1):
-        s = ""
-        a_temp = lista_aerei[cont]
-        j = i
-        inizio = df_tot.iloc[i]["time_sec"]
-        while(j < df.shape[0]-1 and df_tot.iloc[j]["aereo"]==a_temp):
-            s = s + df_tot.iloc[j]["sid"]+"-"
-            j = j+1
-        i = j
-        fine = df_tot.iloc[i-1]["time_sec"]
+       min_tempi_percorsi = minimo_percorsi()
+      res = pd.DataFrame(columns = lista)
+      i = 0
+      cont = 0
+       while(i<df.shape[0]-1):
+         s = ""
+         a_temp = lista_aerei[cont]
+         j = i
+         inizio = df_tot.iloc[i]["time_sec"]
+         while(j < df.shape[0]-1 and df_tot.iloc[j]["aereo"]==a_temp):
+             s = s + df_tot.iloc[j]["sid"]+"-"
+             j = j+1
+         i = j
+         fine = df_tot.iloc[i-1]["time_sec"]
 
-        s = s[:-1]
-        mini = 0
-        if s in min_tempi_percorsi:
-            mini = min_tempi_percorsi[s]
-        else:
-            print("STRANO STRANO")
-            print(i)
-            print(s)
-            print("*****")
-            mini = fine -inizio
-        res = res.append(pd.Series([a_temp,s,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
-        cont = cont + 1
-    return res
+         s = s[:-1]
+         mini = 0
+         if s in min_tempi_percorsi:
+             mini = min_tempi_percorsi[s]
+         else:
+             print("STRANO STRANO")
+             print(i)
+             print(s)
+             print("*****")
+             mini = fine -inizio
+         res = res.append(pd.Series([a_temp,s,inizio,fine,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
+         cont = cont + 1
+      return res
 
 
                                                                                                                              RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT]

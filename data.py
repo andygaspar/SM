@@ -129,7 +129,6 @@ def crea_completo():
     df=df[~df.duplicated()]
     return df
 
-
 def crea_arrivi():
     """
     crea df arrivi pulito e con day e time separati e arrivo in sec
@@ -195,7 +194,7 @@ def carica_liste(airport):
             wp_coordinate.append(row)
 
 
-    return lista_date[0],wp[0],freq_wp,wp_coordinate
+    return lista_date[0],wp[0],freq_wp,wp_coordinate[0]
 
 
 def df_per_data(df,date):

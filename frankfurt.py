@@ -12,74 +12,25 @@ import simple_simulation as ss
 import plot as p
 
 
-cond=d["D"]=="EGLL"
-
-H=d[cond]
-
-
-
-"date"
-
-
-lista_date
-for i in range(H.shape[0]):
-    if H.iloc[i]["date"] not in lista_date:
-        lista_date.append(H.iloc[i]["date"])
-lista_date
-
-
-
-wp_d
-
-"coordinate e frequenze"
-wp_d=fun.frequency(H,"sid")
-
-lista_wp=list(wp_d.keys())
-with open('../data/lista_wp_H.csv','w') as csv_file:
-    writer = csv.writer(csv_file, delimiter=',')
-    writer.writerow(lista_wp)
-
-freq_wp=list(wp_d.values())
-with open('../data/lista_freq_H.csv','w') as csv_file:
-    writer = csv.writer(csv_file, delimiter=',')
-    writer.writerow(freq_wp)
-
-
-lista_WP=[]
-with open('../data/lista_wp_H.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    for row in csv_reader:
-        lista_WP.append(row)
-lista_WP[0]
-lista_WP[0]==lista_wp
-
-
-
-
-
-
-
-
-
 
 
 
 #caricamento preliminari
 d=pd.read_csv("../data/completo.csv")
 d_ar=pd.read_csv("../data/arrivi_completo.csv")
-lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
-lista_date.sort()
-d_wp_coor=fun.dict_wp_coor()
 
 
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
 capacita=60
+
+lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
+lista_date.sort()
+d_wp_coor=fun.dict_wp_coor(airport)
 df=data.airport(d,airport)
 df_ar=data.airport(d_ar,airport)
 df=data.dist_filter(df,200)
-
 
 
 #analisi frequenze
@@ -106,7 +57,7 @@ wp=["ROLIS","UNOKO","KERAX","PSA"]
 
 
 #creazione del df_finale per wp e tuttte le date nella lista (molto lento!!!!!!!)
-df_all_days=data.df_finale_delay_multidata_old(df,df_ar,wp,lista_date)
+df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
 df_all_days
 
 

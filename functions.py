@@ -28,12 +28,11 @@ def frequency(df,label):
 
 
 
-def dict_wp_freq():
+def dict_wp_freq(airport):
     """
     crea dict wp: frequenze
     """
-    lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
-
+    lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 
     return dict(zip(lista_wp,lista_freq_wp))
 
@@ -57,7 +56,9 @@ def df_coor_to_dist(df):
     dato un df con la colonna coor
     ritorna un np.array con le distanze dall'aeroporto
     """
-    AIRPORT=(50.03793, 8.56215)
+    F=(50.03793,8.56215)
+    H=(51.469911,-0.454269)
+    M=(40.494817,-3.567995)
     wp_dist=np.zeros(df.shape[0])
     for i in range(df.shape[0]):
         coordinate=df["coor"][i]
@@ -67,7 +68,12 @@ def df_coor_to_dist(df):
         split_coordinate=coordinate.split(" ")
         split_coordinate=[float(split_coordinate[0]),float(split_coordinate[1])]
         ENTRY=tuple(split_coordinate)
-        dist=geodesic(ENTRY,AIRPORT).kilometers
+        if df.iloc[i]["D"]=="EDDF":
+            dist=geodesic(ENTRY,F).kilometers
+        if df.iloc[i]["D"]=="EGLL":
+            dist=geodesic(ENTRY,H).kilometers
+        if df.iloc[i]["D"]=="LEMD":
+            dist=geodesic(ENTRY,M).kilometers
         wp_dist[i]=dist
     return wp_dist
 
@@ -103,18 +109,31 @@ def wp_neighbours(wp,dist_max):
     return neighbours
 
 
-def dict_wp_coor():
+def dict_wp_coor(airport):
     """
     crea dict wp:coordinate
     """
+
+    if airport=="EDDF":
+        wpl='../data/lista_wp.csv'
+        wpc='../data/wp_coor.csv'
+
+    if airport=="EGLL":
+        wpl='../data/lista_wp_H.csv'
+        wpc='../data/lista_coor_M.csv'
+
+    if airport=="LEMD":
+        wpl='../data/lista_wp_M.csv'
+        wpc='../data/lista_coor_M.csv'
+
     wp_coordinate=[]
-    with open('../data/wp_coor.csv') as csv_file:
+    with open(wpc) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             wp_coordinate.append(row)
 
     wp=[]
-    with open('../data/lista_wp.csv') as csv_file:
+    with open(wpl) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             wp.append(row)

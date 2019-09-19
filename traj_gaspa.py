@@ -65,7 +65,7 @@ df_ar
 
 tempi
 df_ar["time_sec"]=tempi
-df
+df_ar
 
 df_ar
 df_ar =data.data_time(df_ar,"arr_time")
@@ -147,38 +147,6 @@ trajectory[0]
 
 
 
-
-
-
-def shift_coor(d_wp_coor):
-    len(traj_list)
-    """
-    dato il dict_wp_coor
-    shift coordinate vicino all'origine
-    """
-    long=[]
-    lat=[]
-    for i in d_wp_coor:
-        c=fun.coord(d_wp_coor[i])
-        long.append(c[0])
-        lat.append(c[1])
-    long=np.array(long)
-    lat=np.array(lat)
-    mlong=min(long)
-    mlat=min(lat)
-    scaled_long=long-mlong
-    scaled_lat=lat-mlat
-    return scaled_long,scaled_lat
-
-
-
-scaled_long,scaled_lat=shift_coor(d_wp_coor)
-plt.scatter(scaled_long,scaled_lat)
-
-
-
-
-
 """
 CREAZIONE WP_COORD
 """
@@ -188,6 +156,7 @@ def dict_coordinate(df = df):
     """
     INPUT: dataframe con informazioni sui voli
     OUTPUT: dizionario dove per ogni waypoint vengono associate le coordinate
+            come liste e non come dict
     """
     wp_coord = {}
     for i in range(df.shape[0]):
@@ -299,8 +268,8 @@ tempi_coppie["MTR-ORVIV"]
 
 trajectory
 
-
-def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
+df_tot
+def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
     """
     INPUT:
         - tempi_coppie = dictionary con i minimi tempi per ogni coppia
@@ -311,7 +280,10 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
     """
     res = {}
     for i in range(len(traj)):
+        print(i)
         traiettoria = traj[i]
+        print(traiettoria)
+
         s = ""
         tempo = 0
         #formo la stringa che andrà a descrivere la traiettoria
@@ -327,11 +299,75 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
             ss = wp1 + "-" + wp2
             tempo += tempi_coppie[ss]
         res[s]= tempo
+        print(len(res))
+        print("**********")
+    #print(res['SUDEN', 'ETAGO', 'LBU', 'SUPIX', 'PSA', 'ORVIV', 'AIRPORT'])
     return res
 
 min_tempi_percorsi = minimo_percorsi()
-min_tempi_percorsi
+len(min_tempi_percorsi)
+len(trajectory)
 
 """
+'RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT'
 costruisco il dataframe dove c'è aereo-traiettoria-tempo_percorso-tempo_minimo-delay
 """
+
+#ora ho la mia lista aerei
+df_tot
+def lista_aerei(df = df_tot):
+
+    aerei = []
+    i = 0
+    while(i<df.shape[0]):
+        aerei.append(df.iloc[i]["aereo"])
+        j = i+1
+        while(j<df.shape[0]-1 and df.iloc[i]["aereo"]==df.iloc[j]["aereo"]):
+            j = j+1
+        i = j+1
+    return aerei
+
+lista_aerei = lista_aerei()
+df_tot
+
+lista = ["aereo","traiettoria","tempo percorso","tempo minimo","delay"]
+
+
+
+prova = prova.append(pd.Series([a1,s,fine-inizio,min,(fine-inizio)-min], index=prova.columns),ignore_index=True)
+
+def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_aerei):
+    min_tempi_percorsi = minimo_percorsi()
+    res = pd.DataFrame(columns = lista)
+    i = 0
+    cont = 0
+    while(i<df.shape[0]):
+        s = ""
+        a_temp = lista_aerei[cont]
+        j = i
+        inizio = df_tot.iloc[i]["time_sec"]
+        while(j < df.shape[0]-1 and df_tot.iloc[j]["aereo"]==a_temp):
+            s = s + df_tot.iloc[j]["sid"]+"-"
+            j = j+1
+        i = j
+        fine = df_tot.iloc[i-1]["time_sec"]
+
+        s = s[:-1]
+        mini = 0
+        if s in min_tempi_percorsi:
+            mini = min_tempi_percorsi[s]
+        else:
+            mini = fine -inizio
+
+
+        res = res.append(pd.Series([a_temp,s,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
+        i+=1
+        cont = cont + 1
+        print(i)
+    return res
+
+
+pp = dataframe_traiettorie_minime()
+pp
+min = min_tempi_percorsi['RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT']
+min                                                                                                                             RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT]

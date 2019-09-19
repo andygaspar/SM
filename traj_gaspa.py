@@ -301,7 +301,7 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
         res[s]= tempo
         print(len(res))
         print("**********")
-    #print(res['SUDEN', 'ETAGO', 'LBU', 'SUPIX', 'PSA', 'ORVIV', 'AIRPORT'])
+
     return res
 
 min_tempi_percorsi = minimo_percorsi()
@@ -330,7 +330,7 @@ def lista_aerei(df = df_tot):
 lista_aerei = lista_aerei()
 df_tot
 
-lista = ["aereo","traiettoria","tempo percorso","tempo minimo","delay"]
+lista = ["aereo","traiettoria","partenza in sec","arrivo in sec""tempo percorso","tempo minimo","delay"]
 
 
 
@@ -367,7 +367,4 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
     return res
 
 
-pp = dataframe_traiettorie_minime()
-pp
-min = min_tempi_percorsi['RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT']
-min                                                                                                                             RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT]
+df_minimal = dataframe_traiettorie_minime()

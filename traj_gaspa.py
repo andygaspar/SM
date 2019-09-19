@@ -7,31 +7,46 @@ import data as data
 import csv
 import copy
 
-
+lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
+d_wp_coor=fun.dict_wp_coor()
 
 df
 
 df=pd.read_csv("../data/completo.csv") # DA AGGIUNGERE : matcho con arrivo l'aereo con sid aereoporto
 df_ar = pd.read_csv("../data/arrivi_1709.csv")
-df=data.dist_filter(df,200)
-lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
-d_wp_coor=fun.dict_wp_coor()
-df=data.df_per_data(df,'2017-08-17')
-df
-
 main=["KERAX","PSA","ROLIS","UNOKO"]
 
 df_ar
-#lavoro solo su una data
-fr_cond = df_ar["D"] =="EDDF"
-df_ar = df_ar[fr_cond]
- data.rinomina(df_ar,"ifps_id","aereo")
-data.data_time(df_ar,"arr_time")
-data.rinomina(df_ar,"ac_id","sid")
-for i in range(df_ar.shape[0]):
-    df_ar.iloc[i]["sid"] = "AIRPORT"
+def pre_processing_wp(df = df):
+    df=data.dist_filter(df,200)
+    df=data.df_per_data(df,'2017-08-17')
+    return df
 
-df_ar
+
+def pre_processing_arr(df=df_ar):
+    data.rinomina(df_ar,"ifps_id","aereo")
+    data.rinomina(df_ar,"ac_id","sid")
+    data.data_time(df_ar,"arr_time")
+    fr_cond = df_ar["D"] =="EDDF"
+    df_ar = df_ar[fr_cond]
+    for i in range(df_ar.shape[0]):
+        df_ar.iloc[i]["sid"] = "AIRPORT"
+    tempi = []
+    for i in range(df_ar.shape[0]):
+         t = df_ar.iloc[i]["time"]
+         p = fun.time_to_sec(t)
+         tempi.append(p)
+    df_ar["time_sec"]=tempi
+    df_ar["coor"]="POINT(50.037753 8.560964)"
+    df_ar["distance"]=0
+    df_ar = df_ar.drop(["D","O"],axis=1)
+    df_ar = df_ar.drop(["arr_time"],axis=1)
+    return 
+
+
+
+
+
 
 
 df
@@ -47,15 +62,7 @@ lista = ["aereo","sid","coor","distance","date","time","time_sec"]
 PARTE DI PREPROCESSING DI DF_ARR
 
 """
-df_ar
-#lavoro solo su una data
-fr_cond = df_ar["D"] =="EDDF"
-df_ar = df_ar[fr_cond]
- data.rinomina(df_ar,"ifps_id","aereo")
-data.data_time(df_ar,"arr_time")
-data.rinomina(df_ar,"ac_id","sid")
-for i in range(df_ar.shape[0]):
-    df_ar.iloc[i]["sid"] = "AIRPORT"
+
 tempi = []
 for i in range(df_ar.shape[0]):
     t = df_ar.iloc[i]["time"]

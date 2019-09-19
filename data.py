@@ -266,6 +266,7 @@ def df_finale_delay(df,df_ar,date,lista_waypoint):
 
 
 
+
 def df_finale_delay_multidata(df,df_ar,wp,lista_date):
     """
     dati df e df_ar di un aeroporto, lista wp e una lista date

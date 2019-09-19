@@ -22,7 +22,6 @@ d_wp_coor=fun.dict_wp_coor()
 
 
 
-
 #scelta aeroporto e filtro distanze
 airport="EDDF"
 capacita=60
@@ -56,7 +55,7 @@ wp=["ROLIS","UNOKO","KERAX","PSA"]
 
 
 #creazione del df_finale per wp e tuttte le date nella lista (molto lento!!!!!!!)
-df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
+df_all_days=data.df_finale_delay_multidata_old(df,df_ar,wp,lista_date)
 df_all_days
 
 

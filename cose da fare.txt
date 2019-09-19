@@ -1,4 +1,6 @@
 -valutazione dati
+  distanze come nell'articolo
+  test statistico, da bortolussi
 
 -altri aeroporti
 

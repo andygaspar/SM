@@ -10,13 +10,14 @@ import copy
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste()
 d_wp_coor=fun.dict_wp_coor()
 
-df
+
 
 df=pd.read_csv("../data/completo.csv") # DA AGGIUNGERE : matcho con arrivo l'aereo con sid aereoporto
 df_ar = pd.read_csv("../data/arrivi_1709.csv")
 main=["KERAX","PSA","ROLIS","UNOKO"]
+lista = ["aereo","sid","coor","distance","date","time","time_sec"]
 
-df_ar
+
 def pre_processing_wp(df = df):
     df=data.dist_filter(df,200)
     df=data.df_per_data(df,'2017-08-17')
@@ -24,6 +25,7 @@ def pre_processing_wp(df = df):
 
 
 def pre_processing_arr(df=df_ar):
+    df_ar = df.copy()
     data.rinomina(df_ar,"ifps_id","aereo")
     data.rinomina(df_ar,"ac_id","sid")
     data.data_time(df_ar,"arr_time")
@@ -39,9 +41,13 @@ def pre_processing_arr(df=df_ar):
     df_ar["time_sec"]=tempi
     df_ar["coor"]="POINT(50.037753 8.560964)"
     df_ar["distance"]=0
-    df_ar = df_ar.drop(["D","O"],axis=1)
+    df_ar = df_ar.drop(["O"],axis=1)
     df_ar = df_ar.drop(["arr_time"],axis=1)
-    return 
+    return df_ar
+
+
+df = pre_processing_wp()
+df_ar = pre_processing_arr()
 
 
 
@@ -49,42 +55,10 @@ def pre_processing_arr(df=df_ar):
 
 
 
-df
-"""
-idea aggiungere arrivo al df completo
-"""
-lista = ["aereo","sid","coor","distance","date","time","time_sec"]
 
 
 
 
-"""
-PARTE DI PREPROCESSING DI DF_ARR
-
-"""
-
-tempi = []
-for i in range(df_ar.shape[0]):
-    t = df_ar.iloc[i]["time"]
-    p = fun.time_to_sec(t)
-    tempi.append(p)
-df_ar
-
-tempi
-df_ar["time_sec"]=tempi
-df_ar
-
-df_ar
-df_ar =data.data_time(df_ar,"arr_time")
-cond = df_ar["date"]=='2017-08-17'
-df_ar =df_ar[cond]
-df_ar
-df_ar["coor"]="POINT(50.037753 8.560964)"
-df_ar["distance"]=0
-df_ar = df_ar.drop(["D","O"],axis=1)
-df_ar = df_ar.drop(["arr_time"],axis=1)
-df_ar
-df
 
 def complete_dataframe(df = df,df_ar = df_ar, lista = lista):
     """
@@ -142,13 +116,8 @@ def traiettorie_complete(df):
             traj_list.append([df.iloc[i]["sid"]])
             j+=1
     return traj_list
-
-
-
-
-
 trajectory=traiettorie_complete(df_tot)
-trajectory[0]
+
 
 
 
@@ -215,14 +184,14 @@ def distanza_coppie(traj = trajectory,dict_wp = wp_coord):
 dictionario_distanza_coppie = distanza_coppie()
 
 
-dictionario_distanza_coppie
 
 
 
 
 
 
-df_tot
+
+
 
 
 def minimo_coppia(wp1,wp2,df=df_tot):
@@ -241,11 +210,9 @@ def minimo_coppia(wp1,wp2,df=df_tot):
                 print(i)
     return min
 
-
 lista_coppie = list(dictionario_distanza_coppie.keys())
 lista_coppie
-len(lista_coppie)
-df_tot
+
 def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
     """
     INPUT :
@@ -271,12 +238,10 @@ def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
 
 tempi_coppie = tempi_minimi_coppie()
 tempi_coppie
-tempi_coppie["MTR-ORVIV"]
 
-trajectory
 
-df_tot
-def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
+
+def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
     """
     INPUT:
         - tempi_coppie = dictionary con i minimi tempi per ogni coppia
@@ -286,6 +251,7 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
         di ogni coppia che forma il percorso
     """
     res = {}
+
     for i in range(len(traj)):
         print(i)
         traiettoria = traj[i]
@@ -312,8 +278,7 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot):
     return res
 
 min_tempi_percorsi = minimo_percorsi()
-len(min_tempi_percorsi)
-len(trajectory)
+
 
 """
 'RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT'
@@ -337,7 +302,7 @@ def lista_aerei(df = df_tot):
 lista_aerei = lista_aerei()
 df_tot
 
-lista = ["aereo","traiettoria","partenza in sec","arrivo in sec""tempo percorso","tempo minimo","delay"]
+lista = ["aereo","traiettoria","partenza in sec","arrivo in sec","tempo percorso","tempo minimo","delay"]
 
 
 
@@ -348,7 +313,7 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
     res = pd.DataFrame(columns = lista)
     i = 0
     cont = 0
-    while(i<df.shape[0]):
+    while(i<df.shape[0]-1):
         s = ""
         a_temp = lista_aerei[cont]
         j = i
@@ -367,11 +332,12 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
             mini = fine -inizio
 
 
-        res = res.append(pd.Series([a_temp,s,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
-        i+=1
+        res = res.append(pd.Series([a_temp,s,inizio,fine,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
+
         cont = cont + 1
         print(i)
     return res
 
 
 df_minimal = dataframe_traiettorie_minime()
+df_minimal

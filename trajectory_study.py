@@ -8,10 +8,10 @@ from numpy import linalg as LA
 from scipy.spatial import distance
 
 
-df_ar=pd.read_csv("../data/arrivi_1709.csv")
-df_wp=pd.read_csv("../data/punti_1709.csv")
-df_toplot = pd.read_csv("../data/df_to_plot.csv")
-df_wp
+df_ar=pd.read_csv("../data/arrivi_completo.csv")
+df_wp=pd.read_csv("../data/completo.csv")
+
+
 data.rinomina(df_wp,"astext(k.coords)","coor")
 data.add_dist(df_wp)
 df_filtered=data.dist_filter(df_wp,200)
@@ -19,46 +19,32 @@ df_filtered=data.dist_filter(df_wp,200)
 df_filtered
 freq = fun.frequency(df_filtered,"sid")
 
-freq
-df_filtered = data.data_time(df_filtered)
 
 
 
-df_toplot O
-
-#considero solo un giorno e solo la condizione di frankfurt!
-cond_day1=df_filtered["date"]=="2017-09-13"  #data in considerazione
-df_entry_day1=df_filtered[cond_day1]
-df_entry_day1.shape
-df_entry_day1
-f_cont = df_entry_day1["D"]="EDDF"
-df_entry_day1=df_entry_day1[cond_day1]
-df_entry_day1.shape
-df_entry_day1
 
 coordinate = []
 #mettiamo a posto le coordinate
-for i in range(df_entry_day1.shape[0]):
-    coordinate.append(fun.coord(df_entry_day1.iloc[i]["coor"]))
+for i in range(df_filtered.shape[0]):
+    coordinate.append(fun.coord(df_filtered.iloc[i]["coor"]))
 
-df_entry_day1= df_entry_day1.drop(columns=["coor"])
-df_entry_day1["coor"]=coordinate
-df_entry_day1.shape[0]
+df_filtered= df_filtered.drop(columns=["coor"])
+df_filtered["coor"]=coordinate
 
-p= df_entry_day1.to_csv (r'../data/ppt.csv', index = None, header=True)
-df_entry_day1
+
+
 """
 Ora procedo con la costruzione del dataset: in questo dataset ci saranno le traiettorie_13_09
 relative ai voli avvenuti il giorno 13 settembre nell'aereoporto di Frankfurt.
 Per semplicità (da migliorare) consideriamo solo i flight con più di 5 waypoint e
 consideriamo solo i primi 5 waypoint [ai fini del tempo è importante il primo]
 """
-df_entry_day1
 
-i = 0
+
+
 names=['flight','wp1','wp2','wp3','wp4','wp5','t1','t2','t3','t4','t5']
-
-df_traj = data.creation_data_waypoint(df_entry_day1,names)
+df_filtered
+df_traj = data.creation_data_waypoint(df_filtered,names,name_of_col ="aereo")
 df_traj
 
 
@@ -70,17 +56,10 @@ df_traj
 """
 Al dataset creato aggiungo gli arrivi, contenuti nel dataset df_ar
 """
-
-f_cont = arr["D"]=="EDDF"
-arr=arr[f_cont]
-arr = df_ar.copy()
-df_filtered = data.data_time(df_filtered)
-arr = data.data_time(arr,"arr_time")
-date_cond = arr["date"]=="2017-09-13"
-arr = arr[date_cond]
-data.rinomina(arr,"ifps_id","flight")
-arr
-df_traj = data.arrival_matching(df_traj,arr)
+data.rinomina(df_ar,"aereo","flight")
+data.rinomina(df_traj,"aereo","flight")
+df_ar
+df_traj = data.arrival_matching(df_traj,df_ar)
 df_traj
 #df_traj rappresenta i primi 5 waypoints e i vari tempi + tempo arrivo
 #ora aggiungo le tempistiche
@@ -98,7 +77,7 @@ for i in  range(df_traj.shape[0]):
 "aggiungo anche i tempi di arrivo"
 df_traj["tempi di arrivo"] = tempistiche
 df_traj
-traiettorie_13_09 = df_traj.to_csv(r'../traiettorie_13_09.csv',index = None, header=True)
+traiettorie_day1 = df_traj.to_csv(r'../traiettorie_day1.csv',index = None, header=True)
 
 none_cond = df_traj["arrival"]!="None"
 df_traj = df_traj[none_cond]
@@ -132,23 +111,23 @@ for i in range(len(trajectory)):
 
 tr_dict= sorted(tr_dict.items(),key =lambda kv:(kv[1], kv[0]),reverse=True)
 tr_dict = dict(tr_dict)
-tr_dict
+
 
 percorsi = list(tr_dict.keys()) #lista di tutte le pox traiettorie
 num_percorsi = list(tr_dict.values()) #lista del numero di volte in cui le traiettorie si presentano
 len(percorsi)
-percorsi
 
-freq
+
+
 """
 Ora creo un dict,chiamato wp_coord, che ha come chiavi tutti i pox waypoints
 e come valori le loro coordinate
 """
 wp_coord ={}
-for i in range(df_entry_day1.shape[0]):
-    sid = df_entry_day1.iloc[i]["sid"]
+for i in range(df_filtered.shape[0]):
+    sid = df_filtered.iloc[i]["sid"]
     if sid not in wp_coord:
-        wp_coord[sid] = df_entry_day1.iloc[i]["coor"]
+        wp_coord[sid] = df_filtered.iloc[i]["coor"]
     else:
         continue
 
@@ -312,16 +291,16 @@ lista_coordinate = list(wp_coord.values())
 
 
 
-freq
+
 list_freq = list(freq.keys())
-list_freq
+
 list_freq_2 = []
 for i in range(10):
     list_freq_2.append(list_freq[i])
 
 
 wp_freq=list(freq.keys())
-len(wp_freq)
+
 plt.figure(figsize=(20,15))
 for i in range(coord_traj.shape[0]):
     tr = coord_traj.iloc[i]
@@ -361,20 +340,7 @@ for i in range(len(wayp)):
 plt.legend()
 plt.savefig("plot/traj_1_bis_bis.png")
 plt.show()
-wp_freq_l = wp_freq[:20]
-wp_freq_l
-wp_coord["KERAX"]
-wp_dict
-"KERAX" in wayp
-plt.show()
-freq
-frequenze = list(freq.keys())
-wp_freq
-wp_coord["PSA"]
-wp_coord
-wayp
-help(fun.frequency)
-
+w
 
 
 
@@ -434,18 +400,6 @@ p_arr
 
 
 
-for i in range(len(similar_to_one_coord)):
-    x = []
-    y = []
-    for j in range(5):
-        if(similar_to_one_coord[i][j]!=0):
-            x.append(similar_to_one_coord[i][j][0])
-            y.append(similar_to_one_coord[i][j][1])
-    plt.plot(x,y,linewidth=1)
-
-plt.scatter(50.037753, 8.560964,color="red")
-
-plt.plot(coordinate_x[0],coordinate_y[0],linewidth=4,label = "trajectory_0")
 
 """
 stessa cosa con il secondo
@@ -474,35 +428,7 @@ def controlla_traiettoria(trajectories,df = df_traj):
 
 qwerty=controlla_traiettoria(similar_to_one)
 
-df_traj.shape[0]
-
-similar_to_one
-similar_to_2_coord = []
-for i in range(len(similar_to_2)):
-    temp = similar_to_2[i]
-    coord = []
-    for j in range(len(temp)):
-        if (temp[j]!="None"):
-            print(wp_coord[temp[j]])
-            coord.append(wp_coord[temp[j]])
-        else:
-            coord.append(0)
-    similar_to_2_coord.append(coord)
-
-for i in range(len(similar_to_2_coord)):
-    x = []
-    y = []
-    for j in range(5):
-        if(similar_to_2_coord[i][j]!=0):
-            x.append(similar_to_2_coord[i][j][0])
-            y.append(similar_to_2_coord[i][j][1])
-    plt.plot(x,y,linewidth=1)
-
-plt.scatter(50.037753, 8.560964,color="red")
-
-plt.plot(coordinate_x[1],coordinate_y[1],linewidth=5,label = "trajectory_1")
-
-
+d
 
 
 

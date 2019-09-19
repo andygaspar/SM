@@ -297,9 +297,9 @@ lista = ["aereo","traiettoria","partenza in sec","arrivo in sec","tempo percorso
 
 def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_aerei):
        min_tempi_percorsi = minimo_percorsi()
-      res = pd.DataFrame(columns = lista)
-      i = 0
-      cont = 0
+       res = pd.DataFrame(columns = lista)
+       i = 0
+       cont = 0
        while(i<df.shape[0]-1):
          s = ""
          a_temp = lista_aerei[cont]
@@ -323,7 +323,9 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
              mini = fine -inizio
          res = res.append(pd.Series([a_temp,s,inizio,fine,fine-inizio,mini,(fine-inizio)-mini], index=res.columns),ignore_index=True)
          cont = cont + 1
-      return res
+       return res
 
 
-                                                                                                                             RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT]
+
+d = dataframe_traiettorie_minime()
+d

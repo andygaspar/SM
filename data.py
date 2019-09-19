@@ -263,3 +263,40 @@ def df_finale_delay(df,df_ar,date,lista_waypoint):
 
     df_delay["delay"]=delay
     return df_delay,delay_dict
+
+
+
+def df_finale_delay_multidata(df,df_ar,wp,lista_date):
+    """
+    dati df e df_ar di un aeroporto, lista wp e una lista date
+    ritorna il df_finale_delay di tutte le date
+    """
+    date=lista_date[0]
+    dff=df_per_data(df,date)
+    dff_ar=df_per_data(df_ar,date)
+    dff_ar=df_ar.sort_values(by="time_sec")
+    df_delay,min_dict=df_finale_delay(dff,dff_ar,date,wp)
+
+    df_all_days=df_delay.copy()
+
+    for i in range(1,len(lista_date)):
+        date=lista_date[i]
+        dff=df_per_data(df,date)
+        dff_ar=df_per_data(df_ar,date)
+        dff_ar=df_ar.sort_values(by="time_sec")
+        df_delay,min_dict=df_finale_delay(dff,dff_ar,date,wp)
+        df_all_days=df_all_days.append(df_delay)
+
+    return df_all_days
+
+
+
+def make_data_queue(df_busy,capacita,approx="t"):
+    """
+    dati df_busy,capacità e tipo di approx t=truncated,else rounded
+    ritorna la queue
+    """
+    if approx=="t":
+        return (df_busy["delay"].values/capacita).astype(int)
+    else:
+        return np.round(df_busy["delay"].values/capacita)

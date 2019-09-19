@@ -72,7 +72,7 @@ plt.plot(clean/60)
 
 
 # run del modello
-queue,delay_sim, arr=ss.PSRA(end_time-start_time,"norm",freq,10)
+queue,delay_sim, arr=ss.PSRA(end_time-start_time,60,"norm",freq,10)
 queue_d=p.plot_queues(df_busy,queue,freq)
 
 
@@ -96,13 +96,13 @@ queue.shape
 delay
 
 help(ss.simulation_PRSA)
-sim,sim_matrix=ss.simulation_PRSA(1000, start_time, end_time, freq, 10)
+sim,sim_matrix=ss.simulation_PRSA(1000, 60,start_time, end_time, freq, 20)
 sim_d=ss.sim_distribution(sim_matrix)
 
 
+delay.shape
 
-
-data_queue=delay/freq
+data_queue=delay/60
 data_queue=data_queue.astype(int)
 data_d=ss.data_distribution(data_queue)
 

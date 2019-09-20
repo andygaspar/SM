@@ -10,8 +10,6 @@ import csv
 import copy
 import simple_simulation as ss
 import plot as p
-import random as rm
-
 
 
 
@@ -25,7 +23,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
-
+capacita=80
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -49,7 +47,7 @@ lista_date
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=6
-end_time=10
+end_time=11
 
 
 
@@ -75,17 +73,11 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
 
-#definisco la variabile load traffic ro
-ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
-
-
-
+capacita=60
 #run del modello e calcolo della distribuzione
-capacita=max/ro
-capacita
-sigma=9.0
-noise=0.0
+capacita=freq
+sigma=15
+noise=0.0075
 iterazioni=1000
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
@@ -93,6 +85,8 @@ sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, fre
 sim_uni=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
 sim_exp=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
+#sim_tri=ss.sim_distribution(sim_matrix)
 
 
 
@@ -124,7 +118,6 @@ plt.show()
 distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
-D
 qual=fun.quality(D)
 qual
 
@@ -142,10 +135,28 @@ qual
 
 
 
-PAR,min_sig,dist_min=fun.parameter(start_time,end_time,freq,freq,df_busy,1000,noise=False)
-min_sig
+PAR=fun.parameter(start_time,end_time,freq,freq,df_busy,1000)
 
-plt.plot(np.arange(5,21,0.5),PAR)
-plt.grid()
+np.min(PAR)
+np.argmin(PAR)/PAR.shape[1]
+PAR[int(39/PAR.shape[1]),39%PAR.shape[1]]
 
-dist_min
+int(39/PAR.shape[1])
+39%PAR.shape[1]
+
+l_sigma=np.arange(5,31,2.5)
+l_noise=np.arange(0,0.21,0.025)
+
+l_sigma[4]
+l_noise[3]
+
+
+
+fig=plt.figure()
+ax=fig.gca(projection="3d")
+
+x,y=np.meshgrid(l_noise,l_sigma)
+ax.plot_surface(x,y,PAR)
+plt.show()
+x.shape
+PAR.shape

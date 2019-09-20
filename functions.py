@@ -372,8 +372,4 @@ def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
             dist_mat_tot.append(d_m)
 
             i+=1
-<<<<<<< HEAD
-        return sig,l_sigma[np.argmin(sig)]
-=======
         return sig,l_sigma[np.argmin(sig)],dist_mat_tot[np.argmin(sig)]
->>>>>>> bbf4837626b526fce4e3be860c9cf194d4a334ec

@@ -370,4 +370,4 @@ def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
             sig[i]=quality(dist_mat(distrib))
 
             i+=1
-        return sig,l_sigma(np.argmin(sig))
+        return sig,l_sigma[np.argmin(sig)]

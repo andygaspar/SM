@@ -162,7 +162,7 @@ def creation_data_waypoint(df,name,number_of_wp=5,name_of_col = "ifps_id"):
     return  df_traj
 
 
-def arrival_matching(df_wp,df_arrivi,col_flights = "flight"):
+def arrival_matching(df_wp,df_arrivi,col_flights = "aereo"):
     """
     INPUT:
         -df_wp:datagrame dove per ogni volo ci sono tutti i waypoint con i rispettivi

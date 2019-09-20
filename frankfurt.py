@@ -23,7 +23,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
-capacita=60
+capacita=80
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -51,14 +51,16 @@ end_time=11
 
 
 
+
 #scelta waypoint
 wp=["ROLIS","UNOKO","KERAX","PSA"]
 
 
 
 #creazione del df_finale per wp e tuttte le date nella lista (molto lento!!!!!!!)
-df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
-df_all_days
+#df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
+#data.save_df(df_all_days,"francoforte.csv")
+df_all_days=pd.read_csv("francoforte.csv")
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
@@ -71,11 +73,21 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
 
+capacita=60
 #run del modello e calcolo della distribuzione
+capacita=freq
+sigma=15
+noise=0.0075
 iterazioni=1000
-sigma=10
-sim,sim_matrix=ss.simulation_PRSA(iterazioni,capacita, start_time, end_time, freq, sigma)
-sim_d=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+sim_norm=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim_uni=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
+sim_exp=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
+#sim_tri=ss.sim_distribution(sim_matrix)
+
 
 
 #calcolo delle code dai dati e della distribuzione relativa
@@ -89,9 +101,62 @@ data_r=ss.data_distribution(data_queue_rounded)
 
 
 #plotting
-plt.plot(sim_d,label="simulation_PRSA")
+plt.plot(sim_norm,label="simulation_NORM")
+plt.plot(sim_uni,label="simulation_UNI")
+plt.plot(sim_exp,label="simulation_EXP")
+#plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title("Distribution sigma=10")
+plt.title(" FRANKFURT sigma="+str(sigma)+" noise="+str(noise))
 plt.legend()
 plt.show()
+
+
+
+
+
+distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+distrib=fun.standardise_len(distribuzioni)
+D=fun.dist_mat(distrib)
+qual=fun.quality(D)
+qual
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PAR=fun.parameter(start_time,end_time,freq,freq,df_busy,1000)
+
+np.min(PAR)
+np.argmin(PAR)/PAR.shape[1]
+PAR[int(39/PAR.shape[1]),39%PAR.shape[1]]
+
+int(39/PAR.shape[1])
+39%PAR.shape[1]
+
+l_sigma=np.arange(5,31,2.5)
+l_noise=np.arange(0,0.21,0.025)
+
+l_sigma[4]
+l_noise[3]
+
+
+
+fig=plt.figure()
+ax=fig.gca(projection="3d")
+
+x,y=np.meshgrid(l_noise,l_sigma)
+ax.plot_surface(x,y,PAR)
+plt.show()
+x.shape
+PAR.shape

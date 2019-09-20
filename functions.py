@@ -3,6 +3,7 @@ from geopy.distance import geodesic
 import csv
 import pandas as pd
 import data as data
+import simple_simulation as ss
 
 
 "  frequenze **********************"
@@ -268,3 +269,76 @@ def reject_outliers(data, m=2):
     ritorna un array senza gli outliers
     """
     return data[abs(data - np.mean(data)) < m * np.std(data)]
+
+
+def tot_variation(p,q):
+    return sum(abs(p-q))/2
+
+def hellinger(p,q):
+    return np.sqrt(sum((np.sqrt(p)-np.sqrt(q))**2))*1/np.sqrt(2)
+
+def standardise_len(lista_distrib):
+    max=0
+    new_list=[lista_distrib[0]]
+    for d in lista_distrib:
+        if len(d)>max:
+            max=len(d)
+            new_list[0]=d
+
+    for d in lista_distrib[1:]:
+        if len(d)<max:
+            d=np.append(d,np.zeros(max-len(d)))
+            new_list.append(d)
+        if len(d)==max:
+            new_list.append(d)
+
+    return new_list
+
+
+
+def dist_mat(l_distrib):
+    N=len(l_distrib)
+    mat=np.zeros((N-1,4))
+    for i in range(N-1):
+        mat[i,0]=tot_variation(l_distrib[i],l_distrib[3])
+        mat[i,1]=hellinger(l_distrib[i],l_distrib[3])
+        mat[i,2]=tot_variation(l_distrib[i],l_distrib[4])
+        mat[i,3]=hellinger(l_distrib[i],l_distrib[4])
+
+    return mat
+
+def quality(mat):
+    return sum(sum(mat[0:-1]))
+
+
+def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni):
+    l_sigma=np.arange(5,31,2.5)
+    l_noise=np.arange(0,0.21,0.025)
+    mat=np.zeros((len(l_sigma),len(l_noise)))
+
+    i=0
+    for sigma in l_sigma:
+        j=0
+        for noise in l_noise:
+            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+            sim_norm=ss.sim_distribution(sim_matrix)
+            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+            sim_uni=ss.sim_distribution(sim_matrix)
+            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
+            sim_exp=ss.sim_distribution(sim_matrix)
+
+
+
+            data_queue_truncated=data.make_data_queue(df_busy,capacita)
+            data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
+            data_t=ss.data_distribution(data_queue_truncated)
+            data_r=ss.data_distribution(data_queue_rounded)
+
+
+            distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+            distrib=standardise_len(distribuzioni)
+
+            mat[i,j]=quality(dist_mat(distrib))
+            j+=1
+        i+=1
+    return mat

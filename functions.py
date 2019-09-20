@@ -348,6 +348,7 @@ def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
         sig=np.zeros(len(l_sigma))
         noise=0
         i=0
+        dist_mat_tot = []
         for sigma in l_sigma:
             sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
             sim_norm=ss.sim_distribution(sim_matrix)
@@ -366,8 +367,9 @@ def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
 
             distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
             distrib=standardise_len(distribuzioni)
-
-            sig[i]=quality(dist_mat(distrib))
+            d_m = dist_mat(distrib)
+            sig[i]=quality(d_m)
+            dist_mat_tot.append(d_m)
 
             i+=1
-        return sig,l_sigma(np.argmin(sig))
+        return sig,l_sigma[np.argmin(sig)],dist_mat_tot[np.argmin(sig)]

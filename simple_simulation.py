@@ -51,7 +51,7 @@ def arr(N,f,freq,fattore_sigma,negative_delays):
 
 
 "costruzione PSRA"
-def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_delays=True):
+def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,noise,sigma=20, negative_delays=True):
     """
     dato lasso temporale, distribuzione: ("exp", "uni", "norm", "tri"), lam, fattore_sigma
     ritorna liste con queue, delay, arrival
@@ -64,6 +64,10 @@ def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_d
     #costruzione del vettore degli arrivi con ritardi
     arrival,delay=arr(N,distributione,freq,sigma,negative_delays)
 
+    #costruzione vettore rallentamento servizio
+    num_miss=np.random.binomial(N,noise)
+    miss_service=np.append(np.ones(N-num_miss),np.zeros(num_miss))
+    np.random.shuffle(miss_service)
 
     #costruzione del PSRA
     queue=np.zeros(N)
@@ -71,7 +75,7 @@ def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_d
     for i in range(1,N):
         arrival_in_slot=len(arrival[(arrival>=capacita*(i-1)) & (arrival<capacita*i)])
         #queue_old[i]=queue_old[i-1]+arrival_in_slot-int(queue_old[i-1]!=0)
-        queue[i]=queue[i-1]   +   arrival_in_slot   -    int(queue[i-1]!=0)
+        queue[i]=queue[i-1]   +   arrival_in_slot   -    int(queue[i-1]!=0)*miss_service[i]
 
 
     return queue,delay,arrival
@@ -83,17 +87,17 @@ def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_d
 
 
 
-def simulation_PSRA(N,len_periodo, capacita,freq,sigma, distrib="norm"):
+def simulation_PSRA(N, capacita,start_time, end_time,freq,sigma,noise, distrib="norm"):
     """
     dato N numero di simulazioni
     ritorna un vettore con l'andamento medio delle simul (stady state distr)
     """
-    T=(len_periodo)*3600
+    T=(end_time-start_time)*3600
     M=int(T/capacita)
     sim_matrix=np.zeros((N,M))
     sim=np.zeros(M)
     for i in range(N):
-        sim_matrix[i],x,y=PSRA(len_periodo,capacita,distrib,freq,sigma)
+        sim_matrix[i],x,y=PSRA(end_time-start_time,capacita,distrib,freq,noise,sigma)
     for i in range(M):
         sim[i]=np.mean(sim_matrix[:,i])
 

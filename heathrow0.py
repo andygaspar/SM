@@ -70,7 +70,7 @@ df_all_days=pd.read_csv("heathrow.csv")
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
+freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
 
 
 
@@ -83,13 +83,18 @@ ro,max_ro=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
 max_ro
 
+3600/(ro*max_ro)
 freq
+
+3600/(0.976*41)
+capacita=3600/(ro*max_ro)
 freq=3600/(ro*max_ro)
+capacita=freq-1
 
 
 sigma=25
 noise=0.0
-iterazioni=1000
+iterazioni=100
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"uni")
@@ -120,7 +125,7 @@ data_r=ss.data_distribution(data_queue_rounded)
 #plotting
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
-plt.plot(sim_exp,label="simulation_EXP")
+#plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
@@ -134,7 +139,7 @@ D=fun.dist_mat(distrib)
 qual=fun.quality(D)
 qual
 
-distrib
+
 D
 
 a=[1,2,3,4]

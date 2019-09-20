@@ -295,13 +295,13 @@ m_d_1,r,t = M_D_1(1/freq,24)
 m_d_1 = create_distribution(m_d_1)
 plt.plot(m_d_1)
 
-a,b,c,d = simulation_PSRA(24,90,20,volte = 100)
+a,b,c,d = simulation_PSRA(24,3600/(0.96*41),20,volte = 1000)
 
 plt.plot(a,label="UNI")
 plt.plot(b,label="NORM")
-plt.plot(c,label="TRI")
-plt.plot(d,label="EXP")
-plt.plot(ciccio,label="M_D_1")
+#lt.plot(c,label="TRI")
+#plt.plot(d,label="EXP")
+#plt.plot(ciccio,label="M_D_1")
 
 plt.legend()
 plt.show()

@@ -76,16 +76,15 @@ freq
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
+ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
+ro
 
-capacita=80
+
+
+
+capacita=80/ro
 sigma=15
-noise=0.075
-
-
-
-capacita=freq
-sigma=15
-noise=0.0075
+noise=0.0
 iterazioni=1000
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
@@ -125,46 +124,62 @@ D=fun.dist_mat(distrib)
 qual=fun.quality(D)
 qual
 
+distrib
+D
 
 
 
 
 
+capacita=80/ro
 
-
-
-
-
-
-
-
-
-PAR=fun.parameter(start_time,end_time,freq,freq,df_busy,1000)
+PAR,min_sig=fun.parameter(start_time,end_time,freq,capacita,df_busy,1000,noise=False)
 
 np.min(PAR)
-np.argmin(PAR)/PAR.shape[1]
-PAR[int(39/PAR.shape[1]),39%PAR.shape[1]]
+np.argmin(PAR)
+plt.plot(np.arange(5,21,0.5),PAR)
 
-int(39/PAR.shape[1])
-39%PAR.shape[1]
+
+
+
+
+
+
+
+
+PAR[10,1]
+
+int(index/PAR.shape[1])
+
+
+
+index=np.argmin(PAR)
+PAR[int(index/PAR.shape[1]),int(index)%PAR.shape[1]]
+index
+int(index/PAR.shape[1])
+index%PAR.shape[1]
 
 l_sigma=np.arange(5,31,2.5)
 l_noise=np.arange(0,0.21,0.025)
 
-l_sigma[4]
-l_noise[3]
+l_sigma[int(index/PAR.shape[1])]
+l_noise[index%PAR.shape[1]]
 
 
+
+
+
+PAR.T.shape
 
 fig=plt.figure()
 ax=fig.gca(projection="3d")
 
 x,y=np.meshgrid(l_noise,l_sigma)
-ax.plot_surface(x,y,PAR)
+ax.plot_surface(y,x,PAR)
 plt.show()
 x.shape
 PAR.shape
-
+y.shape
 
 """
 

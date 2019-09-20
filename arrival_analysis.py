@@ -124,3 +124,26 @@ def freq_analysis(airport,lista_date):
     plt.plot(to_plot/len(lista_date))
     plt.title("Medie arrivi")
     plt.show()
+
+
+
+def find_ro(freq,start_time,end_time,lista_date,airport):
+    """
+    ritorna ro,max_arrival_per_h
+    """
+    d_ar=pd.read_csv("../data/arrivi_completo.csv")
+    df_ar=data.airport(d_ar,airport)
+    max=0
+    for date in lista_date:
+        arr_day=data.df_per_data(df_ar,date)
+        arr_day=data.airport(arr_day,airport)
+        for i in range(start_time,end_time):
+            cond=arr_day["time_sec"]>=i*3600
+            busy_arrival=arr_day[cond]
+            cond=busy_arrival["time_sec"]<(i+1)*3600
+            busy_arrival=busy_arrival[cond]
+            if(busy_arrival.shape[0]>max):
+                max=busy_arrival.shape[0]
+
+
+    return (3600/freq)/max,max

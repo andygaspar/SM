@@ -70,8 +70,8 @@ df_all_days=pd.read_csv("heathrow.csv")
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
-freq
+capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
+
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
@@ -79,21 +79,28 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 df_busy.shape
 
-ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
+ro,max_ro=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
+max_ro
 
-freq=90
+freq
+freq=3600/(ro*max_ro)
 
-capacita=90
 
-sigma=20
+sigma=25
 noise=0.0
-iterazioni=100
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+iterazioni=1000
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"exp")
+#sim_exp=ss.sim_distribution(sim_matrix)
+# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+# sim_norm=ss.sim_distribution(sim_matrix)
+# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+# sim_uni=ss.sim_distribution(sim_matrix)
+# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
 #sim_exp=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
 #sim_tri=ss.sim_distribution(sim_matrix)
@@ -113,15 +120,15 @@ data_r=ss.data_distribution(data_queue_rounded)
 #plotting
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
-#plt.plot(sim_exp,label="simulation_EXP")
+plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-#plt.plot(data_t,label="data truncated")
-#plt.plot(data_r,label="data rounded")
+plt.plot(data_t,label="data truncated")
+plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma)+" noise="+str(noise))
 plt.legend()
 plt.show()
 
-distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
@@ -130,8 +137,8 @@ qual
 distrib
 D
 
-
-
+a=[1,2,3,4]
+a[-2]
 
 
 capacita=80/ro

@@ -299,10 +299,10 @@ def dist_mat(l_distrib):
     N=len(l_distrib)
     mat=np.zeros((N-1,4))
     for i in range(N-1):
-        mat[i,0]=tot_variation(l_distrib[i],l_distrib[3])
-        mat[i,1]=hellinger(l_distrib[i],l_distrib[3])
-        mat[i,2]=tot_variation(l_distrib[i],l_distrib[4])
-        mat[i,3]=hellinger(l_distrib[i],l_distrib[4])
+        mat[i,0]=tot_variation(l_distrib[i],l_distrib[-2])
+        mat[i,1]=hellinger(l_distrib[i],l_distrib[-2])
+        mat[i,2]=tot_variation(l_distrib[i],l_distrib[-1])
+        mat[i,3]=hellinger(l_distrib[i],l_distrib[-1])
 
     return mat
 
@@ -310,66 +310,32 @@ def quality(mat):
     return sum(sum(mat[0:-1]))
 
 
-def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
-
-    if noise==True:
-        l_sigma=np.arange(5,31,2.5)
-        l_noise=np.arange(0,0.21,0.025)
-        mat=np.zeros((len(l_sigma),len(l_noise)))
-
-        i=0
-        for sigma in l_sigma:
-            j=0
-            for noise in l_noise:
-                sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
-                sim_norm=ss.sim_distribution(sim_matrix)
-                sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
-                sim_uni=ss.sim_distribution(sim_matrix)
-                sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-                sim_exp=ss.sim_distribution(sim_matrix)
+def parameter(len_periodo,l_sigma,freq,capacita,df_busy,iterazioni,noise=True):
+    sig=np.zeros(len(l_sigma))
+    noise=0
+    i=0
+    dist_mat_tot = []
+    for sigma in l_sigma:
+        sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma)
+        sim_norm=ss.sim_distribution(sim_matrix)
+        sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma, "uni")
+        sim_uni=ss.sim_distribution(sim_matrix)
+        #sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma, "exp")
+        #sim_exp=ss.sim_distribution(sim_matrix)
 
 
 
-                data_queue_truncated=data.make_data_queue(df_busy,capacita)
-                data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
-                data_t=ss.data_distribution(data_queue_truncated)
-                data_r=ss.data_distribution(data_queue_rounded)
+        data_queue_truncated=data.make_data_queue(df_busy,capacita)
+        data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
+        data_t=ss.data_distribution(data_queue_truncated)
+        data_r=ss.data_distribution(data_queue_rounded)
 
 
-                distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
-                distrib=standardise_len(distribuzioni)
+        distribuzioni=[sim_norm,sim_uni,data_t,data_r]
+        distrib=standardise_len(distribuzioni)
+        d_m = dist_mat(distrib)
+        sig[i]=quality(d_m)
+        dist_mat_tot.append(d_m)
 
-                mat[i,j]=quality(dist_mat(distrib))
-                j+=1
-            i+=1
-        return mat
-    else:
-        l_sigma=np.arange(5,21,0.5)
-        sig=np.zeros(len(l_sigma))
-        noise=0
-        i=0
-        dist_mat_tot = []
-        for sigma in l_sigma:
-            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
-            sim_norm=ss.sim_distribution(sim_matrix)
-            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
-            sim_uni=ss.sim_distribution(sim_matrix)
-            sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-            sim_exp=ss.sim_distribution(sim_matrix)
-
-
-
-            data_queue_truncated=data.make_data_queue(df_busy,capacita)
-            data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
-            data_t=ss.data_distribution(data_queue_truncated)
-            data_r=ss.data_distribution(data_queue_rounded)
-
-
-            distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
-            distrib=standardise_len(distribuzioni)
-            d_m = dist_mat(distrib)
-            sig[i]=quality(d_m)
-            dist_mat_tot.append(d_m)
-
-            i+=1
-        return sig,l_sigma[np.argmin(sig)],dist_mat_tot[np.argmin(sig)]
+        i+=1
+    return sig,l_sigma[np.argmin(sig)],dist_mat_tot[np.argmin(sig)]

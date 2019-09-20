@@ -27,7 +27,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EGLL"
-capacita=90
+
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -56,8 +56,8 @@ len(lista_date)
 start_time=15
 end_time=21
 
-wp_f=fun.dict_wp_freq("EGLL")
-wp_f
+#wp_f=fun.dict_wp_freq("EGLL")
+
 
 
 #scelta waypoint
@@ -65,36 +65,34 @@ wp=["LOGAN","LAM","ALESO","NUGRA"]
 
 
 #creazione del df_finale per wp e tutte le date nella lista (molto lento!!!!!!!)
-df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
+#df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
 df_all_days=pd.read_csv("heathrow.csv")
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
-freq
+capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
+
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
-df_busy.shape
 
-ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
+ro,max_ro=aa.find_ro(capacita,start_time,end_time,lista_date,airport)
 
-freq
 
-capacita=freq
-capacita=80/ro
+freq=3600/(ro*max_ro)
+
+
 sigma=20
-noise=0.0
 iterazioni=5000
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+len_periodo=50
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-sim_exp=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
+#sim_exp=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
 #sim_tri=ss.sim_distribution(sim_matrix)
 

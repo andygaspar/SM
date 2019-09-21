@@ -50,7 +50,7 @@ lista_date.pop(-1)
 len(lista_date)
 
 
-
+df
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=15
@@ -74,19 +74,26 @@ capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
 
 
 
+
+
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
-ro,max_ro=aa.find_ro(capacita,start_time,end_time,lista_date,airport)
+ro,max_cap=aa.find_ro(freq,start_time,end_time,lista_date,airport)
+ro
 
+80/0.976
+freq
+fattore=90/(3600/(0.976*41))
 
-freq=3600/(ro*max_ro)
+capacita
+freq=yyy
+freq
 
-
-sigma=20
-iterazioni=5000
-len_periodo=50
+sigma=15
+iterazioni=100
+len_periodo=12.5
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
@@ -107,19 +114,21 @@ data_t=ss.data_distribution(data_queue_truncated)
 data_r=ss.data_distribution(data_queue_rounded)
 
 plt.plot(sim)
-
+plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
+
+
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
 #plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title(" HEATHROW sigma="+str(sigma)+" noise="+str(noise))
+plt.title(" HEATHROW sigma="+str(sigma))
 plt.legend()
 plt.show()
 
-distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
@@ -134,7 +143,9 @@ D
 
 capacita=80/ro
 
-PAR,min_sig=fun.parameter(start_time,end_time,freq,capacita,df_busy,1000,noise=False)
+
+l_sigma=np.arange(15,31,2)
+PAR,min_sig,mat_sig=fun.parameter(50,l_sigma,freq,capacita,df_busy,100)
 
 np.min(PAR)
 np.argmin(PAR)
@@ -189,6 +200,139 @@ label
 plt.axis('off')
 p=plt.table(cellText=T,colLabels=label,rowLabels=label,loc='best')
 
-
+df
 plt.show()
 """
+
+df=df[~df.duplicated("aereo")]
+df
+
+start_time
+arr_per_h=[]
+rel_delay=[]
+for date in lista_date:
+    df_day=data.df_per_data(df_ar,date)
+    for i in range(start_time,end_time):
+        cond=df_day["time_sec"]>=i*3600
+        df_aux=df_day[cond]
+        cond=df_aux["time_sec"]<(i+1)*3600
+        df_aux=df_aux[cond]
+        arr_per_h.append(df_aux.shape[0])
+        #rel_delay.append(sum(df_aux["delay"])/df_aux.shape[0])
+
+
+for date in lista_date:
+    df_day=data.df_per_data(df_busy,date)
+    for i in range(start_time,end_time):
+        cond=df_day["time_sec"]>=i*3600
+        df_aux=df_day[cond]
+        cond=df_aux["time_sec"]<(i+1)*3600
+        df_aux=df_aux[cond]
+        rel_delay.append(sum(df_aux["delay"])/df_aux.shape[0])
+
+
+arr_per_h=np.array(arr_per_h)
+rel_delay=np.array(rel_delay)
+df_busy.shape[0]/sum(arr_per_h)
+
+arr_per_h
+
+
+rel_delay
+rel_delay/80
+stima=arr_per_h+(rel_delay/80).astype(int)
+sum(stima)/(45*len(stima))
+cond=stima<45
+stima=stima[cond]
+stima
+
+sum(stima)/len(stima)
+
+(sum(arr_per_h)/(45*len(arr_per_h)))
+
+stima
+df_day=data.df_per_data(df_busy,lista_date[0])
+"""
+******
+"""
+
+
+df_nuovo = df[~df.duplicated("aereo")]
+
+
+
+
+
+
+"""
+*******************
+"""
+
+
+df
+f_wp=fun.dict_wp_freq(airport)
+lis_wp=["LAM","BIG","WEALD","BNN","OCK"]
+cond=df["sid"]=="LAM"
+df_wp=df[cond]
+
+for wp in lis_wp[1:]:
+    cond=df["sid"]==wp
+    df_aux=df[cond]
+    df_wp=df_wp.append(df_aux.copy())
+
+df_wp=df_wp[~df_wp.duplicated("aereo")]
+
+df_wp.shape[0]
+df_wp
+perc=df_wp.shape[0]/df[~df.duplicated("aereo")].shape[0]
+perc
+
+
+df_ok=data.df_per_data(df_wp,lista_date[0])
+df_ok.shape
+
+for date in lista_date[1:]:
+    df_ok=df_ok.append(data.df_per_data(df_wp,date))
+
+df_ok.shape
+cond=df_ok["time_sec"]>=start_time*3600
+df_ok=df_ok[cond]
+cond=df_ok["time_sec"]<end_time*3600
+df_ok=df_ok[cond]
+df_ok.shape
+voli_entrati=df_ok.shape[0]/(28*(end_time-start_time))
+
+voli_entrati
+
+yyy=3600/(voli_entrati/perc)
+yyy
+
+ro=(voli_entrati/perc)/46
+ro
+freq
+
+
+
+
+
+df_test=data.df_per_data(df,lista_date[0])
+df_test.shape
+for date in lista_date[1:]:
+    df_test=df_test.append(data.df_per_data(df,date))
+
+df_test.shape
+
+cond=df_test["time_sec"]>=start_time*3600
+df_test=df_test[cond]
+cond=df_test["time_sec"]<end_time*3600
+df_test=df_test[cond]
+
+
+df_test=df_test[~df_test.duplicated("aereo")]
+df_test.shape
+
+testdata=df_ok[~df_ok.duplicated("date")]
+testdata.shape[0]
+df_test
+df_ok.shape[0]
+"LAM" in list(df["sid"])

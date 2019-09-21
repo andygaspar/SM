@@ -83,16 +83,13 @@ ro,max_ro=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
 max_ro
 
-3600/(ro*max_ro)
+
 freq
 
-3600/(0.976*41)
-capacita=3600/(ro*max_ro)
-freq=3600/(ro*max_ro)
-capacita=freq-1
+capacita=freq-ro
 
 
-sigma=25
+sigma=20
 noise=0.0
 iterazioni=100
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise)

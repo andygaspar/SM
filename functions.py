@@ -310,7 +310,7 @@ def quality(mat):
     return sum(sum(mat[0:-1]))
 
 
-def parameter(len_periodo,l_sigma,freq,capacita,df_busy,iterazioni,noise=True):
+def parameter(len_periodo,l_sigma,freq,capacita,df_busy,iterazioni):
     sig=np.zeros(len(l_sigma))
     noise=0
     i=0
@@ -322,7 +322,6 @@ def parameter(len_periodo,l_sigma,freq,capacita,df_busy,iterazioni,noise=True):
         sim_uni=ss.sim_distribution(sim_matrix)
         #sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma, "exp")
         #sim_exp=ss.sim_distribution(sim_matrix)
-
 
 
         data_queue_truncated=data.make_data_queue(df_busy,capacita)

@@ -296,11 +296,21 @@ m_d_1 = create_distribution(m_d_1)
 plt.plot(m_d_1)
 
 a,b,c,d = simulation_PSRA(24,3600/(0.96*41),20,volte = 1000)
+plt.figure(1)
+plt.subplot(311)
+plt.bar(range(len(a)),a,label = "UNI")
+plt.legend()
+plt.subplot(312)
+plt.bar(range(len(b)),b,label = "NORM")
+plt.legend()
+
+
+
 
 plt.plot(a,label="UNI")
 plt.plot(b,label="NORM")
-#lt.plot(c,label="TRI")
-#plt.plot(d,label="EXP")
+plt.plot(c,label="TRI")
+plt.plot(d,label="EXP")
 #plt.plot(ciccio,label="M_D_1")
 
 plt.legend()

@@ -16,16 +16,21 @@ df=pd.read_csv("../data/completo.csv") # DA AGGIUNGERE : matcho con arrivo l'aer
 df_ar = pd.read_csv("../data/arrivi_1709.csv")
 main=["KERAX","PSA","ROLIS","UNOKO"]
 lista = ["aereo","sid","coor","distance","date","time","time_sec"]
-
+df_ar
 
 def pre_processing_wp(df = df):
     df=data.dist_filter(df,200)
     df=data.df_per_data(df,'2017-08-17')
+    cond = df["time_sec"]>=6*3600
+    df = df[cond]
+    cond = df["time_sec"]<21*3600
+    df = df[cond]
     return df
 
 
 def pre_processing_arr(df=df_ar):
     df_ar = df.copy()
+
     data.rinomina(df_ar,"ifps_id","aereo")
     data.rinomina(df_ar,"ac_id","sid")
     data.data_time(df_ar,"arr_time")
@@ -43,6 +48,12 @@ def pre_processing_arr(df=df_ar):
     df_ar["distance"]=0
     df_ar = df_ar.drop(["O"],axis=1)
     df_ar = df_ar.drop(["arr_time"],axis=1)
+    df_ar=data.df_per_data(df_ar,'2017-08-17')
+    cond = df_ar["time_sec"]>=6*3600
+    df_ar = df_ar[cond]
+    cond = df_ar["time_sec"]<21*3600
+    df_ar = df_ar[cond]
+
     return df_ar
 
 
@@ -53,7 +64,7 @@ df_ar = pre_processing_arr()
 
 
 
-
+df_ar
 
 
 
@@ -119,7 +130,7 @@ def traiettorie_complete(df):
 trajectory=traiettorie_complete(df_tot)
 
 
-
+len(trajectory)
 
 
 
@@ -147,7 +158,7 @@ def dict_coordinate(df = df):
     center = ["50.037753","8.560964"]
     wp_coord["AIRPORT"]=center
     return wp_coord
-wp_coord = dict_coordinate()
+wp_coord = dict_coordinate(df_tot)
 
 wp_coord
 """
@@ -211,7 +222,7 @@ def minimo_coppia(wp1,wp2,df=df_tot):
     return min
 
 lista_coppie = list(dictionario_distanza_coppie.keys())
-lista_coppie
+len(lista_coppie)
 
 def tempi_minimi_coppie( lista_coppie = lista_coppie, df = df_tot):
     """
@@ -279,7 +290,7 @@ def minimo_percorsi(tempi_coppie = tempi_coppie,df = df_tot,traj = trajectory):
 
 min_tempi_percorsi = minimo_percorsi()
 
-
+min_tempi_percorsi
 """
 'RIMET-ODIPI-TUNIV-KERAX-GED-MTR-AIRPORT'
 costruisco il dataframe dove c'è aereo-traiettoria-tempo_percorso-tempo_minimo-delay
@@ -313,7 +324,7 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
     res = pd.DataFrame(columns = lista)
     i = 0
     cont = 0
-    while(i<df.shape[0]-1):
+    while(i<df.shape[0]-1 and cont<len(lista_aerei)):
         s = ""
         a_temp = lista_aerei[cont]
         j = i
@@ -340,4 +351,4 @@ def dataframe_traiettorie_minime(lista = lista ,df = df_tot, aircrafts = lista_a
 
 
 df_minimal = dataframe_traiettorie_minime()
-df_minimal
+df_minimal = df_minimal.to_csv("pp.csv")

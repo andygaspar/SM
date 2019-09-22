@@ -9,7 +9,7 @@ import data as data
 import csv
 import copy
 import simple_simulation as ss
-import plot as p
+import plot as pp
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -57,10 +57,10 @@ lista_date.pop(-1)
 "**********************************************"
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=4
-end_time=23
+end_time=18
 
 
-date=lista_date[1]
+date=lista_date[4]
 arr_day=data.df_per_data(df_ar,date)
 arr_day=data.airport(arr_day,airport)
 arr_day=arr_day.sort_values(by="time_sec")
@@ -74,7 +74,7 @@ curve, freq_per_h, approx,pol=aa.freq_analysis_by_day(date,airport,DEG=30)
 
 plt.plot(arr_day["time_sec"].values[0:-1]/3600,curve)
 plt.plot(arr_day["time_sec"].values[0:-1]/3600,approx)
-
+plt.plot(3600/approx[20:-20])
 
 t=[]
 t.append(start_time*3600)
@@ -89,50 +89,87 @@ arr_test=arr_test[arr_test["time_sec"]<end_time*3600]
 arr_test.shape
 len(t)
 len(t)/12   #arrivi per ora
-3600/(len(t)/12)   #freq
+3600/(len(t)/(end_time-start_time))   #freq
 
 
 
-df_busy=data.df_busy(df_all_days,start_time,end_time)
+df_busy=data.df_busy(df_all_days,start_time,end_time,"time_sec")
 df_busy,delay=data.sort_df(df_busy)
 df_busy=data.df_per_data(df_busy,date)
 df_busy
 
-
+"""
 plt.plot(np.arange(len(df_busy["a_time_sec"].values))*len(arrival)/len(df_busy["a_time_sec"].values),df_busy["a_time_sec"].values)
 plt.plot(sorted(arrival))
-plt.plot(arr_test["time_sec"].values)
-plt.plot(t)
+"""
+plt.plot(arr_test["time_sec"].values/3660)
+plt.plot(t/3660)
+
+
+
 
 
 
 min(approx)
 schedule=t
-sigma=50
+sigma=100
 capacita=65
 data_queue=df_busy["delay"].values/capacita
 data_queue=fun.reject_outliers(data_queue)
-queue,delay,arrival=PSRA_M(schedule,distributione,capacita,sigma)
-sim,sim_matrix=simulation_PSRA_M(200, schedule,capacita,sigma)
-sim_uni,sim_matrix_uni=simulation_PSRA_M(200, schedule,capacita,sigma,"uni")
+sim,sim_matrix=simulation_PSRA_M(200, schedule,capacita,sigma,"norm",False)
+sim_uni,sim_matrix_uni=simulation_PSRA_M(200, schedule,capacita,sigma,"uni",False)
 
-pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,30)
-approx_data_queue=np.polyval(pol_data,np.arange(len(data_queue)))
+pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,20)
+approx_d=np.polyval(pol_data,np.arange(len(data_queue)))
 
 
-df_busy["time_sec"].values
-plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),data_queue,color="orange")
-plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),approx_data_queue)
+x=np.array(df_busy["a_time_sec"].values)
+new_x=np.arange(start_time*3600,end_time*3600,capacita)
+approx_to_plot=plot_interp(approx_d,x,new_x,capacita)
+queue_to_plot=plot_interp(data_queue,x,new_x,capacita)
+
+plt.plot(3600/approx[20:-20])
+
+
+plt.plot(queue_to_plot)
+plt.plot(approx_to_plot)
 plt.plot(sim,color="red")
 plt.plot(sim_uni,color="pink")
 plt.show()
 
 
-plt.plot(freq_per_h)
+np.mean(sim)
+np.mean(data_queue)
 
 
-plt.plot(np.arange(len(approx_data_queue))*len(approx)/len(approx_data_queue),approx_data_queue)
-plt.plot((3600/approx)*max(approx_data_queue)/max(3600/approx))
+def plot_interp(f_x,x,new_x,step):
+    """
+    dato il df_busy e la coda simulata
+    crea un array coda_da_data e i sui indici (per il plot)
+
+    poi plotta
+    """
+    new_fx=np.zeros(len(new_x))-1
+    shift=min(new_x)
+    for i in range(len(f_x)):
+        index=int((x[i]-shift)/step)
+        new_fx[index]=f_x[i]
+
+    #interpolazione
+
+    i=0
+    while i<len(new_fx)-1:
+        a=new_fx[i]
+        b=0
+        k=i+1
+        while k<(len(new_fx)-1) and new_fx[k]==-1:
+            k+=1
+        b=new_fx[k]
+        for j in range(i+1,k):
+            new_fx[j]=a+(j-i)*(b-a)/(k+1-i)
+        i=k
+
+    return abs(new_fx)
 
 
 
@@ -141,10 +178,12 @@ plt.plot((3600/approx)*max(approx_data_queue)/max(3600/approx))
 
 
 
-data_queue.shape
-plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),data_queue)
-plt.plot(queue)
-plt.show()
+
+
+
+
+
+
 
 
 
@@ -161,25 +200,27 @@ def arr_m(schedule,capacita,f,fattore_sigma,negative_delays):
 
     #casi distribuzioni
     # if f=="exp":
-        # delay=np.array(samp.sample_from_exp(lam/fattore_sigma,N))-fattore_sigma/lam
+        # delay=np.array(samp.sample_from_exp(lam/fattore_sigma,len(schedule)))-fattore_sigma/lam
 
     if f=="uni":
         max_delay=fattore_sigma*np.sqrt(12)/lam
         int_a_b=fattore_sigma/2*np.sqrt(12)/lam
-        delay=np.random.uniform(-int_a_b,int_a_b,N)
+        delay=np.random.uniform(-int_a_b,int_a_b,len(schedule))
         if negative_delays==False:
 
-            delay[delay<0]=0
+            #delay[delay<0]=0
+            delay[delay<0]=abs(delay[delay<0])
 
 
     if f=="norm":
-        delay=np.random.normal(0, fattore_sigma/lam, N)
+        delay=np.random.normal(0, fattore_sigma/lam, len(schedule))
         if negative_delays==False:
-            delay[delay<0]=0
+            #delay[delay<0]=0
+            delay[delay<0]=abs(delay[delay<0])
 
         # if f=="tri":
     # b = (fattore_sigma/lam)*np.sqrt(6)
-        # delay = np.random.triangular(0,b/2,b,N)
+        # delay = np.random.triangular(0,b/2,b,len(schedule))
 
     #calolo arrival
     arrival=np.zeros(len(schedule))
@@ -223,7 +264,7 @@ def PSRA_M(schedule,distributione,capacita,sigma=20, negative_delays=True):
 
 
 
-def simulation_PSRA_M(N, schedule,capacita,sigma, distrib="norm"):
+def simulation_PSRA_M(N, schedule,capacita,sigma, distrib="norm",negative_delays=True):
     """
     dato N numero di simulazioni
     ritorna un vettore con l'andamento medio delle simul (stady state distr)
@@ -232,7 +273,7 @@ def simulation_PSRA_M(N, schedule,capacita,sigma, distrib="norm"):
     sim_matrix=np.zeros((N,M))
     sim=np.zeros(M)
     for i in range(N):
-        sim_matrix[i],x,y=PSRA_M(schedule,distrib,capacita,sigma)
+        sim_matrix[i],x,y=PSRA_M(schedule,distrib,capacita,sigma,negative_delays)
     for i in range(M):
         sim[i]=np.mean(sim_matrix[:,i])
 

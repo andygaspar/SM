@@ -222,16 +222,16 @@ def df_fascia_oraria(df,start_time,end_time):
 
 
 
-def df_busy(df,start,end):
+def df_busy(df,start,end,time="a_time_sec"):
     """
     dato df_finale_delay, ora iniziale, ora finale
     df_finale_arrival con i voli nella fascia oraria
     """
     df_new=df.copy()
     #selezione in base al plot della fascia oraria le start-end
-    cond=df["a_time_sec"]>start*3600
+    cond=df[time]>start*3600
     busy_arrival=df[cond]
-    cond=busy_arrival["a_time_sec"]<end*3600
+    cond=busy_arrival[time]<end*3600
     busy_arrival=busy_arrival[cond]
 
     return busy_arrival

@@ -117,7 +117,7 @@ def plot_queues(df_busy,queue,freq):
         if index<len(queue):
             queue_d[index]=int(df_busy.iloc[i]["delay"]/freq)
 
-    #interpretazione
+    #interpolazione
     i=0
     while i<len(queue_d)-1:
         a=queue_d[i]

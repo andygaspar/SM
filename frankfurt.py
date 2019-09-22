@@ -48,8 +48,8 @@ lista_date
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=4
-end_time=19
+start_time=6
+end_time=9
 
 
 
@@ -69,20 +69,13 @@ df_all_days=pd.read_csv("francoforte.csv")
 
 
 #ricaviamo il valre della capacità e della frequenza (che nel nostro modello sono uguali)
-def trovo_capacity(start_time, end_time, df = df_ar):
-    """
-    funzione che calcola
-    """
-    dfarr=data.df_per_data(df_ar,lista_date)
-    dfarr=data.df_fascia_oraria(dfarr,start_time,end_time)
-    capacita=3600/(dfarr.shape[0]/(len(lista_date)*(end_time-start_time)))
-    return capacita
 
 
 
-capacita = trovo_capacity(start_time,end_time)
 
+capacita = aa.find_capacity([start_time,10],[end_time,11])
 
+capacita
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
@@ -95,7 +88,7 @@ capacita=freq
 sigma=10
 
 iterazioni=200
-len_periodo=14
+len_periodo=4
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma,"uni")
@@ -152,20 +145,3 @@ PAR,min_sig,mat_sig=fun.parameter(14,l_sigma,freq,capacita,df_busy,200)
 min_sig
 np.min(PAR)
 PAR
-
-l_sigma=np.arange(5,31,2.5)
-l_noise=np.arange(0,0.21,0.025)
-
-l_sigma[4]
-l_noise[3]
-
-
-
-fig=plt.figure()
-ax=fig.gca(projection="3d")
-
-x,y=np.meshgrid(l_noise,l_sigma)
-ax.plot_surface(x,y,PAR)
-plt.show()
-x.shape
-PAR.shape

@@ -128,6 +128,26 @@ def freq_analysis(airport,lista_date):
     plt.show()
 
 
+def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
+    """
+    funzione che calcola capacita media del servizio
+    INPUT:
+        -start_time: lista di vettori di start_time (stessa lunghezza di end_time)
+        -end_time:ista di vettori  di end_time (stessa lunghezza di start_time)
+    OUTPUT:
+        capacità media delle varie zone orarie date in input
+    """
+    cap = np.zeros(len(start_time))
+
+    for i in range(len(start_time)):
+        dfarr=data.df_per_data(df_ar,lista_date)
+        dfarr=data.df_fascia_oraria(dfarr,start_time[i],end_time[i])
+        capacita=3600/(dfarr.shape[0]/(len(lista_date)*(end_time[i]-start_time[i])))
+        cap[i]=capacita
+    capacita = sum(cap)/len(cap)
+    return capacita
+
+
 
 
 def find_ro(freq,start_time,end_time,lista_date,airport):

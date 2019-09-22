@@ -33,6 +33,9 @@ df_ar=data.airport(d_ar,airport)
 df=data.dist_filter(df,200)
 
 
+
+lista_date.pop(0)
+lista_date.pop(-1)
 #analisi frequenze
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
@@ -41,13 +44,14 @@ aa.freq_analysis(airport,lista_date)
 
 #tolto il primo giorno perché inutile come si vede dai grafici
 lista_date.pop(0)
+lista_date.pop(-1)
 lista_date
 
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=6
-end_time=11
+start_time=7
+end_time=14
 
 
 

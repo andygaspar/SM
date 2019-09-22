@@ -27,7 +27,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
-
+df_all_days=pd.read_csv("francoforte.csv")
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -54,35 +54,34 @@ lista_date.pop(0)
 lista_date.pop(-1)
 
 
-
+"**********************************************"
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=8
-end_time=20
+start_time=4
+end_time=23
 
 
-date=lista_date[2]
+date=lista_date[1]
 arr_day=data.df_per_data(df_ar,date)
 arr_day=data.airport(arr_day,airport)
 arr_day=arr_day.sort_values(by="time_sec")
 
 
 
+
+"*******************************simul   ****************"
 #wp_f=fun.dict_wp_freq("EGLL")
 curve, freq_per_h, approx,pol=aa.freq_analysis_by_day(date,airport,DEG=30)
-plt.plot(3600/approx)
-plt.plot(freq_per_h)
+
 plt.plot(arr_day["time_sec"].values[0:-1]/3600,curve)
 plt.plot(arr_day["time_sec"].values[0:-1]/3600,approx)
-len(approx)
-np.mean(approx[60:120])
+
 
 t=[]
 t.append(start_time*3600)
 while t[-1]<end_time*3600:
     t.append(t[-1]+np.polyval(pol,t[-1]))
-
 t=np.array(t)
-plt.plot(t/3600)
+
 
 
 arr_test=arr_day[arr_day["time_sec"]>=start_time*3600]
@@ -92,40 +91,52 @@ len(t)
 len(t)/12   #arrivi per ora
 3600/(len(t)/12)   #freq
 
-capacita=75
+
 
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 df_busy=data.df_per_data(df_busy,date)
 df_busy
-data_queue=df_busy["delay"].values/capacita
 
 
 plt.plot(np.arange(len(df_busy["a_time_sec"].values))*len(arrival)/len(df_busy["a_time_sec"].values),df_busy["a_time_sec"].values)
 plt.plot(sorted(arrival))
 plt.plot(arr_test["time_sec"].values)
+plt.plot(t)
 
 
+
+min(approx)
 schedule=t
-distributione="norm"
-sigma=10
-
+sigma=50
+capacita=65
+data_queue=df_busy["delay"].values/capacita
+data_queue=fun.reject_outliers(data_queue)
 queue,delay,arrival=PSRA_M(schedule,distributione,capacita,sigma)
-sim,sim_matrix=simulation_PSRA_M(100, schedule,capacita,sigma, distributione)
+sim,sim_matrix=simulation_PSRA_M(200, schedule,capacita,sigma)
+sim_uni,sim_matrix_uni=simulation_PSRA_M(200, schedule,capacita,sigma,"uni")
+
+pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,30)
+approx_data_queue=np.polyval(pol_data,np.arange(len(data_queue)))
 
 
-plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),data_queue)
-plt.plot(sim)
+df_busy["time_sec"].values
+plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),data_queue,color="orange")
+plt.plot(np.arange(len(data_queue))*len(queue)/len(data_queue),approx_data_queue)
+plt.plot(sim,color="red")
+plt.plot(sim_uni,color="pink")
 plt.show()
 
 
-
-x=(np.arange(len(queue))*120+8*3600)/3600
-plt.plot(t/3600,np.polyval(pol,t)/10)
-plt.plot(x,queue)
+plt.plot(freq_per_h)
 
 
-df_all_days=pd.read_csv("francoforte.csv")
+plt.plot(np.arange(len(approx_data_queue))*len(approx)/len(approx_data_queue),approx_data_queue)
+plt.plot((3600/approx)*max(approx_data_queue)/max(3600/approx))
+
+
+
+
 
 
 

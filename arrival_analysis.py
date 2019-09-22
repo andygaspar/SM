@@ -121,9 +121,12 @@ def freq_analysis(airport,lista_date):
         cond=busy_arrival["time_sec"]<(i+1)*3600
         busy_arrival=busy_arrival[cond]
         to_plot[i]=busy_arrival.shape[0]
-    plt.plot(to_plot/len(lista_date))
+    plt.plot(range(24),to_plot/len(lista_date))
+    plt.xticks(np.arange(0, 24, 1))
+    plt.grid(b=True,axis='x')
     plt.title("Medie arrivi")
     plt.show()
+
 
 
 

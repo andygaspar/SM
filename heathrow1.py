@@ -41,22 +41,28 @@ df=data.dist_filter(df,300)
 
 
 
+
+
+
+
 #analisi frequenze
-"""
+
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
-aa.freq_analysis(airport,lista_date)
-"""
+freq_analysis(airport,lista_date)
+
+
+
+
 
 #tolto il primo giorno perché inutile come si vede dai grafici
 lista_date.pop(0)
 lista_date.pop(-1)
 
 
-
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=15
-end_time=21
+start_time=7
+end_time=12
 
 #wp_f=fun.dict_wp_freq("EGLL")
 
@@ -70,29 +76,40 @@ wp=["LOGAN","LAM","ALESO","BNN"]
 #df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
 df_all_days=pd.read_csv("heathrow_2.csv")
 #df_all_days=pd.read_csv("heathrow.csv")
-
-d=data.df_per_data(df,lista_date)
-dd=data.df_fascia_oraria(d,start_time,end_time)
-dd=dd[~dd.duplicated("aereo")]
-dd.shape
+df_all_days
 
 
-tutti=df[~df.duplicated("aereo")]
-tutti.shape
 
-df_entry_zone=data.df_lista_wp(d,["LAM","ALESO","BNN","OCK"])
-df_entry_zone=data.df_fascia_oraria(df_entry_zone,start_time,end_time)
-df_entry_zone.shape[0]
-3600/(dd.shape[0]/(len(lista_date)*(end_time-start_time)))
+
+dfarr=data.df_per_data(df_ar,lista_date)
+dfarr=data.df_fascia_oraria(dfarr,start_time,end_time)
+dfarr.shape
+capacita_1=3600/(dfarr.shape[0]/(len(lista_date)*(end_time-start_time)))
+
+
+dfarr=data.df_per_data(df_ar,lista_date)
+dfarr=data.df_fascia_oraria(dfarr,15,20)
+dfarr.shape
+capacita_2=3600/(dfarr.shape[0]/(len(lista_date)*(end_time-start_time)))
+capacita=(capacita_1+capacita_2)/2
+capacita
+
+
+#df_entry_zone=data.df_lista_wp(d,["LAM","ALESO","BNN","OCK"])
+
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
+#capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
+df_busy_2=data.df_busy(df_all_days,15,20)
+df_busy_2,delay=data.sort_df(df_busy_2)
+
+df_busy=df_busy.append(df_busy_2)
 
 df_busy.shape
 
@@ -101,20 +118,13 @@ df_busy.shape
 
 
 
-ro,max_cap=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
-
-80/0.976
-freq
-fattore=90/(3600/(0.976*41))
 
 capacita
-freq=yyy
-freq=87.9
+freq=capacita
 
-sigma=20
+sigma=18
 iterazioni=200
-len_periodo=6
+len_periodo=13
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
@@ -143,7 +153,7 @@ plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-#plt.plot(data_t,label="data truncated")
+plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma))
 plt.legend()
@@ -162,19 +172,20 @@ D
 
 
 
-capacita=80/ro
+capacita
+freq
 
 
-l_sigma=np.arange(15,31,2)
-PAR,min_sig,mat_sig=fun.parameter(50,l_sigma,freq,capacita,df_busy,100)
+l_sigma=np.arange(15,25.5,0.5)
+PAR,min_sig,mat_sig=fun.parameter(13,l_sigma,freq,capacita,df_busy,200)
 
 np.min(PAR)
 np.argmin(PAR)
 plt.plot(np.arange(5,21,0.5),PAR)
 
-min_sig
-
-
+plt.plot(PAR)
+PAR.shape
+np.arange(5,21,0.5).shape
 
 
 

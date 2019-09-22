@@ -79,12 +79,16 @@ def df_coor_to_dist(df):
     return wp_dist
 
 
-def wp_neighbours(wp,dist_max):
+def wp_neighbours(wp,dist_max,airport):
     """
     dato un wp e un raggio
     crea una lista degli wp in quel raggio
     """
-    wp_dict=dict_wp_coor()
+    wp_dict=dict_wp_coor(airport)
+    wp_dict["H"]="POINT(51.469911 -0.454269)"
+    wp_dict["F"]="POINT(50.03793 8.56215)"
+    wp_dict["M"]="POINT(40.494817 -3.567995)"
+
     neighbours=[]
 
     coordinate=wp_dict[wp]

@@ -199,11 +199,27 @@ def carica_liste(airport):
 
 def df_per_data(df,date):
     """
-    dato df e data
+    dato df e data o lista date
     crea df con solo i voli in quella data
     """
-    entry_condition=df['date']==date
-    return df[entry_condition]
+    if type(date)==str:
+        entry_condition=df['date']==date
+        return df[entry_condition]
+
+    entry_condition=df['date']==date[0]
+    df_new=df[entry_condition]
+    for d in date[1:]:
+        entry_condition=df['date']==d
+        df_new=df_new.append(df[entry_condition])
+    return df_new
+
+def df_fascia_oraria(df,start_time,end_time):
+    cond=df["time_sec"]>=start_time*3600
+    df_new=df[cond]
+    cond=df["time_sec"]<end_time*3600
+    df_new=df_new[cond]
+    return df_new
+
 
 
 def df_busy(df,start,end):
@@ -229,13 +245,21 @@ def df_lista_wp(df,lista_wp):
 
     dato df e lista
     crea df con il primo passaggio in uno dei pinti della lista
-    """
+
     df_new = pd.DataFrame(data=None, columns=df.columns)
     voli=[]
     for i in range(df.shape[0]):
         if df.iloc[i]["sid"] in lista_wp and df.iloc[i]["aereo"] not in voli:
             df_new=df_new.append(df.iloc[i].copy(),ignore_index=True)
             voli.append(df.iloc[i]["aereo"])
+    return df_new
+    """
+    cond=df["sid"]==lista_wp[0]
+    df_new=df[cond]
+    for wp in lista_wp[1:]:
+        cond=df["sid"]==wp
+        df_new=df_new.append(df[cond])
+    df_new=df_new[~df_new.duplicated("aereo")]
     return df_new
 
 

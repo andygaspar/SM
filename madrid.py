@@ -51,12 +51,18 @@ lista_date
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=7
-end_time=14
+end_time=13
 
+
+
+
+d_freq=fun.dict_wp_freq("LEMD")
+d_freq
+d_freq["ORBIS"]
 
 
 #scelta waypoint
-wp=["ROLIS","UNOKO","KERAX","PSA"]
+wp=["TERSA","PRADO","BAN","ORBIS"]
 
 
 
@@ -66,20 +72,47 @@ df_all_days
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
+capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
 freq
+capacita_1=aa.frequenza_media(16,20.30,airport,lista_date)
+capacita=(capacita+capacita_1)/2
+
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
+df_busy=df_busy[df_busy["delay"]<1500]
 df_busy,delay=data.sort_df(df_busy)
 
 
+df_busy1=data.df_busy(df_all_days,16,20.5)
+df_busy1=df_busy1[df_busy1["delay"]<1500]
+df_busy1,delay=data.sort_df(df_busy1)
+
+df_busy=df_busy.append(df_busy1)
+
+
+
 #run del modello e calcolo della distribuzione
-iterazioni=1000
-sigma=10
-sim,sim_matrix=ss.simulation_PRSA(iterazioni,capacita, start_time, end_time, freq, sigma)
-sim_d=ss.sim_distribution(sim_matrix)
+capacita
+freq=capacita
+
+
+
+
+
+sigma=4
+iterazioni=200
+len_periodo=12.5
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
+sim_norm=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
+sim_uni=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
+#sim_exp=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
+#sim_tri=ss.sim_distribution(sim_matrix)
+
 
 
 #calcolo delle code dai dati e della distribuzione relativa
@@ -90,12 +123,60 @@ data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
 data_t=ss.data_distribution(data_queue_truncated)
 data_r=ss.data_distribution(data_queue_rounded)
 
-
-
+plt.plot(sim)
+plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
-plt.plot(sim_d,label="simulation_PRSA")
+
+
+plt.plot(sim_norm,label="simulation_NORM")
+plt.plot(sim_uni,label="simulation_UNI")
+#plt.plot(sim_exp,label="simulation_EXP")
+#plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title("Distribution sigma=10")
+plt.title(" MADRID sigma="+str(sigma))
 plt.legend()
+plt.show()
+
+
+
+distribuzioni=[sim_norm,sim_uni,data_t,data_r]
+distrib=fun.standardise_len(distribuzioni)
+D=fun.dist_mat(distrib)
+qual=fun.quality(D)
+qual
+D
+
+
+
+
+
+
+capacita
+freq
+
+
+l_sigma=np.arange(1,10,0.5)
+P=[]
+ms=[]
+mt=[]
+for i in range(3):
+    PAR,min_sig,mat_sig=fun.parameter(12.5,l_sigma,freq,capacita,df_busy,200)
+    P.append(PAR)
+    ms.append(min_sig)
+    mt.append(mat_sig)
+
+
+Pr=np.array(P)
+Pr[1,0]
+
+M=np.zeros(Pr.shape[1])
+for i in range(len(M)):
+    M[i]=np.mean(Pr[:,i])
+
+
+
+plt.plot(l_sigma,M)
+
+plt.plot(Pr.T)
 plt.show()

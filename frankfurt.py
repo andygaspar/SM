@@ -54,6 +54,8 @@ end_time=9
 
 
 
+
+
 #scelta waypoint
 wp=["ROLIS","UNOKO","KERAX","PSA"]
 

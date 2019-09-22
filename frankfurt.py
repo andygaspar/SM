@@ -39,6 +39,8 @@ for i in range(len(lista_date)):
 aa.freq_analysis(airport,lista_date)
 
 
+
+
 #tolto il primo giorno perché inutile come si vede dai grafici
 lista_date.pop(0)
 lista_date
@@ -46,8 +48,8 @@ lista_date
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=6
-end_time=11
+start_time=4
+end_time=19
 
 
 
@@ -63,9 +65,23 @@ wp=["ROLIS","UNOKO","KERAX","PSA"]
 df_all_days=pd.read_csv("francoforte.csv")
 
 
-#calcolo frequenza media nella fascia oraria in tutte le date scelte
-freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
-freq
+
+
+
+#ricaviamo il valre della capacità e della frequenza (che nel nostro modello sono uguali)
+def trovo_capacity(start_time, end_time, df = df_ar):
+    """
+    funzione che calcola
+    """
+    dfarr=data.df_per_data(df_ar,lista_date)
+    dfarr=data.df_fascia_oraria(dfarr,start_time,end_time)
+    capacita=3600/(dfarr.shape[0]/(len(lista_date)*(end_time-start_time)))
+    return capacita
+
+
+
+capacita = trovo_capacity(start_time,end_time)
+
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
@@ -73,26 +89,22 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 
 
-capacita=60
+
 #run del modello e calcolo della distribuzione
 capacita=freq
-sigma=15
-noise=0.0075
-iterazioni=1000
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+sigma=10
+
+iterazioni=200
+len_periodo=14
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-sim_exp=ss.sim_distribution(sim_matrix)
-#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
-#sim_tri=ss.sim_distribution(sim_matrix)
 
 
 
-#calcolo delle code dai dati e della distribuzione relativa
-#due metodi, truncated e rounded. questo perché
-#delay/capacità=queue è decimale e va reso intero
+
+
 data_queue_truncated=data.make_data_queue(df_busy,capacita)
 data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
 data_t=ss.data_distribution(data_queue_truncated)
@@ -103,8 +115,8 @@ data_r=ss.data_distribution(data_queue_rounded)
 #plotting
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
-plt.plot(sim_exp,label="simulation_EXP")
-#plt.plot(sim_tri,label="simulation_TRI")
+
+
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" FRANKFURT sigma="+str(sigma)+" noise="+str(noise))
@@ -115,7 +127,7 @@ plt.show()
 
 
 
-distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
@@ -134,15 +146,12 @@ qual
 
 
 
+l_sigma=np.arange(10,20.5,0.5)
+PAR,min_sig,mat_sig=fun.parameter(14,l_sigma,freq,capacita,df_busy,200)
 
-PAR=fun.parameter(start_time,end_time,freq,freq,df_busy,1000)
-
+min_sig
 np.min(PAR)
-np.argmin(PAR)/PAR.shape[1]
-PAR[int(39/PAR.shape[1]),39%PAR.shape[1]]
-
-int(39/PAR.shape[1])
-39%PAR.shape[1]
+PAR
 
 l_sigma=np.arange(5,31,2.5)
 l_noise=np.arange(0,0.21,0.025)

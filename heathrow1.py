@@ -122,7 +122,7 @@ df_busy.shape
 capacita
 freq=capacita
 
-sigma=18
+sigma=20.5
 iterazioni=200
 len_periodo=13
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
@@ -164,9 +164,8 @@ distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
 qual
-
-distrib
 D
+
 
 
 
@@ -177,17 +176,41 @@ freq
 
 
 l_sigma=np.arange(15,25.5,0.5)
-PAR,min_sig,mat_sig=fun.parameter(13,l_sigma,freq,capacita,df_busy,200)
+P=[]
+ms=[]
+mt=[]
+for i in range(3):
+    PAR,min_sig,mat_sig=fun.parameter(13,l_sigma,freq,capacita,df_busy,200)
+    P.append(PAR)
+    ms.append(min_sig)
+    mt.append(mat_sig)
+
+
+Pr=np.array(P)
+Pr[1,0]
+
+M=np.zeros(Pr.shape[1])
+for i in range(len(M)):
+    M[i]=np.mean(Pr[:,i])
+
+
+
+plt.plot(np.arange(15,25.5,0.5),M)
+
+plt.plot(Pr.T)
+plt.show()
+
+
 
 np.min(PAR)
 np.argmin(PAR)
-plt.plot(np.arange(5,21,0.5),PAR)
+plt.plot(np.arange(15,25.5,0.5),PAR)
 
 plt.plot(PAR)
 PAR.shape
 np.arange(5,21,0.5).shape
 
-
+min_sig
 
 
 

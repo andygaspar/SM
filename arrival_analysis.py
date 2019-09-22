@@ -84,11 +84,11 @@ def freq_analysis_by_day(date,airport,DEG=30):
     pol=np.polyfit(arr_day["time_sec"].values[0:-1],curve,DEG)
     approx=np.polyval(pol,arr_day["time_sec"].values[0:-1])
 
-    plt.plot(arr_day)
-    plt.plot(approx)
+    plt.plot(arr_day["time_sec"].values[0:-1],curve)
+    plt.plot(arr_day["time_sec"].values[0:-1],approx)
     plt.show()
 
-    return curve, freq_per_h, approx
+    return curve, freq_per_h, approx, pol
 
 
 
@@ -128,7 +128,7 @@ def freq_analysis(airport,lista_date):
     plt.show()
 
 
-def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
+def find_capacity(start_time, end_time, df,lista_date):
     """
     funzione che calcola capacita media del servizio
     INPUT:
@@ -140,8 +140,8 @@ def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
     cap = np.zeros(len(start_time))
 
     for i in range(len(start_time)):
-        dfarr=data.df_per_data(df_ar,lista_date)
-        dfarr=data.df_fascia_oraria(dfarr,start_time[i],end_time[i])
+        dfarr=data.df_per_data(df,lista_date)
+        dfarr=data.df_fascia_oraria(df,start_time[i],end_time[i])
         capacita=3600/(dfarr.shape[0]/(len(lista_date)*(end_time[i]-start_time[i])))
         cap[i]=capacita
     capacita = sum(cap)/len(cap)

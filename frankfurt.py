@@ -23,7 +23,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
-capacita=80
+
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -31,7 +31,7 @@ d_wp_coor=fun.dict_wp_coor(airport)
 df=data.airport(d,airport)
 df_ar=data.airport(d_ar,airport)
 df=data.dist_filter(df,200)
-
+df_ar
 
 #analisi frequenze
 for i in range(len(lista_date)):
@@ -43,13 +43,14 @@ aa.freq_analysis(airport,lista_date)
 
 #tolto il primo giorno perché inutile come si vede dai grafici
 lista_date.pop(0)
+lista_date.pop(-1)
 lista_date
 
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=6
-end_time=9
+start_time=[5,12.5]
+end_time=[10,18.5]
 
 
 
@@ -73,22 +74,28 @@ df_all_days=pd.read_csv("francoforte.csv")
 
 
 
-capacita = aa.find_capacity([start_time,10],[end_time,11])
+capacita = aa.find_capacity(start_time,end_time,df_ar,lista_date)
 
 capacita
 
 #df_finale filtrato con solo la fascia oraria di interesse
-df_busy=data.df_busy(df_all_days,start_time,end_time)
+
+df_busy=data.df_busy(df_all_days,start_time[0],end_time[0])
 df_busy,delay=data.sort_df(df_busy)
 
+for i in range(1,len(start_time)):
+    df_busy_i=data.df_busy(df_all_days,start_time[i],end_time[i])
+    df_busy_i,delay=data.sort_df(df_busy_i)
+    df_busy=df_busy.append(df_busy_i)
 
+df_busy
 
 #run del modello e calcolo della distribuzione
-capacita=freq
-sigma=10
-
+freq = capacita
+sigma=4.5
+freq
 iterazioni=200
-len_periodo=4
+len_periodo=11
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma,"uni")
@@ -112,7 +119,7 @@ plt.plot(sim_uni,label="simulation_UNI")
 
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title(" FRANKFURT sigma="+str(sigma)+" noise="+str(noise))
+plt.title(" FRANKFURT sigma="+str(sigma))
 plt.legend()
 plt.show()
 
@@ -126,22 +133,30 @@ D=fun.dist_mat(distrib)
 qual=fun.quality(D)
 qual
 
+D
 
 
 
+l_sigma=np.arange(4,12.5,0.5)
+P=[]
+ms=[]
+mt=[]
+for i in range(3):
+    PAR,min_sig,mat_sig=fun.parameter(11,l_sigma,freq,capacita,df_busy,200)
+    P.append(PAR)
+    ms.append(min_sig)
+    mt.append(mat_sig)
 
 
+Pr=np.array(P)
+M=np.zeros(Pr.shape[1])
+for i in range(len(M)):
+    M[i]=np.mean(Pr[:,i])
 
+for i in range(len(Pr)):
+    plt.plot(np.arange(4,12.5,0.5),Pr[i],linewidth=0.5)
+plt.plot(np.arange(4,12.5,0.5),M,linewidth=8)
+plt.xlabel(" possible value of sigma")
+plt.legend()
 
-
-
-
-
-
-
-l_sigma=np.arange(10,20.5,0.5)
-PAR,min_sig,mat_sig=fun.parameter(14,l_sigma,freq,capacita,df_busy,200)
-
-min_sig
-np.min(PAR)
-PAR
+M

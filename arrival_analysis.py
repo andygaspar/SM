@@ -123,12 +123,12 @@ def freq_analysis(airport,lista_date):
         to_plot[i]=busy_arrival.shape[0]
     plt.plot(range(24),to_plot/len(lista_date))
     plt.xticks(np.arange(0, 24, 1))
-    plt.grid(b=True,axis='x')
+    plt.grid(b=True,axis='both')
     plt.title("Medie arrivi")
     plt.show()
 
 
-def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
+def find_capacity(start_time, end_time, df,lista_date):
     """
     funzione che calcola capacita media del servizio
     INPUT:
@@ -140,7 +140,7 @@ def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
     cap = np.zeros(len(start_time))
 
     for i in range(len(start_time)):
-        dfarr=data.df_per_data(df_ar,lista_date)
+        dfarr=data.df_per_data(df,lista_date)
         dfarr=data.df_fascia_oraria(dfarr,start_time[i],end_time[i])
         capacita=3600/(dfarr.shape[0]/(len(lista_date)*(end_time[i]-start_time[i])))
         cap[i]=capacita

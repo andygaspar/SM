@@ -8,6 +8,14 @@ df_ar=pd.read_csv("../data/arrivi_1709.csv")
 df_wp=pd.read_csv("../data/punti_1709.csv")
 
 
+w = pd.read_csv("../data/arrivi_completo.csv")
+
+
+
+
+
+
+
 def rinomina(df,vecchio_nome_o_indice,nuovo_nome):
     """
     dato un df, un nome o l'indice del nome

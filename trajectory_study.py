@@ -19,7 +19,8 @@ df_filtered=data.dist_filter(df_wp,200)
 df_filtered
 freq = fun.frequency(df_filtered,"sid")
 
-
+cond = df_filtered["date"]=="2017-09-13"
+df_filtered=df_filtered[cond]
 
 
 
@@ -56,11 +57,14 @@ df_traj
 """
 Al dataset creato aggiungo gli arrivi, contenuti nel dataset df_ar
 """
-data.rinomina(df_ar,"aereo","flight")
-data.rinomina(df_traj,"aereo","flight")
+data.rinomina(df_ar,"flight","aereo")
+data.rinomina(df_traj,"flight","aereo")
 df_ar
+cond = df_ar["date"]=="2017-09-13"
+df_ar=df_ar[cond]
 df_traj = data.arrival_matching(df_traj,df_ar)
 df_traj
+
 #df_traj rappresenta i primi 5 waypoints e i vari tempi + tempo arrivo
 #ora aggiungo le tempistiche
 tempistiche = []
@@ -77,6 +81,7 @@ for i in  range(df_traj.shape[0]):
 "aggiungo anche i tempi di arrivo"
 df_traj["tempi di arrivo"] = tempistiche
 df_traj
+
 traiettorie_day1 = df_traj.to_csv(r'../traiettorie_day1.csv',index = None, header=True)
 
 none_cond = df_traj["arrival"]!="None"

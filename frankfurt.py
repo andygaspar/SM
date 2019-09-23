@@ -122,9 +122,8 @@ plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" FRANKFURT sigma="+str(sigma))
 plt.legend()
+plt.savefig("../Frankfurt")
 plt.show()
-plt.savefig("results/Frankfurt.png")
-
 
 
 

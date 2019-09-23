@@ -157,8 +157,8 @@ plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma))
 plt.legend()
+plt.savefig("../heatrow")
 plt.show()
-plt.savefig("results/heatrow.png")
 
 distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)

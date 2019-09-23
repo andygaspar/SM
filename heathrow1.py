@@ -119,7 +119,7 @@ df_busy.shape
 capacita
 freq=capacita
 
-sigma=20
+sigma=19
 iterazioni=200
 len_periodo=13
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
@@ -130,10 +130,10 @@ sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"t
 sim_tri=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
 sim_esp=ss.sim_distribution(sim_matrix)
-ttt = ss.simulation_M_D_1(1/capacita,len_periodo,2)
+ttt = ss.simulation_M_D_1(1/capacita,len_periodo,40)
 
 
-
+sum(ttt)
 #calcolo delle code dai dati e della distribuzione relativa
 #due metodi, truncated e rounded. questo perché
 #delay/capacità=queue è decimale e va reso intero
@@ -151,7 +151,7 @@ plt.bar(range(len(sim_uni)),sim_uni)
 ******************************************************
 
 """
-sim_esp
+
 len(X)
 X = np.arange(25)
 #Z = np.arange(33)
@@ -162,18 +162,23 @@ plt.legend()
 plt.show()
 
 len(sim_uni)
-len(sim_esp)
+len(sim_norm)
 plt.bar(np.arange(24),sim_esp,color = 'b', width = 0.30,label = "esp distribution")
-plt.bar(np.arange(24)+0.30,sim_uni[:-1], color = 'r', width = 0.30,label = "uniform distribution")
+plt.bar(np.arange(24)+0.30,ttt[:24], color = 'r', width = 0.30,label = "uniform distribution")
 """
 CONFORNTO CON DATI TRAMITE BARPLOT
 """
+
+len(data_t[:24])
+len(sim_norm)
 plt.title(" HEATHROW sigma="+str(sigma))
-plt.bar(X+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
-plt.bar(X+0.30,data_t[:24], color = 'r', width = 0.30,label = "data")
+plt.bar(X+0.00,sim_norm, color = 'y', width = 0.20,label = "normal distribution")
+plt.bar(X+0.20,sim_uni[:25], color = 'b', width = 0.20,label = "uniform distribution")
+plt.bar(X+0.40,data_t[:25], color = 'r', width = 0.20,label = "data")
 plt.legend()
 plt.show()
 
+len(data_t)
 plt.title(" HEATHROW sigma="+str(sigma))
 plt.bar(Z+0.00,ttt[:33], color = 'b', width = 0.30,label = "M_D_1")
 plt.bar(Z+0.30,data_t, color = 'r', width = 0.30,label = "data")
@@ -235,7 +240,7 @@ M=np.zeros(Pr.shape[1])
 for i in range(len(M)):
     M[i]=np.mean(Pr[:,i])
 
-
+np.argmin(M)
 
 
 

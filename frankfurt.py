@@ -92,7 +92,7 @@ df_busy
 
 #run del modello e calcolo della distribuzione
 freq = capacita
-sigma=4.5
+sigma=5.5
 freq
 iterazioni=200
 len_periodo=11
@@ -100,6 +100,7 @@ sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
+
 
 
 
@@ -122,6 +123,7 @@ plt.plot(data_r,label="data rounded")
 plt.title(" FRANKFURT sigma="+str(sigma))
 plt.legend()
 plt.show()
+plt.savefig("results/Frankfurt.png")
 
 
 
@@ -141,7 +143,7 @@ l_sigma=np.arange(4,12.5,0.5)
 P=[]
 ms=[]
 mt=[]
-for i in range(3):
+for i in range(20):
     PAR,min_sig,mat_sig=fun.parameter(11,l_sigma,freq,capacita,df_busy,200)
     P.append(PAR)
     ms.append(min_sig)
@@ -153,10 +155,13 @@ M=np.zeros(Pr.shape[1])
 for i in range(len(M)):
     M[i]=np.mean(Pr[:,i])
 
+
+
+
 for i in range(len(Pr)):
     plt.plot(np.arange(4,12.5,0.5),Pr[i],linewidth=0.5)
-plt.plot(np.arange(4,12.5,0.5),M,linewidth=8)
+plt.plot(np.arange(4,12.5,0.5),M,linewidth=8,label = "mean plot")
 plt.xlabel(" possible value of sigma")
+plt.ylabel("quality value")
 plt.legend()
-
-M
+plt.savefig("results/frankfurt_sigmas.png")

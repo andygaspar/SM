@@ -111,7 +111,7 @@ def frequenza_media(start_time,end_time,airport,lista_date):
 
 
 
-def freq_analysis(airport,lista_date):
+def freq_analysis(airport,lista_date,name):
     df_ar=pd.read_csv("../data/arrivi_completo.csv")
     arr_day=data.airport(df_ar,airport)
     to_plot=np.zeros(24)
@@ -125,7 +125,7 @@ def freq_analysis(airport,lista_date):
     plt.xticks(np.arange(0, 24, 1))
     plt.grid(b=True,axis='both')
     plt.title("Medie arrivi")
-    plt.show()
+    plt.savefig("frank freq")
 
 
 def find_capacity(start_time, end_time, df,lista_date):

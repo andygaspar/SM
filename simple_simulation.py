@@ -51,7 +51,7 @@ def arr(N,f,freq,fattore_sigma,negative_delays):
 
 
 "costruzione PSRA"
-def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_delays=True):
+def PSRA(lasso_temporale_in_ore,capacita,distributione,sigma=20, negative_delays=True):
     """
     dato lasso temporale, distribuzione: ("exp", "uni", "norm", "tri"), lam, fattore_sigma
     ritorna liste con queue, delay, arrival
@@ -62,7 +62,7 @@ def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_d
     N=int(T/capacita)
 
     #costruzione del vettore degli arrivi con ritardi
-    arrival,delay=arr(N,distributione,freq,sigma,negative_delays)
+    arrival,delay=arr(N,distributione,capacita,sigma,negative_delays)
 
 
     #costruzione del PSRA
@@ -83,7 +83,7 @@ def PSRA(lasso_temporale_in_ore,capacita,distributione,freq,sigma=20, negative_d
 
 
 
-def simulation_PSRA(N, lasso_temporale,capacita,freq,sigma, distrib="norm"):
+def simulation_PSRA(N, lasso_temporale,capacita,sigma, distrib="norm"):
     """
     dato N numero di simulazioni
     ritorna un vettore con l'andamento medio delle simul (stady state distr)
@@ -93,7 +93,7 @@ def simulation_PSRA(N, lasso_temporale,capacita,freq,sigma, distrib="norm"):
     sim_matrix=np.zeros((N,M))
     sim=np.zeros(M)
     for i in range(N):
-        sim_matrix[i],x,y=PSRA(lasso_temporale,capacita,distrib,freq,sigma)
+        sim_matrix[i],x,y=PSRA(lasso_temporale,capacita,distrib,sigma)
     for i in range(M):
         sim[i]=np.mean(sim_matrix[:,i])
 

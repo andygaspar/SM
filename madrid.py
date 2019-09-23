@@ -43,19 +43,18 @@ aa.freq_analysis(airport,lista_date)
 
 
 #tolto il primo giorno perché inutile come si vede dai grafici
-lista_date.pop(0)
-lista_date.pop(-1)
-lista_date
+
+len(lista_date)
 
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=7
-end_time=13
+start_time=[7,16]
+end_time=[13,20]
 
+capacita = aa.find_capacity(start_time,end_time,df_ar,lista_date)
 
-
-
+capacita
 d_freq=fun.dict_wp_freq("LEMD")
 d_freq
 d_freq["ORBIS"]
@@ -72,15 +71,15 @@ df_all_days
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
-freq
+capacita=aa.frequenza_media(7,13,airport,lista_date)
+
 capacita_1=aa.frequenza_media(16,20.30,airport,lista_date)
 capacita=(capacita+capacita_1)/2
 
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
-df_busy=data.df_busy(df_all_days,start_time,end_time)
+df_busy=data.df_busy(df_all_days,7,13)
 df_busy=df_busy[df_busy["delay"]<1500]
 df_busy,delay=data.sort_df(df_busy)
 
@@ -104,9 +103,9 @@ freq=capacita
 sigma=4
 iterazioni=200
 len_periodo=12.5
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
 #sim_exp=ss.sim_distribution(sim_matrix)
@@ -137,6 +136,7 @@ plt.plot(data_r,label="data rounded")
 plt.title(" MADRID sigma="+str(sigma))
 plt.legend()
 plt.show()
+plt.savefig("madrid.png")
 
 
 
@@ -153,15 +153,15 @@ D
 
 
 capacita
-freq
 
+freq=capacita
 
 l_sigma=np.arange(1,10,0.5)
 P=[]
 ms=[]
 mt=[]
-for i in range(3):
-    PAR,min_sig,mat_sig=fun.parameter(12.5,l_sigma,freq,capacita,df_busy,200)
+for i in range(20):
+    PAR,min_sig,mat_sig=fun.parameter(12.5,l_sigma,capacita,df_busy,200)
     P.append(PAR)
     ms.append(min_sig)
     mt.append(mat_sig)

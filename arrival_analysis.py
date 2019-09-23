@@ -128,7 +128,7 @@ def freq_analysis(airport,lista_date):
     plt.show()
 
 
-def find_capacity(start_time, end_time, df = df_ar,lista_date = lista_date):
+def find_capacity(start_time, end_time, df_ar,lista_date):
     """
     funzione che calcola capacita media del servizio
     INPUT:

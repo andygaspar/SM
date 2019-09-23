@@ -21,8 +21,8 @@ freq = fun.frequency(df_filtered,"sid")
 
 cond = df_filtered["date"]=="2017-09-13"
 df_filtered=df_filtered[cond]
-
-
+df_filtered
+pp = df_filtered.to_csv("../c.csv")
 
 coordinate = []
 #mettiamo a posto le coordinate

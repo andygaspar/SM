@@ -82,9 +82,9 @@ df_busy.shape
 ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
 
-freq=90
+freq
 
-capacita=90
+capacita=freq
 
 sigma=20
 noise=0.0
@@ -136,11 +136,11 @@ D
 
 capacita=80/ro
 
-PAR,min_sig=fun.parameter(start_time,end_time,freq,capacita,df_busy,1000,noise=False)
+PAR=fun.parameter(start_time,end_time,freq,capacita,df_busy,4,noise=True)
 
 np.min(PAR)
 np.argmin(PAR)
-plt.plot(np.arange(5,21,0.5),PAR)
+plt.plot(PAR)
 
 min_sig
 
@@ -184,6 +184,8 @@ x.shape
 PAR.shape
 y.shape
 
+
+plt.imshow(PAR)
 """
 
 label=["sim_norm","sim_uni","sim_exp","data_t","data_r"]

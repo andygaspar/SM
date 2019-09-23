@@ -310,11 +310,9 @@ def quality(mat):
     return sum(sum(mat[0:-1]))
 
 
-def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
+def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,l_sigma,noise=True,l_noise=np.arange(0,0.21,0.025)):
 
     if noise==True:
-        l_sigma=np.arange(5,31,2.5)
-        l_noise=np.arange(0,0.21,0.025)
         mat=np.zeros((len(l_sigma),len(l_noise)))
 
         i=0
@@ -344,7 +342,6 @@ def parameter(start_time,end_time,freq,capacita,df_busy,iterazioni,noise=True):
             i+=1
         return mat
     else:
-        l_sigma=np.arange(5,21,0.5)
         sig=np.zeros(len(l_sigma))
         noise=0
         i=0

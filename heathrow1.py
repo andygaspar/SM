@@ -116,9 +116,6 @@ df_busy.shape
 
 
 
-
-
-
 capacita
 freq=capacita
 
@@ -129,12 +126,9 @@ sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-#sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
-#sim_exp=ss.sim_distribution(sim_matrix)
-#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
-#sim_tri=ss.sim_distribution(sim_matrix)
+ttt = ss.simulation_M_D_1(1/capacita,len_periodo,50)
 
-
+sum(ttt)
 
 #calcolo delle code dai dati e della distribuzione relativa
 #due metodi, truncated e rounded. questo perché
@@ -148,7 +142,7 @@ plt.plot(sim)
 plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
 
-
+plt.plot(ttt,label="M_D_1")
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")

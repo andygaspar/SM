@@ -123,15 +123,15 @@ def data_distribution(queue):
 
 """
 ############################ M_D_1 ########################################
-
+"""
 def M_D_1(arrival_time,max_time):
-
+    """
     arrival_time = frequency of the exponential distribution related to the arrival time in 1/seconds
     = service time
     max_time = time of simulation in hour to be converted in seconds in the program
 
     OUTPUT: arrivi e vettore della coda
-    
+    """
     #conversion in seconds
     max_seconds = max_time*60*60
     sim_time = 0.0 # simulation time
@@ -155,7 +155,7 @@ def M_D_1(arrival_time,max_time):
             t_1 = sim_time + rm.expovariate(arrival_time)
             if(aircraft==1):
                 t_b = sim_time
-                t_2 = sim_time + 1/service_time
+                t_2 = sim_time + 1/arrival_time
         else:
             sim_time = t_2
             aircraft = aircraft -1
@@ -164,45 +164,78 @@ def M_D_1(arrival_time,max_time):
             attesa.append( t_2 - arrival[c])
             c+=1
             if(aircraft>0):
-                t_2=sim_time + 1/service_time
+                t_2=sim_time + 1/arrival_time
             else:
                 t_2 = max_seconds
     return queue_aircraft,arrival,attesa
 
+def create_distribution(vector):
+    """
+    funzione che serve per creare una distribuzione di probabilità sui numeri
+    contenuti dentro il vettore
+    esempio dato v = [0,1,2,2,2,1,0,3] allora il risultato sarà res = [2/8,2/8,3/8,1/8]
+    INPUT: vettore di interi sottoforma di lista
+    OUTPUT: distribuzione discreta di probabilità
+    """
+    res = []
+    N = len(vector)
+    vector_np = np.array(vector)
+    massimo = np.max(vector)
+    for i in range(int(massimo+1)):
+        cont = 0
+        for j in range(len(vector)):
+            if vector[j]==i:
+                cont+=1
+        res.append(cont/N)
 
-def simulation_M_D_1(iterazioni,service_time,max_time):
-    list_simulation = []
-    for i in range(iterazioni):
-        queue_aircraft,arrival,attesa = M_D_1(service_time,max_time)
-        list_simulation.append(queue_aircraft)
-    return list_simulation
-
-
-a = simulation_M_D_1(100,1/90,24)
-
-def create_dix_M_D_1(lista):
-    maximo = trova_massimo(lista)
-    print(maximo)
-    # trasformo le liste tutte della stessa lunghezza con un ciclo for
-    for i in range(len(lista)):
-        if len(lista[i])<maximo:
-            for j in range(0,maximo - len(lista)-1):
-                lista[i].append(0)
-    return lista
-
-
-
-def trova_massimo(lista):
-    res = 0
-    for i in range(len(lista)):
-        if len(lista[i])>res:
-            res = len(lista[i])
     return res
 
-ll = [[1,2,3,4],[1,2,3],[1,1,1,1,1,1],[1,2,3,4,5,6,7,8]]
-r = trova_massimo(ll)
-r
-q = create_dix_M_D_1(ll)
 
-q
-"""
+
+def trovo_massimo(lista):
+    """
+    dta una lista ti trova il massimo
+    """
+    v = []
+    for i in range(len(lista)):
+         v.append(len(lista[i]))
+    v = np.array(v)
+    return np.max(v)
+
+def media_vettori(lista):
+    """
+    data una lista di lista, ti trova la media component-wise delle liste contenute
+    nella lista (ritorna uuna lista)
+    INPUT: lista di liste
+    OUTPUT: lista con le medie
+    """
+    res = []
+    N = len(lista)
+    n = trovo_massimo(lista)
+    #trasformo tutti i vettori con la stessa dimensione
+    for i in range(len(lista)):
+        temp = lista[i]
+        if(len(temp)<n):
+            for j in range(len(temp),n):
+                lista[i].append(0)
+        else:
+            continue
+    for i in range(n):
+        t = 0
+        for j in range(N):
+            t = t + lista[j][i]
+        res.append(t)
+    for i in range(len(res)):
+        res[i]=res[i]/N
+
+    return res
+
+def simulation_M_D_1(arrival_time,max_time,volte =10):
+    p = []
+    for i in range(volte):
+        m_d_1,a,b = M_D_1(arrival_time,max_time)
+        m_d_1 = create_distribution(m_d_1)
+        p.append(m_d_1)
+
+    res = media_vettori(p)
+    return res

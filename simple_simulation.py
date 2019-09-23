@@ -20,7 +20,8 @@ def arr(N,f,freq,fattore_sigma,negative_delays):
 
     #casi distribuzioni
     if f=="exp":
-        delay=np.array(samp.sample_from_exp(lam/fattore_sigma,N))-fattore_sigma/lam
+
+        delay=np.array(np.random.exponential(fattore_sigma/lam, N))-fattore_sigma/lam
 
     if f=="uni":
         max_delay=fattore_sigma*np.sqrt(12)/lam
@@ -38,7 +39,7 @@ def arr(N,f,freq,fattore_sigma,negative_delays):
 
     if f=="tri":
         b = (fattore_sigma/lam)*np.sqrt(6)
-        delay = np.random.triangular(0,b/2,b,N)
+        delay = np.random.triangular(-b,0,b,N)
 
     #calolo arrival
     arrival=np.zeros(N)

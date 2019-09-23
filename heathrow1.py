@@ -119,16 +119,20 @@ df_busy.shape
 capacita
 freq=capacita
 
-sigma=20.5
+sigma=20
 iterazioni=200
 len_periodo=13
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-ttt = ss.simulation_M_D_1(1/capacita,len_periodo,50)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"tri")
+sim_tri=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
+sim_esp=ss.sim_distribution(sim_matrix)
+ttt = ss.simulation_M_D_1(1/capacita,len_periodo,2)
 
-sum(ttt)
+
 
 #calcolo delle code dai dati e della distribuzione relativa
 #due metodi, truncated e rounded. questo perché
@@ -141,10 +145,53 @@ data_r=ss.data_distribution(data_queue_rounded)
 plt.plot(sim)
 plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
+"""
+******************************************************
+************ROBUSTEZZA DEL MODELLO TEORICO************
+******************************************************
 
+"""
+sim_esp
+len(X)
+X = np.arange(25)
+#Z = np.arange(33)
+plt.bar(X+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(X+0.30,sim_uni[:-1], color = 'r', width = 0.30,label = "uniform distribution")
+plt.bar(X+0.60,ttt[:25], color = 'g', width = 0.30,label = "normal distribution")
+plt.legend()
+plt.show()
+
+len(sim_uni)
+len(sim_esp)
+plt.bar(np.arange(24),sim_esp,color = 'b', width = 0.30,label = "esp distribution")
+plt.bar(np.arange(24)+0.30,sim_uni[:-1], color = 'r', width = 0.30,label = "uniform distribution")
+"""
+CONFORNTO CON DATI TRAMITE BARPLOT
+"""
+plt.title(" HEATHROW sigma="+str(sigma))
+plt.bar(X+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(X+0.30,data_t[:24], color = 'r', width = 0.30,label = "data")
+plt.legend()
+plt.show()
+
+plt.title(" HEATHROW sigma="+str(sigma))
+plt.bar(Z+0.00,ttt[:33], color = 'b', width = 0.30,label = "M_D_1")
+plt.bar(Z+0.30,data_t, color = 'r', width = 0.30,label = "data")
+plt.legend()
+plt.show()
+
+
+
+
+
+len(ttt)
+len(data_r)
 plt.plot(ttt,label="M_D_1")
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
+
+
+plt.show()
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")

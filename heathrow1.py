@@ -49,7 +49,7 @@ df=data.dist_filter(df,300)
 
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
-freq_analysis(airport,lista_date)
+aa.freq_analysis(airport,lista_date)
 
 
 
@@ -158,6 +158,7 @@ plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma))
 plt.legend()
 plt.show()
+plt.savefig("results/heatrow.png")
 
 distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)

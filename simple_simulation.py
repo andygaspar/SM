@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas
 import copy
-
+import random as rm
 
 
 
@@ -118,3 +118,91 @@ def data_distribution(queue):
         prob[i]=len(queue[h])
     prob/=sum(prob)
     return prob
+
+
+
+"""
+############################ M_D_1 ########################################
+
+def M_D_1(arrival_time,max_time):
+
+    arrival_time = frequency of the exponential distribution related to the arrival time in 1/seconds
+    = service time
+    max_time = time of simulation in hour to be converted in seconds in the program
+
+    OUTPUT: arrivi e vettore della coda
+    
+    #conversion in seconds
+    max_seconds = max_time*60*60
+    sim_time = 0.0 # simulation time
+    t_1 = 0.0 # time for next event (arrival)
+    t_2 = max_seconds # time for next event (departure)
+    t_n = 0.0 #last event time--> tempo dell'ultimo avvenimento generico
+    t_b = 0.0 # last start of busy time--> tempo in cui la queue inizia ad essere non vuota per l'ultima volta
+    c = 0 # numero di servizi completati
+    queue_aircraft = [] # number of aircraft in the queue
+    aircraft = 0
+    arrival = [] # time of arrival
+    attesa = [] # attesa per gli aerei-->NON SICURO CHE SI CALCOLI COSI'
+    # simulation loop
+    while(sim_time < max_seconds):
+        if(t_1<t_2): #event1:arrival
+            sim_time = t_1
+            arrival.append(t_1)
+            aircraft += 1
+            queue_aircraft.append(aircraft)
+            t_n = sim_time
+            t_1 = sim_time + rm.expovariate(arrival_time)
+            if(aircraft==1):
+                t_b = sim_time
+                t_2 = sim_time + 1/service_time
+        else:
+            sim_time = t_2
+            aircraft = aircraft -1
+            queue_aircraft.append(aircraft)
+            t_n = sim_time
+            attesa.append( t_2 - arrival[c])
+            c+=1
+            if(aircraft>0):
+                t_2=sim_time + 1/service_time
+            else:
+                t_2 = max_seconds
+    return queue_aircraft,arrival,attesa
+
+
+def simulation_M_D_1(iterazioni,service_time,max_time):
+    list_simulation = []
+    for i in range(iterazioni):
+        queue_aircraft,arrival,attesa = M_D_1(service_time,max_time)
+        list_simulation.append(queue_aircraft)
+    return list_simulation
+
+
+a = simulation_M_D_1(100,1/90,24)
+
+def create_dix_M_D_1(lista):
+    maximo = trova_massimo(lista)
+    print(maximo)
+    # trasformo le liste tutte della stessa lunghezza con un ciclo for
+    for i in range(len(lista)):
+        if len(lista[i])<maximo:
+            for j in range(0,maximo - len(lista)-1):
+                lista[i].append(0)
+    return lista
+
+
+
+def trova_massimo(lista):
+    res = 0
+    for i in range(len(lista)):
+        if len(lista[i])>res:
+            res = len(lista[i])
+    return res
+
+ll = [[1,2,3,4],[1,2,3],[1,1,1,1,1,1],[1,2,3,4,5,6,7,8]]
+r = trova_massimo(ll)
+r
+q = create_dix_M_D_1(ll)
+
+q
+"""

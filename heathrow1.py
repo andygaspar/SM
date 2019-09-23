@@ -114,12 +114,14 @@ df_busy=df_busy.append(df_busy_2)
 df_busy.shape
 
 
+e = np.array(([1,2],[3,4,6,5,6,7,3]))
 
-
+c = len(np.max(e))
+c
 capacita
 freq=capacita
 
-sigma=19
+sigma=19.5
 iterazioni=200
 len_periodo=13
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
@@ -130,10 +132,11 @@ sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"t
 sim_tri=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"exp")
 sim_esp=ss.sim_distribution(sim_matrix)
-ttt = ss.simulation_M_D_1(1/capacita,len_periodo,40)
+tt = ss.simulation_M_D_1(1/capacita,len_periodo,100)
 
 
-sum(ttt)
+
+sum(tt)
 #calcolo delle code dai dati e della distribuzione relativa
 #due metodi, truncated e rounded. questo perché
 #delay/capacità=queue è decimale e va reso intero
@@ -147,19 +150,59 @@ plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
 """
 ******************************************************
-************ROBUSTEZZA DEL MODELLO TEORICO************
+************CONFRONTO CON I DATI***************************************
 ******************************************************
 
 """
-
+len(sim_uni)
+len(data_r[:28])
 len(X)
-X = np.arange(25)
+
+"UNIFORM DISTRIBUTION"
+X = np.arange(28)
 #Z = np.arange(33)
-plt.bar(X+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
-plt.bar(X+0.30,sim_uni[:-1], color = 'r', width = 0.30,label = "uniform distribution")
-plt.bar(X+0.60,ttt[:25], color = 'g', width = 0.30,label = "normal distribution")
+plt.bar(X+0.00,sim_uni, color = 'b', width = 0.30,label = "uniform distribution")
+plt.bar(X+0.30,data_r[:28], color = 'r', width = 0.30,label = "data rounded")
+plt.title(" HEATHROW  with sigma-factor ="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
 plt.legend()
+plt.savefig("../Heathrow_bar_uni")
 plt.show()
+
+"NORMAL DISTRIBUTION"
+len(sim_norm)
+Z = np.arange(24)
+#Z = np.arange(33)
+plt.bar(Z+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(Z+0.30,data_r[:24], color = 'r', width = 0.30,label = "data rounded")
+plt.title(" HEATHROW  with sigma-factor ="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+plt.savefig("../Heathrow_bar_norm")
+plt.show()
+
+
+
+"DATA FIT"
+len(tt)
+len(data_r)
+R = np.arange(34)
+#Z = np.arange(33)
+plt.bar(R+0.00,tt[:34], color = 'b', width = 0.30,label = "M_D_1")
+plt.bar(R+0.30,data_r, color = 'r', width = 0.30,label = "data rounded")
+plt.title(" HEATHROW DATA vs M_D_1")
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+plt.savefig("../Heathrow_bar_MD1")
+plt.show()
+
+
+
+
+
 
 len(sim_uni)
 len(sim_norm)
@@ -189,19 +232,15 @@ plt.show()
 
 
 
-len(ttt)
-len(data_r)
-plt.plot(ttt,label="M_D_1")
+
+#plt.plot(ttt,label="M_D_1")
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
-
-
-plt.show()
-#plt.plot(sim_exp,label="simulation_EXP")
-#plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title(" HEATHROW sigma="+str(sigma))
+plt.title(" HEATHROW  with sigma-factor ="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
 plt.legend()
 plt.savefig("../heatrow")
 plt.show()
@@ -226,7 +265,8 @@ l_sigma=np.arange(15,25.5,0.5)
 P=[]
 ms=[]
 mt=[]
-for i in range(3):
+for i in range(25):
+    print(i)
     PAR,min_sig,mat_sig=fun.parameter(13,l_sigma,freq,capacita,df_busy,200)
     P.append(PAR)
     ms.append(min_sig)
@@ -240,12 +280,70 @@ M=np.zeros(Pr.shape[1])
 for i in range(len(M)):
     M[i]=np.mean(Pr[:,i])
 
-np.argmin(M)
+15 + np.argmin(M)*0.5
 
 
-
+"PLOT OF SIGMA FACTORS"
 for i in range(len(Pr)):
     plt.plot(np.arange(15,25.5,0.5),Pr[i],linewidth=0.5)
-plt.plot(np.arange(15,25.5,0.5),M,linewidth=8)
-plt.xlabel(" possible value of sigma")
+plt.plot(np.arange(15,25.5,0.5),M,linewidth=5)
+
+plt.title("parameter selection of sigma-factor")
+plt.ylabel("Quality value")
+plt.xlabel("possible value of sigma-factor")
 plt.legend()
+plt.savefig("../sigma_factor_heatrow")
+plt.show()
+
+
+
+"""
+********************************************************************************
+*************************** PLOT ROBUSTEZZA ************************************
+********************************************************************************
+"""
+
+len(X)
+X = np.arange(25)
+len(sim_norm)
+
+
+plt.bar(len(sim_norm),sim_norm, color = 'b',label = "normal distribution")
+
+plt.figure(figsize=(20,10))
+
+
+
+plt.bar(range(len(sim_norm)),sim_norm, color = 'b',label = "normal distribution")
+plt.xlabel("queue length")
+plt.ylabel("probability")
+plt.title("Queue distribution")
+plt.legend()
+plt.savefig("../normal_dix_queue")
+
+plt.bar(range(len(sim_uni)),sim_uni, color = 'b',label = "uniform distribution")
+plt.xlabel("queue length")
+plt.ylabel("probability")
+plt.title("Queue distribution")
+plt.legend()
+plt.savefig("../unif_dist_queue")
+
+plt.bar(range(len(sim_esp)),sim_esp, color = 'b',label = "exponential distribution")
+plt.xlabel("queue length")
+plt.ylabel("probability")
+plt.title("Queue distribution")
+plt.legend()
+plt.savefig("../esp_dist_queue")
+
+plt.bar(range(len(sim_tri)),sim_tri, color = 'b',label = "triangular distribution")
+plt.xlabel("queue length")
+plt.ylabel("probability")
+plt.title("Queue distribution")
+plt.legend()
+plt.savefig("../tri_dist_queue")
+
+"""
+********************************************************************************
+***************************** FINE PLOT ROBUSTEZZA******************************
+********************************************************************************
+"""

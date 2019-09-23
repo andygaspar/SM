@@ -69,18 +69,18 @@ def bubble_plot(df,wp_list,al=0.5,scale=0.1,textsize=22):
 
 
 
-def bubble_plot_2(df,wp_list,al=0.5,scale=0.1,textsize=22):
+def bubble_plot_2(df,airport,wp_list,al=0.5,scale=0.1,textsize=22):
     """
     dato un df una lista di punti ()
     ritorna il bubble plot con bubble size
     """
-    coor_dict=fun.dict_wp_coor()
+    coor_dict=fun.dict_wp_coor(airport)
     N=len(wp_list)
     x=np.zeros(N)
     y=np.zeros(N)
     z=np.zeros(N)
     i=0
-    fr_dict=fun.dict_wp_freq()
+    fr_dict=fun.dict_wp_freq(airport)
     for key in wp_list:
         c=fun.coord(coor_dict[key])
         x[i]=c[0]

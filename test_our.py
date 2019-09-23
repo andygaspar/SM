@@ -27,18 +27,14 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EDDF"
-df_all_days=pd.read_csv("francoforte.csv")
+df_day=pd.read_csv("francoforte.csv")
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
 d_wp_coor=fun.dict_wp_coor(airport)
 df=data.airport(d,airport)
 df_ar=data.airport(d_ar,airport)
-df=data.dist_filter(df,300)
-
-
-
-
+#df=data.dist_filter(df,400)
 
 
 #analisi frequenze
@@ -56,24 +52,32 @@ lista_date.pop(-1)
 
 "**********************************************"
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=4
-end_time=18
+start_time=3
+end_time=20
 
 
-date=lista_date[4]
+date=lista_date[1]
 arr_day=data.df_per_data(df_ar,date)
 arr_day=data.airport(arr_day,airport)
 arr_day=arr_day.sort_values(by="time_sec")
 
 
 
+freq_wp=fun.dict_wp_freq(airport)
+freq_wp
+wp_list=list(freq_wp.keys())
+wp_list[:30]
+#pp.bubble_plot_2(df,airport,wp_list[:30],al=0.5,scale=0.1,textsize=22)
+
+#lista_wp=["KERAX","PSA","UNOKO","ROLIS","PESOV","NIVNU"]
+#df_day,delay=data.df_finale_delay(df,df_ar,date,lista_wp)
+#df_day
 
 "*******************************simul   ****************"
-#wp_f=fun.dict_wp_freq("EGLL")
+wp_f=fun.dict_wp_freq("EGLL")
 curve, freq_per_h, approx,pol=aa.freq_analysis_by_day(date,airport,DEG=30)
 
-plt.plot(arr_day["time_sec"].values[0:-1]/3600,curve)
-plt.plot(arr_day["time_sec"].values[0:-1]/3600,approx)
+#plot frequency of arrivals
 plt.plot(3600/approx[20:-20])
 
 t=[]
@@ -88,59 +92,77 @@ arr_test=arr_day[arr_day["time_sec"]>=start_time*3600]
 arr_test=arr_test[arr_test["time_sec"]<end_time*3600]
 arr_test.shape
 len(t)
-len(t)/12   #arrivi per ora
+len(t)/(end_time-start_time)   #arrivi per ora
 3600/(len(t)/(end_time-start_time))   #freq
 
 
-
-df_busy=data.df_busy(df_all_days,start_time,end_time,"time_sec")
+df_busy=data.df_busy(df_day,start_time,end_time,"a_time_sec")
 df_busy,delay=data.sort_df(df_busy)
 df_busy=data.df_per_data(df_busy,date)
 df_busy
 
-"""
-plt.plot(np.arange(len(df_busy["a_time_sec"].values))*len(arrival)/len(df_busy["a_time_sec"].values),df_busy["a_time_sec"].values)
-plt.plot(sorted(arrival))
-"""
+
+#plot fitting di t
 plt.plot(arr_test["time_sec"].values/3660)
 plt.plot(t/3660)
 
 
 
-
-
-
+#controllo parametri
 min(approx)
+
+
+#simulazione
 schedule=t
-sigma=100
-capacita=65
+sigma=70
+capacita=75
 data_queue=df_busy["delay"].values/capacita
-data_queue=fun.reject_outliers(data_queue)
+#data_queue=fun.reject_outliers(data_queue)
 sim,sim_matrix=simulation_PSRA_M(200, schedule,capacita,sigma,"norm",False)
 sim_uni,sim_matrix_uni=simulation_PSRA_M(200, schedule,capacita,sigma,"uni",False)
 
-pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,20)
+#creazione polinomio interpolante i data_queue
+pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,15)
 approx_d=np.polyval(pol_data,np.arange(len(data_queue)))
 
 
+#rescaling grafici di confronto
 x=np.array(df_busy["a_time_sec"].values)
 new_x=np.arange(start_time*3600,end_time*3600,capacita)
-approx_to_plot=plot_interp(approx_d,x,new_x,capacita)
-queue_to_plot=plot_interp(data_queue,x,new_x,capacita)
-
-plt.plot(3600/approx[20:-20])
+approx_data_to_plot=plot_interp(approx_d,x,new_x,capacita)
 
 
-plt.plot(queue_to_plot)
+
+plt.plot(3600/approx)
+len(approx)
+
+len(new_x)
+len(sim)
+len(approx_data_to_plot)
+new_x=np.append(new_x,new_x[-1]+capacita)
+#plot frequency of arrivals
+plt.plot(np.ones(len(approx))*capacita)
+plt.plot(np.arange(len(approx)),approx)
+
 plt.plot(approx_to_plot)
-plt.plot(sim,color="red")
-plt.plot(sim_uni,color="pink")
+
+
+
+
+shift=30*60
+plt.scatter(x,data_queue,marker=".")
+plt.plot(new_x-shift,sim,color="red")
+plt.plot(new_x-shift,sim_uni,color="pink")
+plt.plot(new_x[:-1],approx_data_to_plot,color="orange")
 plt.show()
 
 
 np.mean(sim)
+np.mean(sim_uni)
 np.mean(data_queue)
 
+
+np.var(data_queue)
 
 def plot_interp(f_x,x,new_x,step):
     """
@@ -170,13 +192,6 @@ def plot_interp(f_x,x,new_x,step):
         i=k
 
     return abs(new_fx)
-
-
-
-
-
-
-
 
 
 

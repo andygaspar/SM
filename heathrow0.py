@@ -86,16 +86,83 @@ max_ro
 
 freq
 
-capacita=freq-ro
-
+capacita=freq
+help(ss.simulation_PSRA)
 
 sigma=20
 noise=0.0
-iterazioni=100
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise)
+sim,sim_matrix=ss.simulation_PSRA(20,15,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
+sim_norm
+X=[]
+Y=[]
+T=[]
+H=[]
+for iterazioni in range(40,1001,20):
+    sim_old=sim_norm
+    sim,sim_matrix=ss.simulation_PSRA(iterazioni,15,capacita, freq,sigma)
+    sim_norm=ss.sim_distribution(sim_matrix)
+    distribuzioni=[sim_norm,sim_old]
+    distrib=fun.standardise_len(distribuzioni)
+    D=fun.dist_mat(distrib)
+    print(sum(D[0]),iterazioni)
+    X.append(iterazioni)
+    Y.append(sum(D[0]))
+    T.append(D[0][2])
+    H.append(D[0][3])
+
+
+plt.figure(figsize=(15,10))
+plt.plot(X,Y,label="SDI")
+plt.plot(X,T,label="Total variance")
+plt.plot(X,H,label="Hellinger")
+plt.plot(X,np.ones(len(X))*0.03,label="Article accuracy")
+
+plt.rc('font',size=20)
+plt.rc('axes',titlesize=20)
+plt.legend()
+plt.title("N setting")
+plt.savefig("../Plot/N_setting.png")
+
+
+matt=[]
+for i in range(50):
+    sim,sim_matrix=ss.simulation_PSRA(400,15,capacita, freq,sigma)
+    matt.append(ss.sim_distribution(sim_matrix))
+    print(i)
+
+mat
+M=np.array(mat)
+M[0]
+plt.figure(figsize=(15,10))
+for i in M:
+    plt.plot(i)
+plt.rc('axes',titlesize=20)
+plt.legend()
+plt.title("N=200, 100 runs ")
+plt.savefig("../Plot/N_200.png")
+
+
+matt
+M=np.array(matt)
+plt.figure(figsize=(15,10))
+for i in M:
+    plt.plot(i)
+plt.rc('font',size=20)
+plt.rc('axes',titlesize=20)
+plt.legend()
+plt.title("N=200, 100 runs ")
+plt.savefig("../Plot/N_400.png")
+plt.show()
+
+
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
+
+
+
+
+
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"exp")
 #sim_exp=ss.sim_distribution(sim_matrix)
 # sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)

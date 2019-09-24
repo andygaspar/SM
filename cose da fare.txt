@@ -25,8 +25,8 @@ presentazione:
 
 6) trattazione dei dati, comparazione con i loro dati, fascie orarie, numero di voli, calcolo delay, calcolo queue length(primo problema di approssimazione!!!)
 7) l'algoritmo, la simulazione (tempo rapido perché converge alla stady state dopo poche iterazioni), noi non avevamo sigma quindi abbiamo cercato il best fitting
-8) tentativo con il miss service (interessante, ma aggiunge il problema della stima del parametro p della binom)
 9) risultati ottimi!!!!  ma...fattore sigma troppo importante, mostrare anche plot doppio parametro(miss service)
+8) tentativo con il miss service (interessante, ma aggiunge il problema della stima del parametro p della binom)
 
 10) altri aeroporti: problema con la selezione dei wp, studio delle traiettorie
 11) non funziona!!! perché   (l'assuzione arrival costante salta e heathrow un caso particolare)

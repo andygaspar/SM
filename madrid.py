@@ -43,15 +43,17 @@ aa.freq_analysis(airport,lista_date)
 
 
 #tolto il primo giorno perché inutile come si vede dai grafici
-lista_date.pop(0)
-lista_date.pop(-1)
-lista_date
+df1=data.df_per_data(df,lista_date)
+df_aux=data.df_fascia_oraria(df1,7,12.5)
+df_aux=df_aux.append(data.df_fascia_oraria(df,16,20))
+df_aux=df_aux[~df_aux.duplicated("aereo")]
+df_aux.shape
 
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=7
-end_time=14
+end_time=12.5
 
 
 

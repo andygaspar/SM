@@ -33,6 +33,16 @@ df_ar=data.airport(d_ar,airport)
 df=data.dist_filter(df,200)
 df_ar
 
+df1=data.df_per_data(df,lista_date)
+df_aux=data.df_fascia_oraria(df1,5,10)
+df_aux=df_aux.append(data.df_fascia_oraria(df,12.5,18.5))
+df_aux=df_aux[~df_aux.duplicated("aereo")]
+df_aux.shape
+
+
+
+
+help(data.df_fascia_oraria)
 #analisi frequenze
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
@@ -65,7 +75,7 @@ wp=["ROLIS","UNOKO","KERAX","PSA"]
 #data.save_df(df_all_days,"francoforte.csv")
 df_all_days=pd.read_csv("francoforte.csv")
 
-
+lista_date
 
 
 
@@ -88,7 +98,7 @@ for i in range(1,len(start_time)):
     df_busy_i,delay=data.sort_df(df_busy_i)
     df_busy=df_busy.append(df_busy_i)
 
-df_busy
+df_busy.shape
 
 #run del modello e calcolo della distribuzione
 freq = capacita

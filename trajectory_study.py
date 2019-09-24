@@ -6,6 +6,7 @@ import functions as fun
 import data as data
 from numpy import linalg as LA
 from scipy.spatial import distance
+import csv
 
 
 df_ar=pd.read_csv("../data/arrivi_completo.csv")
@@ -282,7 +283,7 @@ for i in range(10):
 wp_freq=list(freq.keys())
 
 wp_freq_l = wp_freq[:5]
-
+wp_freq
 
 wp_freq_l
 
@@ -316,14 +317,14 @@ for i in range(coord_traj.shape[0]):
                 plt.plot(coordinate_y[i,:-2],coordinate_x[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
-coor_dict=dict_wp_coor(airport)
-N=len(wp_list)
+coor_dict=dict_wp_coor("EDDF")
+N=len(wp_freq)
 x=np.zeros(N)
 y=np.zeros(N)
 z=np.zeros(N)
 i=0
-fr_dict=dict_wp_freq(airport)
-for key in wp_list:
+fr_dict=dict_wp_freq("EDDF")
+for key in wp_freq:
     c=fun.coord(coor_dict[key])
     x[i]=c[0]
     y[i]=c[1]
@@ -391,3 +392,12 @@ def dict_wp_coor(airport):
             wp.append(row)
     wp_coor=dict(zip(wp[0],wp_coordinate[0]))
     return wp_coor
+
+
+def dict_wp_freq(airport):
+    """
+    crea dict wp: frequenze
+    """
+    lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
+
+    return dict(zip(lista_wp,lista_freq_wp))

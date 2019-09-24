@@ -66,7 +66,7 @@ wp=["LOGAN","LAM","ALESO","BNN"]
 df_all_days=pd.read_csv("heathrow_1.csv")
 #data.save_df(df_all_days,"heathrow_1.csv")
 
-
+df_all_days
 
 
 
@@ -80,23 +80,22 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy_1=data.df_busy(df_all_days,6,12.5)
 df_busy=df_busy.append(df_busy_1)
 df_busy,delay=data.sort_df(df_busy)
-df_busy.shape
+df_busy
 
 
 
-ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
+
 
 freq
 
 capacita=freq
 
-sigma=13.5
-noise=0.025
-iterazioni=100
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+sigma=13
+noise=0.003
+iterazioni=400
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 6, 20, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 6, 20, freq,sigma, noise,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
 #sim_exp=ss.sim_distribution(sim_matrix)
@@ -113,9 +112,10 @@ data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
 data_t=ss.data_distribution(data_queue_truncated)
 data_r=ss.data_distribution(data_queue_rounded)
 
-
+5*90/60
 
 #plotting
+
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
@@ -147,6 +147,15 @@ np.min(PAR)
 np.argmin(PAR)
 plt.plot(PAR)
 
+PAR=[]
+with open('matrix_DB_PLOT.csv', mode='r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+    for row in csv_reader:
+        PAR.append(row)
+
+
+PAR=np.array(PAR).astype(float)
+PAR[1,1]
 
 fig=plt.figure()
 ax=fig.gca(projection="3d")
@@ -157,9 +166,10 @@ ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.show()
 
-+plt.imshow(PAR)
-l_sigma[int(np.argmin(PAR)/len(l_noise))]
-l_noise[np.argmin(PAR)%len(l_noise)]
+plt.imshow(PAR)
+l_sigma[np.argmin(PAR)%len(l_noise)]
+l_noise[int(np.argmin(PAR)/len(l_noise))]
+
 PAR[]
 len(l_sigma)
 len(l_noise)

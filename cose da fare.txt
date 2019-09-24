@@ -24,7 +24,7 @@ presentazione:
 5) esempio negativo sulla non convergenza del MD1
 
 6) trattazione dei dati, comparazione con i loro dati, fascie orarie, numero di voli, calcolo delay, calcolo queue length(primo problema di approssimazione!!!)
-7) i parametri e il loro calcolo, l'algoritmo, la simulazione (tempo rapido perché converge alla stady state dopo poche iterazioni), noi non avevamo sigma quindi abbiamo cercato il best fitting
+7) l'algoritmo, la simulazione (tempo rapido perché converge alla stady state dopo poche iterazioni), noi non avevamo sigma quindi abbiamo cercato il best fitting
 8) tentativo con il miss service (interessante, ma aggiunge il problema della stima del parametro p della binom)
 9) risultati ottimi!!!!  ma...fattore sigma troppo importante, mostrare anche plot doppio parametro(miss service)
 

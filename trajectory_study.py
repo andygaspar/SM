@@ -316,13 +316,13 @@ for i in range(coord_traj.shape[0]):
                 plt.plot(coordinate_y[i,:-2],coordinate_x[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
-coor_dict=fun.dict_wp_coor(airport)
+coor_dict=dict_wp_coor(airport)
 N=len(wp_list)
 x=np.zeros(N)
 y=np.zeros(N)
 z=np.zeros(N)
 i=0
-fr_dict=fun.dict_wp_freq(airport)
+fr_dict=dict_wp_freq(airport)
 for key in wp_list:
     c=fun.coord(coor_dict[key])
     x[i]=c[0]
@@ -357,3 +357,37 @@ for i in range(len(wayp)):
 plt.legend()
 plt.savefig("../../results/traj_1_bis_bis.png")
 plt.show()
+
+
+
+
+def dict_wp_coor(airport):
+    """
+    crea dict wp:coordinate
+    """
+
+    if airport=="EDDF":
+        wpl='../data/lista_wp.csv'
+        wpc='../data/wp_coor.csv'
+
+    if airport=="EGLL":
+        wpl='../data/lista_wp_H.csv'
+        wpc='../data/lista_coor_M.csv'
+
+    if airport=="LEMD":
+        wpl='../data/lista_wp_M.csv'
+        wpc='../data/lista_coor_M.csv'
+
+    wp_coordinate=[]
+    with open(wpc) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            wp_coordinate.append(row)
+
+    wp=[]
+    with open(wpl) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            wp.append(row)
+    wp_coor=dict(zip(wp[0],wp_coordinate[0]))
+    return wp_coor

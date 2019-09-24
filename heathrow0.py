@@ -17,8 +17,6 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 
 
-
-
 #caricamento preliminari
 d=pd.read_csv("../data/completo.csv")
 d_ar=pd.read_csv("../data/arrivi_completo.csv")
@@ -27,7 +25,7 @@ d_ar=pd.read_csv("../data/arrivi_completo.csv")
 
 #scelta aeroporto e filtro distanze
 airport="EGLL"
-capacita=90
+
 
 lista_date,lista_wp,lista_freq_wp,wp_coor=data.carica_liste(airport)
 lista_date.sort()
@@ -41,32 +39,35 @@ df=data.dist_filter(df,300)
 """
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
-aa.freq_analysis(airport,lista_date)
 """
+
 
 #tolto il primo giorno perché inutile come si vede dai grafici
 lista_date.pop(0)
 lista_date.pop(-1)
 len(lista_date)
-
+aa.freq_analysis(airport,lista_date)
 
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=15
-end_time=21
+end_time=20
 
 wp_f=fun.dict_wp_freq("EGLL")
 wp_f
 
 
 #scelta waypoint
-wp=["LOGAN","LAM","ALESO","NUGRA"]
-
+wp=["LOGAN","LAM","ALESO","BNN"]
 
 #creazione del df_finale per wp e tutte le date nella lista (molto lento!!!!!!!)
 #df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
-df_all_days=pd.read_csv("heathrow.csv")
+df_all_days=pd.read_csv("heathrow_1.csv")
+#data.save_df(df_all_days,"heathrow_1.csv")
+
+
+
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
@@ -76,8 +77,12 @@ freq
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
+df_busy_1=data.df_busy(df_all_days,6,12.5)
+df_busy=df_busy.append(df_busy_1)
 df_busy,delay=data.sort_df(df_busy)
 df_busy.shape
+
+
 
 ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
@@ -86,8 +91,8 @@ freq
 
 capacita=freq
 
-sigma=20
-noise=0.0
+sigma=13.5
+noise=0.025
 iterazioni=100
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
@@ -115,13 +120,13 @@ plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-#plt.plot(data_t,label="data truncated")
-#plt.plot(data_r,label="data rounded")
+plt.plot(data_t,label="data truncated")
+plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma)+" noise="+str(noise))
 plt.legend()
 plt.show()
 
-distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
+distribuzioni=[sim_norm,sim_uni,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
@@ -133,66 +138,28 @@ D
 
 
 
-
-capacita=80/ro
-
-PAR=fun.parameter(start_time,end_time,freq,capacita,df_busy,4,noise=True)
+l_sigma=np.arange(5,26,0.5)
+l_noise=np.arange(0,0.21,0.005)
+iterazioni=100
+PAR=fun.parameter(6,20,freq,capacita,df_busy,iterazioni,l_sigma,True,l_noise)
 
 np.min(PAR)
 np.argmin(PAR)
 plt.plot(PAR)
 
-min_sig
-
-
-
-
-
-
-
-PAR[10,1]
-
-int(index/PAR.shape[1])
-
-
-
-index=np.argmin(PAR)
-PAR[int(index/PAR.shape[1]),int(index)%PAR.shape[1]]
-index
-int(index/PAR.shape[1])
-index%PAR.shape[1]
-
-l_sigma=np.arange(5,31,2.5)
-l_noise=np.arange(0,0.21,0.025)
-
-l_sigma[int(index/PAR.shape[1])]
-l_noise[index%PAR.shape[1]]
-
-
-
-
-
-PAR.T.shape
 
 fig=plt.figure()
 ax=fig.gca(projection="3d")
-
 x,y=np.meshgrid(l_noise,l_sigma)
-ax.plot_surface(y,x,PAR)
+surf=ax.plot_surface(y,x,PAR,cmap=cm.coolwarm,linewidth=0, antialiased=False)
+ax.zaxis.set_major_locator(LinearLocator(10))
+ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.show()
-x.shape
-PAR.shape
-y.shape
 
-
-plt.imshow(PAR)
-"""
-
-label=["sim_norm","sim_uni","sim_exp","data_t","data_r"]
-label
-plt.axis('off')
-p=plt.table(cellText=T,colLabels=label,rowLabels=label,loc='best')
-
-
-plt.show()
-"""
++plt.imshow(PAR)
+l_sigma[int(np.argmin(PAR)/len(l_noise))]
+l_noise[np.argmin(PAR)%len(l_noise)]
+PAR[]
+len(l_sigma)
+len(l_noise)

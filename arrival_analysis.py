@@ -122,6 +122,7 @@ def freq_analysis(airport,lista_date):
         busy_arrival=busy_arrival[cond]
         to_plot[i]=busy_arrival.shape[0]
     plt.plot(to_plot/len(lista_date))
+    plt.grid(axis="both")
     plt.title("Medie arrivi")
     plt.show()
 

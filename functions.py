@@ -299,10 +299,10 @@ def dist_mat(l_distrib):
     N=len(l_distrib)
     mat=np.zeros((N-1,4))
     for i in range(N-1):
-        mat[i,0]=tot_variation(l_distrib[i],l_distrib[3])
-        mat[i,1]=hellinger(l_distrib[i],l_distrib[3])
-        mat[i,2]=tot_variation(l_distrib[i],l_distrib[4])
-        mat[i,3]=hellinger(l_distrib[i],l_distrib[4])
+        mat[i,0]=tot_variation(l_distrib[i],l_distrib[-2])
+        mat[i,1]=hellinger(l_distrib[i],l_distrib[-2])
+        mat[i,2]=tot_variation(l_distrib[i],l_distrib[-1])
+        mat[i,3]=hellinger(l_distrib[i],l_distrib[-1])
 
     return mat
 

@@ -42,6 +42,26 @@ for i in range(len(lista_date)):
 aa.freq_analysis(airport,lista_date)
 
 
+"""
+df_ar=pd.read_csv("../data/arrivi_completo.csv")
+arr_day=data.airport(df_ar,airport)
+to_plot=np.zeros(24)
+for i in range(24):
+    cond=arr_day["time_sec"]>=i*3600
+    busy_arrival=arr_day[cond]
+    cond=busy_arrival["time_sec"]<(i+1)*3600
+    busy_arrival=busy_arrival[cond]
+    to_plot[i]=busy_arrival.shape[0]
+plt.plot(range(24),to_plot/len(lista_date))
+plt.xlabel("Hours")
+plt.xticks(np.arange(0, 24, 1))
+plt.grid(b=True,axis='both')
+plt.title(" mean of arrival rate")
+plt.savefig("../../results/mean_arrival_madrid")
+plt.show()
+"""
+
+
 #tolto il primo giorno perché inutile come si vede dai grafici
 
 len(lista_date)
@@ -71,7 +91,7 @@ df_all_days
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-capacita=aa.frequenza_media(7,13,airport,lista_date)
+capacita=aa.frequenza_media(7,12.5,airport,lista_date)
 
 capacita_1=aa.frequenza_media(16,20.30,airport,lista_date)
 capacita=(capacita+capacita_1)/2
@@ -79,7 +99,7 @@ capacita=(capacita+capacita_1)/2
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
-df_busy=data.df_busy(df_all_days,7,13)
+df_busy=data.df_busy(df_all_days,7,12.5)
 df_busy=df_busy[df_busy["delay"]<1500]
 df_busy,delay=data.sort_df(df_busy)
 
@@ -101,8 +121,8 @@ freq=capacita
 
 
 sigma=4
-iterazioni=200
-len_periodo=12.5
+iterazioni=400
+len_periodo=13.5
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita,sigma,"uni")
@@ -125,18 +145,74 @@ data_r=ss.data_distribution(data_queue_rounded)
 plt.plot(sim)
 plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
-
+plt.figure(figsize=(10,5))
+plt.rc('font', size=10)
+plt.rc('axes', titlesize=10)
 
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
-#plt.plot(sim_exp,label="simulation_EXP")
-#plt.plot(sim_tri,label="simulation_TRI")
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title(" MADRID sigma="+str(sigma))
+plt.title(" MADRID with Omega="+str(sigma))
 plt.legend()
+plt.savefig("../../results/madrid_plots.png")
 plt.show()
-plt.savefig("madrid.png")
+plt.savefig("../../results/madrid_plots.png")
+
+len(sim_uni) #12
+len(sim_norm) #13
+len(data_r) #15
+len(data_t) #15
+
+Z = np.arange(13)
+X = np.arange(12)
+fig = plt.figure()
+plt.figure(figsize=(60,30))
+
+plt.rc('font', size=40)
+plt.rc('axes', titlesize=40)
+
+
+plt.subplot(2, 2, 1)
+plt.bar(Z+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(Z+0.30,data_r[:13], color = 'r', width = 0.30,label = "data rounded")
+
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+
+plt.subplot(2, 2, 2)
+plt.bar(Z+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(Z+0.30,data_t[:13], color = 'r', width = 0.30,label = "data truncated")
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+
+plt.subplot(2, 2, 3)
+plt.bar(X+0.00,sim_uni, color = 'b', width = 0.30,label = "uniform distribution")
+plt.bar(X+0.30,data_r[:12], color = 'r', width = 0.30,label = "data rounded")
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+
+
+plt.subplot(2, 2, 4)
+plt.bar(X+0.00,sim_uni, color = 'b', width = 0.30,label = "uniform distribution")
+plt.bar(X+0.30,data_t[:12], color = 'r', width = 0.30,label = "data truncated")
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+
+plt.savefig("../../results/madrid_bars")
+plt.show()
+
+
+
+
+
+
+
+
 
 
 

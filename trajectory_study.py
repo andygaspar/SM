@@ -316,6 +316,31 @@ for i in range(coord_traj.shape[0]):
                 plt.plot(coordinate_y[i,:-2],coordinate_x[i,:-2],linewidth=num_percorsi[i]/10)
         else:
             continue
+coor_dict=fun.dict_wp_coor(airport)
+N=len(wp_list)
+x=np.zeros(N)
+y=np.zeros(N)
+z=np.zeros(N)
+i=0
+fr_dict=fun.dict_wp_freq(airport)
+for key in wp_list:
+    c=fun.coord(coor_dict[key])
+    x[i]=c[0]
+    y[i]=c[1]
+    z[i]=fr_dict[key]
+    i=i+1
+#plt.figure(figsize=(20,15))
+    #plt.scatter(y,x ,s=z*0.3, alpha=al)
+lon=8.560964
+lat=50.037753
+AIR="FR AIRPORT"
+plt.scatter( lon,lat,color="red",s=150)
+plt.annotate(AIR,xy=(lon,lat),xytext=(lon-0.3, lat-0.1),size=textsize+1)
+for wp in wp_list:
+    c=fun.coord(coor_dict[wp])
+    plt.scatter(c[1],c[0],color="green")
+    plt.annotate(wp,xy=(c[1],c[0]),xytext=(c[1]-0.08, c[0]-0.08),size=textsize)
+
 plt.scatter(8.560964,50.037753,color="red",linewidth=2)
 plt.annotate("Airport",xy=(8.560964,50.037753), xytext=(8.560964-0.20,50.037753 -0.20),arrowprops=dict(facecolor='black', shrink=0.05))
 plt.title("Airport map")

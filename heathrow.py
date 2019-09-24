@@ -65,13 +65,13 @@ wp=["LOGAN","LAM","ALESO","NUGRA"]
 
 
 #creazione del df_finale per wp e tutte le date nella lista (molto lento!!!!!!!)
-#df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
+df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
 df_all_days=pd.read_csv("heathrow.csv")
 
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
 freq=aa.frequenza_media(start_time,end_time,airport,lista_date)
-
+freq
 
 
 #df_finale filtrato con solo la fascia oraria di interesse
@@ -79,36 +79,27 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 df_busy.shape
 
-ro,max_ro=aa.find_ro(freq,start_time,end_time,lista_date,airport)
+ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
 ro
-max_ro
-
 
 freq
 
-capacita=freq-ro
-
-
+capacita=freq
+capacita=80/ro
 sigma=20
 noise=0.0
-iterazioni=100
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise)
+iterazioni=5000
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, 0, 50, freq,sigma, noise,"exp")
-#sim_exp=ss.sim_distribution(sim_matrix)
-# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
-# sim_norm=ss.sim_distribution(sim_matrix)
-# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
-# sim_uni=ss.sim_distribution(sim_matrix)
-# sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-#sim_exp=ss.sim_distribution(sim_matrix)
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
+sim_exp=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
 #sim_tri=ss.sim_distribution(sim_matrix)
 
-plt.bar(range(len(sim_uni)),sim_uni)
-plt.plot(sim)
+
+
 #calcolo delle code dai dati e della distribuzione relativa
 #due metodi, truncated e rounded. questo perché
 #delay/capacità=queue è decimale e va reso intero
@@ -117,30 +108,30 @@ data_queue_rounded=data.make_data_queue(df_busy,capacita,"rounded")
 data_t=ss.data_distribution(data_queue_truncated)
 data_r=ss.data_distribution(data_queue_rounded)
 
-
+plt.plot(sim)
 
 #plotting
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-plt.plot(data_t,label="data truncated")
+#plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma)+" noise="+str(noise))
 plt.legend()
 plt.show()
 
-distribuzioni=[sim_norm,sim_uni,data_t,data_r]
+distribuzioni=[sim_norm,sim_uni,sim_exp,data_t,data_r]
 distrib=fun.standardise_len(distribuzioni)
 D=fun.dist_mat(distrib)
 qual=fun.quality(D)
 qual
 
-
+distrib
 D
 
-a=[1,2,3,4]
-a[-2]
+
+
 
 
 capacita=80/ro
@@ -176,6 +167,7 @@ l_noise=np.arange(0,0.21,0.025)
 
 l_sigma[int(index/PAR.shape[1])]
 l_noise[index%PAR.shape[1]]
+
 
 
 

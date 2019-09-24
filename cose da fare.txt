@@ -13,20 +13,24 @@
 
 presentazione:
 
-0)come svolgeremo la presentazione, ripercorreremo i passi che abbiamo fatto
+0)come svolgeremo la presentazione, ripercorreremo i passi che abbiamo fatto quasi in ordine cronologico
 1)problema di nostro interesse e modello semplice,cioè che lasciava spazio a modifiche.  (anche troppo semplice...
   sembra funzionare con tutte le distribuzioni...interessante!!!)
 2) abbiamo seguito gli sviluppi consigliati dal paper: test su altri dataframe e su altri aeroporti, miglioramenti
 2) la problematica: come funzionano gli arrival, perché solo certi wp scelti (obiettivo aggiuntivo di usare anche le altre star attraverso analisi delle traiettorie (fallito))
+
 3) il modello: obiettivi(stady state), assunzioni, parametri (riduzione ad un parametro), misura dei risultati(distanze)
 4) digressione teorica
 5) esempio negativo sulla non convergenza del MD1
-6) trattazione dei dati, fascie orarie, numero di voli, calcolo delay, calcolo queue length(primo problema di approssimazione!!!)
+
+6) trattazione dei dati, comparazione con i loro dati, fascie orarie, numero di voli, calcolo delay, calcolo queue length(primo problema di approssimazione!!!)
 7) i parametri e il loro calcolo, l'algoritmo, la simulazione (tempo rapido perché converge alla stady state dopo poche iterazioni), noi non avevamo sigma quindi abbiamo cercato il best fitting
 8) tentativo con il miss service (interessante, ma aggiunge il problema della stima del parametro p della binom)
 9) risultati ottimi!!!!  ma...fattore sigma troppo importante, mostrare anche plot doppio parametro(miss service)
+
 10) altri aeroporti: problema con la selezione dei wp, studio delle traiettorie
-11) non funziona!!! perché   (l'assuzione arrival costante salta e heathrow)
+11) non funziona!!! perché   (l'assuzione arrival costante salta e heathrow un caso particolare)
+
 12) il nostro modello: obiettivo, datu uno scheduling avere una buona distribuzione per le ore di punta(cioè dove interessa)
 13) ricostruzione dello scheduling con l'approx ai MQ delle frequenze di arrivo (MD per lo smooth di arrival troppo vicini)
  di arrivo e algoritmo per gli arrivi

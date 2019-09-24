@@ -120,10 +120,43 @@ plt.plot(sim_uni,label="simulation_UNI")
 
 plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
-plt.title(" FRANKFURT sigma="+str(sigma))
+plt.title(" FRANKFURT  with sigma-factor="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
 plt.legend()
 plt.savefig("../Frankfurt")
 plt.show()
+
+
+
+len(data_r)
+len(sim_uni)
+X = np.arange(16)
+#Z = np.arange(33)
+plt.bar(X+0.00,sim_uni, color = 'b', width = 0.30,label = "uniform distribution")
+plt.bar(X+0.30,data_r[:16], color = 'r', width = 0.30,label = "data rounded")
+plt.title(" HEATHROW  with sigma-factor ="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+plt.savefig("../frankfurt_bar_uni")
+plt.show()
+
+
+
+len(sim_norm)
+Z = np.arange(15)
+#Z = np.arange(33)
+plt.bar(Z+0.00,sim_norm, color = 'b', width = 0.30,label = "normal distribution")
+plt.bar(Z+0.30,data_r[:15], color = 'r', width = 0.30,label = "data rounded")
+plt.title(" HEATHROW  with sigma-factor ="+str(sigma))
+plt.xlabel("Queue length")
+plt.ylabel("Probability")
+plt.legend()
+plt.savefig("../frankfurt_bar_norm")
+plt.show()
+
+
 
 
 
@@ -142,25 +175,27 @@ l_sigma=np.arange(4,12.5,0.5)
 P=[]
 ms=[]
 mt=[]
-for i in range(20):
+for i in range(25):
+    print(i)
     PAR,min_sig,mat_sig=fun.parameter(11,l_sigma,freq,capacita,df_busy,200)
     P.append(PAR)
     ms.append(min_sig)
     mt.append(mat_sig)
 
 
-Pr=np.array(P)
+ Pr=np.array(P)
 M=np.zeros(Pr.shape[1])
 for i in range(len(M)):
     M[i]=np.mean(Pr[:,i])
 
-
+np.argmin(M)
 
 
 for i in range(len(Pr)):
     plt.plot(np.arange(4,12.5,0.5),Pr[i],linewidth=0.5)
-plt.plot(np.arange(4,12.5,0.5),M,linewidth=8,label = "mean plot")
-plt.xlabel(" possible value of sigma")
+plt.plot(np.arange(4,12.5,0.5),M,linewidth=5,label = "mean plot")
+plt.title("Estimation of sigma-factor")
+plt.xlabel("value od sigma factor ")
 plt.ylabel("quality value")
 plt.legend()
-plt.savefig("results/frankfurt_sigmas.png")
+plt.savefig("../frankfurt_sigmas.png")

@@ -55,8 +55,8 @@ lista_date.pop(-1)
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
-start_time=15
-end_time=21
+start_time=7
+end_time=12
 
 #wp_f=fun.dict_wp_freq("EGLL")
 
@@ -86,13 +86,18 @@ df_entry_zone.shape[0]
 3600/(dd.shape[0]/(len(lista_date)*(end_time-start_time)))
 
 #calcolo frequenza media nella fascia oraria in tutte le date scelte
-capacita=aa.frequenza_media(start_time,end_time,airport,lista_date)
+capacita=aa.frequenza_media(7,20,airport,lista_date)
 
+
+lista_date=lista_date[1:2]
 
 #df_finale filtrato con solo la fascia oraria di interesse
 df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
+df_busy_2=data.df_busy(df_all_days,15,20)
+df_busy_2,delay=data.sort_df(df_busy_2)
 
+df_busy=df_busy.append(df_busy_2)
 
 df_busy.shape
 
@@ -100,21 +105,12 @@ df_busy.shape
 
 
 
-
-ro,max_cap=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
-
-80/0.976
+freq=capacita
 freq
-fattore=90/(3600/(0.976*41))
 
-capacita
-freq=yyy
-freq=87.9
-
-sigma=20
-iterazioni=200
-len_periodo=6
+sigma=17.5
+iterazioni=1000
+len_periodo=12.5
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo ,capacita, freq,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
 sim,sim_matrix=ss.simulation_PSRA(iterazioni,len_periodo,capacita, freq,sigma,"uni")
@@ -124,6 +120,7 @@ sim_uni=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
 #sim_tri=ss.sim_distribution(sim_matrix)
 
+7.5*90/60
 
 
 #calcolo delle code dai dati e della distribuzione relativa
@@ -139,14 +136,17 @@ plt.bar(range(len(sim_uni)),sim_uni)
 #plotting
 
 
+plt.figure(figsize=(15,10))
+plt.rc("axes",titlesize=25)
 plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-#plt.plot(data_t,label="data truncated")
-plt.plot(data_r,label="data rounded")
-plt.title(" HEATHROW sigma="+str(sigma))
+plt.plot(data_t,label="data truncated",color="green")
+plt.plot(data_r,label="data rounded",color="red")
+plt.title("HEATHROW OMEGA=23")
 plt.legend()
+plt.savefig("../Plot/test_2.png")
 plt.show()
 
 distribuzioni=[sim_norm,sim_uni,data_t,data_r]

@@ -36,10 +36,10 @@ df_ar=data.airport(d_ar,airport)
 
 
 #analisi frequenze
-"""
+
 for i in range(len(lista_date)):
     arr_vect=aa.arr_hist(lista_date[i],airport,i,24)
-"""
+
 aa.freq_analysis("EGLL",lista_date,"freq H")
 
 
@@ -51,10 +51,10 @@ lista_date.pop(-1)
 "**********************************************"
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
 start_time=3
-end_time=20
+end_time=19
 
 
-date=lista_date[6]
+date=lista_date[1]
 arr_day=data.df_per_data(df_ar,date)
 arr_day=data.airport(arr_day,airport)
 arr_day=arr_day.sort_values(by="time_sec")
@@ -62,9 +62,7 @@ arr_day=arr_day.sort_values(by="time_sec")
 
 
 freq_wp=fun.dict_wp_freq(airport)
-freq_wp
 wp_list=list(freq_wp.keys())
-wp_list[:30]
 #pp.bubble_plot_2(df,airport,wp_list[:30],al=0.5,scale=0.1,textsize=22)
 
 #lista_wp=["KERAX","PSA","UNOKO","ROLIS","PESOV","NIVNU"]
@@ -101,8 +99,14 @@ df_busy
 
 
 #plot fitting di t
-plt.plot(arr_test["time_sec"].values/3660)
-plt.plot(t/3660)
+plt.figure(figsize=(15,10))
+plt.rc("axes",titlesize=30)
+plt.rc("font",size=25)
+plt.plot(np.arange(len(t[:-3])),arr_test["time_sec"].values/3600,label="actual")
+plt.plot(np.arange(len(t[:-3])),t[:-3]/3600,label="aprrox schedule")
+plt.title("Flight - arrival time")
+plt.legend()
+#plt.savefig("../Plot/approx_arrival.png")
 #plt.savefig("aprrox_schedule")
 
 
@@ -112,16 +116,14 @@ min(approx)
 
 #simulazione
 schedule=t
-sigma=40
-capacita=75
+sigma=20
+capacita=60
 data_queue=df_busy["delay"].values/capacita
 #data_queue=fun.reject_outliers(data_queue)
-sim,sim_matrix=ss.simulation_PSRA_M(200, schedule,capacita,sigma,"norm",True)
-sim_uni,sim_matrix_uni=ss.simulation_PSRA_M(200, schedule,capacita,sigma,"uni",True)
+sim,sim_matrix=ss.simulation_PSRA_M(200, schedule,capacita,sigma,"norm",False)
+sim_uni,sim_matrix_uni=ss.simulation_PSRA_M(200, schedule,capacita,sigma,"uni",False)
 
-#creazione polinomio interpolante i data_queue
-pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,15)
-approx_d=np.polyval(pol_data,np.arange(len(data_queue)))
+
 
 
 #rescaling grafici di confronto
@@ -130,24 +132,19 @@ new_x=np.arange(start_time*3600,end_time*3600,capacita)
 #approx_data_to_plot=plot_interp(approx_d,x,new_x,capacita)
 
 
-
-
-len(approx)
-
 len(new_x)
 len(sim)
 #len(approx_data_to_plot)
 new_x=np.append(new_x,new_x[-1]+capacita)
-#plot frequency of arrivals
-plt.plot(np.ones(len(approx))*capacita)
-plt.plot(np.arange(len(approx)),approx)
-
-plt.plot(approx_to_plot)
+#plot fr
 
 
 
 data_queue[data_queue>20]=0
 shift=0
+plt.figure(figsize=(15,10))
+plt.rc("axes",titlesize=30)
+plt.rc("font",size=25)
 plt.scatter(np.arange(start_time*3600,end_time*3600,(end_time-start_time)*3600/len(approx)),3600/(approx*10),marker=".")
 plt.scatter(x,data_queue,marker=".",color="grey")
 plt.plot(new_x,sim,color="red")
@@ -163,6 +160,14 @@ np.mean(data_queue)
 
 np.var(data_queue)
 
+
+
+
+
+
+#creazione polinomio interpolante i data_queue
+pol_data=np.polyfit(np.arange(len(data_queue)),data_queue,15)
+approx_d=np.polyval(pol_data,np.arange(len(data_queue)))
 
 
 
@@ -196,3 +201,55 @@ def plot_interp(f_x,x,new_x,step):
         i=k
 
     return abs(new_fx)
+
+
+
+
+
+def freq_analysis_by_day(date,airport,DEG=30):
+    """
+    data una data e un aeroporto
+    restituisce:
+        un vettore con tutte le frequenze inter arrival
+        un vettore con le frequenze medie per ora
+        un vettore con la curva che approx l'andamento della frequenza
+            mediande i minimi quadrati con un pol di ordine DEG=30
+    """
+
+    df_ar=pd.read_csv("../data/arrivi_completo.csv")
+    arr_day=data.df_per_data(df_ar,date)
+    arr_day=data.airport(arr_day,airport)
+    arr_day=arr_day.sort_values(by="time_sec")
+
+    curve=np.zeros(arr_day.shape[0]-1)
+
+    for i in range(arr_day.shape[0]-1):
+        curve[i]=arr_day.iloc[i+1]["time_sec"]-arr_day.iloc[i]["time_sec"]
+
+
+    freq_per_h=np.zeros(24)
+    j=0
+    for i in range(24):
+        k=j
+        while k<arr_day.shape[0] and arr_day.iloc[k]["time_sec"]<(i+1)*3600:
+            k+=1
+        if k>j+1:
+            freq_per_h[i]=np.mean(curve[j:k+1])
+        j=k
+
+    pol=np.polyfit(arr_day["time_sec"].values[0:-1],curve,DEG)
+    approx=np.polyval(pol,arr_day["time_sec"].values[0:-1])
+
+    plt.figure(figsize=(15,10))
+    plt.rc("axes",titlesize=30)
+    plt.rc("font",size=20)
+
+    plt.plot(arr_day["time_sec"].values[0:-1]/3600,curve,label="Actual interarrival time")
+    plt.plot(arr_day["time_sec"].values[0:-1]/3600,approx,label="MS approx DEG="+str(DEG),linewidth=3)
+
+    plt.legend()
+    plt.title("Inter-arrival approximation")
+    plt.savefig("../Plot/freq_approx.png")
+    plt.show()
+
+    return curve, freq_per_h, approx, pol

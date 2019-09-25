@@ -50,7 +50,7 @@ def freq_busy(start,end,date,airport):
 
 
 #distribuzione frequenza nelle ore della giornata
-def freq_analysis_by_day(date,airport,DEG=30):
+def freq_analysis_by_day(date,airport,DEG=30,save=False):
     """
     data una data e un aeroporto
     restituisce:
@@ -84,8 +84,10 @@ def freq_analysis_by_day(date,airport,DEG=30):
     pol=np.polyfit(arr_day["time_sec"].values[0:-1],curve,DEG)
     approx=np.polyval(pol,arr_day["time_sec"].values[0:-1])
 
-    plt.plot(arr_day["time_sec"].values[0:-1],curve)
-    plt.plot(arr_day["time_sec"].values[0:-1],approx)
+    plt.figure(figsize=(20,10))
+    plt.rc("axes",titlesize="30")
+    plt.plot(arr_day["time_sec"].values[0:-1],curve,label="Actual interarrival time")
+    plt.plot(arr_day["time_sec"].values[0:-1],approx,label="MS aprrox DEG="+str(DEG))
     plt.show()
 
     return curve, freq_per_h, approx, pol

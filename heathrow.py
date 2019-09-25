@@ -49,7 +49,7 @@ lista_date.pop(0)
 lista_date.pop(-1)
 len(lista_date)
 
-
+lista_date=lista_date[1:10]
 
 
 #scelta lasso lasso_temporale_in_ore in base all'analisi dei grafici
@@ -65,7 +65,7 @@ wp=["LOGAN","LAM","ALESO","NUGRA"]
 
 
 #creazione del df_finale per wp e tutte le date nella lista (molto lento!!!!!!!)
-df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
+#df_all_days=data.df_finale_delay_multidata(df,df_ar,wp,lista_date)
 df_all_days=pd.read_csv("heathrow.csv")
 
 
@@ -79,22 +79,21 @@ df_busy=data.df_busy(df_all_days,start_time,end_time)
 df_busy,delay=data.sort_df(df_busy)
 df_busy.shape
 
-ro,max=aa.find_ro(freq,start_time,end_time,lista_date,airport)
-ro
+
 
 freq
-
+help(ss.simulation_PSRA)
 capacita=freq
-capacita=80/ro
+capacita=80
 sigma=20
 noise=0.0
-iterazioni=5000
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise)
+iterazioni=200
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,15, freq,capacita,sigma)
 sim_norm=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"uni")
+sim,sim_matrix=ss.simulation_PSRA(iterazioni,15,capacita, freq,sigma,"uni")
 sim_uni=ss.sim_distribution(sim_matrix)
-sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
-sim_exp=ss.sim_distribution(sim_matrix)
+#sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"exp")
+#sim_exp=ss.sim_distribution(sim_matrix)
 #sim,sim_matrix=ss.simulation_PSRA(iterazioni,capacita, start_time, end_time, freq,sigma, noise,"tri")
 #sim_tri=ss.sim_distribution(sim_matrix)
 
@@ -115,7 +114,7 @@ plt.plot(sim_norm,label="simulation_NORM")
 plt.plot(sim_uni,label="simulation_UNI")
 #plt.plot(sim_exp,label="simulation_EXP")
 #plt.plot(sim_tri,label="simulation_TRI")
-#plt.plot(data_t,label="data truncated")
+plt.plot(data_t,label="data truncated")
 plt.plot(data_r,label="data rounded")
 plt.title(" HEATHROW sigma="+str(sigma)+" noise="+str(noise))
 plt.legend()
